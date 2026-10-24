@@ -158,12 +158,12 @@ function scriptFull(txt){let sf=50,sl=[];for(;sf>=24;sf-=2){sl=[];(txt||"").spli
 const EC=3.8;const durOf=it=>Math.min(90,Math.max(G.dur,2+scriptPages(it.script).np*6+EC+.4));
 function draw(it,t){
   const D=durOf(it),a=(s,d)=>ease((t-s)/d),C=(s)=>{ctx.textAlign=s?"center":"left"};
-  ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.textBaseline="alphabetic";ctx.textAlign="left";ctx.shadowBlur=0;
+  ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";ctx.globalAlpha=1;ctx.textBaseline="alphabetic";ctx.textAlign="left";ctx.shadowBlur=0;
   ctx.fillStyle="#0a0a0a";ctx.fillRect(0,0,W,H);
   const pu=.1+.04*Math.sin(t*1.5);ctx.fillStyle="#f3f3f3";ctx.fillRect(0,0,W,H);
   [[0,560],[1080,650],[1080,1500],[0,1420]].forEach(([x,y])=>{const g=ctx.createRadialGradient(x,y,0,x,y,600);g.addColorStop(0,`rgba(215,25,32,${pu})`);g.addColorStop(1,"rgba(215,25,32,0)");ctx.fillStyle=g;ctx.fillRect(0,0,W,H)});
   ctx.save();ctx.globalAlpha=.05;ctx.fillStyle="#D71920";const gx=((t*140)%1600)-300;poly([[gx,0],[gx+120,0],[gx-380,H],[gx-500,H]]);ctx.fill();ctx.restore();
-  ctx.save();const zoom=1+.01*(t/D);ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-W/2,-H/2);
+  ctx.save();const zoom=1;ctx.translate(W/2,H/2);ctx.scale(zoom,zoom);ctx.translate(-W/2,-H/2);
 
   /* header */
   let p=a(.1,.7);HEADER(t,p);
@@ -176,7 +176,7 @@ function draw(it,t){
   ctx.save();ctx.globalAlpha=p;ctx.translate(W/2,vy+vh/2);ctx.scale(.9+.1*p,.9+.1*p);ctx.translate(-W/2,-(vy+vh/2));
   ctx.fillStyle="#fff";ctx.fillRect(vx,vy,vw,vh);ctx.fillStyle="#161616";ctx.fillRect(vx+8,vy+8,vw-16,vh-16);
   const fx=vx+12,fy=vy+12,fw=vw-24,fh=vh-24,ML=MLF(it),uz=(it.zoom||1)*(1+.03*(t/D));
-  const SL=G.slide||3,nM=ML.length,si=nM?Math.floor(t/SL)%nM:0,st2=t%SL,nx=nM?(si+1)%nM:0;
+  const SL=G.slide||3,nM=ML.length,si=nM?Math.max(0,Math.floor(t/SL))%nM:0,st2=t%SL,nx=nM?(si+1)%nM:0;
   if(!STILL)ML.forEach((m,i)=>{if(m.type!=="v")return;const on=i===si||(nM>1&&i===nx&&st2>SL-.6);if(on&&!m.el._on){m.el._on=true;m.el.currentTime=0;m.el.play().catch(()=>{})}else if(!on&&m.el._on){m.el._on=false;m.el.pause()}m.el.muted=!(rec&&i===si)});
   const dm=(m,al)=>{ctx.save();ctx.globalAlpha=al;if(m.type==="v"){if(m.el.readyState>=2)cover(m.el,m.el.videoWidth,m.el.videoHeight,fx,fy,fw,fh,uz,it.px,it.py)}else cover(m.el,m.el.naturalWidth,m.el.naturalHeight,fx,fy,fw,fh,uz,it.px,it.py);ctx.restore()};
   if(nM){dm(ML[si],p);if(nM>1&&st2>SL-.5)dm(ML[nx],p*ease((st2-(SL-.5))/.5))}
@@ -367,7 +367,7 @@ function CONTACT(t){
 
 /* ---------- loop ---------- */
 let startT=performance.now(),rec=false,playing=true;
-function loop(now){if(cardMode&&items[cur].card){STILL=true;draw(items[cur].card,4);requestAnimationFrame(loop);return}STILL=false;let t=(now-startT)/1000;const DD=durOf(items[cur]);t=rec?Math.min(t,DD):playing?t%DD:4;draw(items[cur],t);requestAnimationFrame(loop)}
+function loop(now){if(cardMode&&items[cur].card){STILL=true;try{draw(items[cur].card,4)}catch(e){console.error(e)}requestAnimationFrame(loop);return}STILL=false;let t=Math.max(0,(now-startT)/1000);const DD=durOf(items[cur]);t=rec?Math.min(t,DD):playing?t%DD:4;try{draw(items[cur],t)}catch(e){console.error(e)}requestAnimationFrame(loop)}
 (async()=>{try{await document.fonts.load("800 40px 'Noto Sans Tamil'","தமிழ்");await document.fonts.load("700 40px 'Noto Sans Tamil'","தமிழ்")}catch(e){}requestAnimationFrame(loop)})();
 
 /* ---------- UI ---------- */
@@ -486,7 +486,7 @@ async function record(i){
   let wl=null;try{wl=await navigator.wakeLock.request("screen")}catch(e){}
   try{
     const ML=media[i]||[];let best=null;
-    for(const mt of mimes()){for(const br of [6e6,2.5e6]){
+    for(const mt of mimes()){for(const br of [14e6,9e6,5e6,2.5e6]){
       const st=cv.captureStream(30);
       ML.forEach(m=>{if(m.type==="v"){try{m.el.captureStream().getAudioTracks().forEach(t=>st.addTrack(t))}catch(e){}}});
       let r;try{r=new MediaRecorder(st,Object.assign({videoBitsPerSecond:br},mt?{mimeType:mt}:{}))}catch(e){continue}
