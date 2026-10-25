@@ -549,6 +549,8 @@ addEventListener("online",netInfo);addEventListener("offline",netInfo);netInfo()
 #ownerCard input{background:#f7f9fc;border:1px solid #d5deed;border-radius:10px;padding:12px;color:#17233a}
 #ownerCard button{width:100%;margin-top:12px;border-radius:10px;background:#075bd8;padding:13px}
 #ownerCard .hint{font-size:12px;color:#66738b;margin-top:15px;line-height:1.6}
+#ownerCard .linkbtn{width:auto;background:none;border:0;color:#075bd8;font-size:13px;font-weight:700;padding:8px 10px;margin-top:6px;text-decoration:underline;box-shadow:none}
+#ownerCard .linkbtn[hidden]{display:none!important}
 #ownerMsg{min-height:22px;font-size:13px;color:#c51c2c;margin-top:8px}
 #ownerLockBtn{position:fixed;right:12px;bottom:12px;z-index:99990;border-radius:999px;padding:9px 13px;box-shadow:0 3px 12px #0003;font-size:13px}
 </style>
@@ -559,9 +561,11 @@ addEventListener("online",netInfo);addEventListener("offline",netInfo);netInfo()
     <p class="sub" id="ownerSubtitle">உரிமையாளர் உள்நுழைவு</p>
     <form id="ownerForm" autocomplete="on">
       <label>பயனர்பெயர்<input id="ownerUser" name="username" autocomplete="username" required maxlength="50" placeholder="உங்கள் பயனர்பெயர்"></label>
-      <label>கடவுச்சொல்<input id="ownerPass" name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="குறைந்தது 8 எழுத்துகள்"></label>
-      <label id="ownerConfirmWrap" hidden>கடவுச்சொல்லை மீண்டும் உள்ளிடவும்<input id="ownerConfirm" type="password" autocomplete="new-password" minlength="8" placeholder="உறுதிப்படுத்தவும்"></label>
+      <label><span id="ownerPassLbl">கடவுச்சொல்</span><input id="ownerPass" name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="குறைந்தது 8 எழுத்துகள்"></label>
+      <label id="ownerNewWrap" hidden>புதிய கடவுச்சொல்<input id="ownerNew" type="password" autocomplete="new-password" minlength="8" placeholder="குறைந்தது 8 எழுத்துகள்"></label>
+      <label id="ownerConfirmWrap" hidden><span id="ownerConfirmLbl">கடவுச்சொல்லை மீண்டும் உள்ளிடவும்</span><input id="ownerConfirm" type="password" autocomplete="new-password" minlength="8" placeholder="உறுதிப்படுத்தவும்"></label>
       <button id="ownerSubmit" type="submit">உள்நுழை</button>
+      <button id="ownerChangeBtn" class="linkbtn" type="button">கடவுச்சொல்லை மாற்று</button>
       <div id="ownerMsg" role="status" aria-live="polite"></div>
     </form>
     <p class="hint" id="ownerHint">இந்தச் சாதனத்தில் மட்டுமே உள்நுழைவு விவரங்கள் சேமிக்கப்படும். கடவுச்சொல்லை மறந்தால் தரவு இழப்பைத் தவிர்க்க முன்கூட்டியே backup வைத்திருங்கள்.</p>
@@ -570,8 +574,8 @@ addEventListener("online",netInfo);addEventListener("offline",netInfo);netInfo()
 <button id="ownerLockBtn" type="button" hidden>🔒 பூட்டு / வெளியேறு</button>
 <script>
 (()=>{
- const gate=document.getElementById('ownerGate'),form=document.getElementById('ownerForm'),user=document.getElementById('ownerUser'),pass=document.getElementById('ownerPass'),confirm=document.getElementById('ownerConfirm'),confirmWrap=document.getElementById('ownerConfirmWrap'),submit=document.getElementById('ownerSubmit'),msg=document.getElementById('ownerMsg'),subtitle=document.getElementById('ownerSubtitle'),hint=document.getElementById('ownerHint'),lock=document.getElementById('ownerLockBtn');
- const KEY='tk_owner_auth_v1'; let setup=false,failures=0,nextTry=0;
+ const gate=document.getElementById('ownerGate'),form=document.getElementById('ownerForm'),user=document.getElementById('ownerUser'),pass=document.getElementById('ownerPass'),confirm=document.getElementById('ownerConfirm'),confirmWrap=document.getElementById('ownerConfirmWrap'),newWrap=document.getElementById('ownerNewWrap'),newPass=document.getElementById('ownerNew'),passLbl=document.getElementById('ownerPassLbl'),confirmLbl=document.getElementById('ownerConfirmLbl'),changeBtn=document.getElementById('ownerChangeBtn'),submit=document.getElementById('ownerSubmit'),msg=document.getElementById('ownerMsg'),subtitle=document.getElementById('ownerSubtitle'),hint=document.getElementById('ownerHint'),lock=document.getElementById('ownerLockBtn');
+ const KEY='tk_owner_auth_v1'; let setup=false,change=false,failures=0,nextTry=0;
  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){return null}};
  const bytesToHex=b=>Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
  const hexToBytes=h=>new Uint8Array((h.match(/.{1,2}/g)||[]).map(x=>parseInt(x,16)));
@@ -580,10 +584,14 @@ addEventListener("online",netInfo);addEventListener("offline",netInfo);netInfo()
    const enc=new TextEncoder(),key=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveBits']);
    return bytesToHex(await crypto.subtle.deriveBits({name:'PBKDF2',salt:hexToBytes(salt),iterations:210000,hash:'SHA-256'},key,256));
  }
- function show(){setup=!read();gate.hidden=false;lock.hidden=true;confirmWrap.hidden=!setup;subtitle.textContent=setup?'முதல் முறை — உரிமையாளர் கணக்கை உருவாக்கவும்':'உரிமையாளர் உள்நுழைவு';submit.textContent=setup?'கணக்கை உருவாக்கி திறக்கவும்':'உள்நுழை';hint.textContent=setup?'பயனர்பெயர் மற்றும் குறைந்தது 8 எழுத்துகளுள்ள வலுவான கடவுச்சொல்லை அமைக்கவும். இவை இந்தச் சாதனத்தில் சேமிக்கப்படும்.':'தனிப்பட்ட பயன்பாட்டிற்கான உள்நுழைவு. கடவுச்சொல்லை யாருடனும் பகிர வேண்டாம்.';msg.textContent='';pass.value='';confirm.value='';setTimeout(()=>user.focus(),100)}
+ const LOGIN_HINT='தனிப்பட்ட பயன்பாட்டிற்கான உள்நுழைவு. கடவுச்சொல்லை யாருடனும் பகிர வேண்டாம்.';
+ function setChange(on){change=on;newWrap.hidden=!on;confirmWrap.hidden=!on;passLbl.textContent=on?'தற்போதைய கடவுச்சொல்':'கடவுச்சொல்';confirmLbl.textContent=on?'புதிய கடவுச்சொல்லை மீண்டும் உள்ளிடவும்':'கடவுச்சொல்லை மீண்டும் உள்ளிடவும்';subtitle.textContent=on?'கடவுச்சொல்லை மாற்றவும்':'உரிமையாளர் உள்நுழைவு';submit.textContent=on?'கடவுச்சொல்லை மாற்று':'உள்நுழை';changeBtn.textContent=on?'← உள்நுழைவுக்குத் திரும்பு':'கடவுச்சொல்லை மாற்று';hint.textContent=on?'பயனர்பெயர் மற்றும் தற்போதைய கடவுச்சொல்லை உள்ளிட்ட பின் புதிய கடவுச்சொல்லை அமைக்கவும்.':LOGIN_HINT;msg.style.color='';msg.textContent='';pass.value='';newPass.value='';confirm.value=''}
+ function show(){setup=!read();setChange(false);gate.hidden=false;lock.hidden=true;confirmWrap.hidden=!setup;changeBtn.hidden=setup;if(setup){subtitle.textContent='முதல் முறை — உரிமையாளர் கணக்கை உருவாக்கவும்';submit.textContent='கணக்கை உருவாக்கி திறக்கவும்';hint.textContent='பயனர்பெயர் மற்றும் குறைந்தது 8 எழுத்துகளுள்ள வலுவான கடவுச்சொல்லை அமைக்கவும். இவை இந்தச் சாதனத்தில் சேமிக்கப்படும்.'}setTimeout(()=>user.focus(),100)}
+ changeBtn.addEventListener('click',()=>{setChange(!change)});
  async function unlock(){gate.hidden=true;lock.hidden=false;}
- form.addEventListener('submit',async e=>{e.preventDefault();msg.textContent='';if(Date.now()<nextTry){msg.textContent='சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.';return}const u=user.value.trim(),p=pass.value;if(!u||p.length<8){msg.textContent='பயனர்பெயரை உள்ளிட்டு, குறைந்தது 8 எழுத்துகள் கொண்ட கடவுச்சொல்லைப் பயன்படுத்தவும்.';return}submit.disabled=true;
+ form.addEventListener('submit',async e=>{e.preventDefault();msg.style.color='';msg.textContent='';if(Date.now()<nextTry){msg.textContent='சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.';return}const u=user.value.trim(),p=pass.value;if(!u||p.length<8){msg.textContent='பயனர்பெயரை உள்ளிட்டு, குறைந்தது 8 எழுத்துகள் கொண்ட கடவுச்சொல்லைப் பயன்படுத்தவும்.';return}submit.disabled=true;
  try{
+  if(change){const rec=read();if(!rec||u!==rec.username||await digest(p,rec.salt)!==rec.hash){failures++;if(failures>=5){nextTry=Date.now()+30000;failures=0}msg.textContent='பயனர்பெயர் அல்லது தற்போதைய கடவுச்சொல் சரியில்லை.';return}const np=newPass.value;if(np.length<8){msg.textContent='புதிய கடவுச்சொல் குறைந்தது 8 எழுத்துகள் இருக்க வேண்டும்.';return}if(np!==confirm.value){msg.textContent='இரண்டு புதிய கடவுச்சொற்களும் ஒன்றாக இல்லை.';return}if(np===p){msg.textContent='புதிய கடவுச்சொல் பழையதிலிருந்து வேறுபட வேண்டும்.';return}const salt=bytesToHex(crypto.getRandomValues(new Uint8Array(16))),hash=await digest(np,salt);localStorage.setItem(KEY,JSON.stringify({username:rec.username,salt,hash,version:1}));failures=0;show();msg.style.color='#0a7a3b';msg.textContent='✔ கடவுச்சொல் மாற்றப்பட்டது. புதிய கடவுச்சொல்லுடன் உள்நுழையவும்.';return}
   if(setup){if(p!==confirm.value){msg.textContent='இரண்டு கடவுச்சொற்களும் ஒன்றாக இல்லை.';return}const salt=bytesToHex(crypto.getRandomValues(new Uint8Array(16))),hash=await digest(p,salt);localStorage.setItem(KEY,JSON.stringify({username:u,salt,hash,version:1}));await unlock();}
   else{const rec=read();if(!rec||u!==rec.username||await digest(p,rec.salt)!==rec.hash){failures++;if(failures>=5){nextTry=Date.now()+30000;failures=0}msg.textContent='பயனர்பெயர் அல்லது கடவுச்சொல் சரியில்லை.';return}failures=0;await unlock()}
  }catch(err){msg.textContent='பிழை: '+(err.message||'உள்நுழைவு செயல்படவில்லை');if(setup)localStorage.removeItem(KEY)}finally{submit.disabled=false}
