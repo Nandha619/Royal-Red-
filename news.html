@@ -10,9 +10,9 @@
 <style>
 @font-face{font-family:"Noto Sans Tamil";font-weight:100 900;src:local("Noto Sans Tamil"),local("NotoSansTamil-Regular"),local("NotoSansTamil")}
 @font-face{font-family:"Noto Sans Tamil";font-weight:700 900;src:local("Noto Sans Tamil Bold"),local("NotoSansTamil-Bold")}
-:root{--bg:#fffdf0;--card:#fff;--ink:#101010;--mut:#6b6b6b;--line:#efe3b0;--red:#FFC800;--gold:#B07A00;--in:#fffef8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101010;--card:#1b1b1b;--ink:#f4f4f4;--mut:#9a9a9a;--line:#333;--gold:#FFC800;--in:#242424;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#101010;--card:#1b1b1b;--ink:#f4f4f4;--mut:#9a9a9a;--line:#333;--gold:#FFC800;--in:#242424;color-scheme:dark}
+:root{--bg:#fffdf0;--card:#fff;--ink:#101010;--mut:#6b6b6b;--line:#efe3b0;--red:#D71920;--gold:#FFC800;--warm:#FFC800;--yel:#FFC800;--in:#fffef8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101010;--card:#1b1b1b;--ink:#f4f4f4;--mut:#9a9a9a;--line:#333;--gold:#FFC800;--warm:#FFC800;--yel:#FFC800;--in:#242424;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101010;--card:#1b1b1b;--ink:#f4f4f4;--mut:#9a9a9a;--line:#333;--gold:#FFC800;--warm:#FFC800;--yel:#FFC800;--in:#242424;color-scheme:dark}
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.5 "Noto Sans Tamil","Latha","Nirmala UI",sans-serif}
@@ -124,7 +124,7 @@ details summary{cursor:pointer;font-weight:700}
 </div>
 </main>
 <script>
-let SBY=1140;let GOLD="#D71920",RED="#D71920",YEL="#FFC800",PAGE="#f3f3f3",PANEL="#ffffff",PANEL2="#f1f1f1",INK="#101010",TKB="#070707",TKT="#ffffff",YR="255,200,0";const _sh=(h,f)=>{const n=parseInt(h.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const m=f<0?0:255,p=Math.abs(f);r=Math.round(r+(m-r)*p);g=Math.round(g+(m-g)*p);b=Math.round(b+(m-b)*p);return "#"+((1<<24)|(r<<16)|(g<<8)|b).toString(16).slice(1)};const VX=0,VY=540,VW=1080,VH=600,BRY=258,TT=1180,TH=560,TW=880,W=1080,H=1920,FONT='"Noto Sans Tamil","Latha","Nirmala UI","Tamil Sangam MN",sans-serif';
+let SBY=1140;let GOLD="#FFC800",RED="#D71920",YEL="#FFC800",PAGE="#f3f3f3",PANEL="#ffffff",PANEL2="#f1f1f1",INK="#101010",TKB="#070707",TKT="#ffffff",YR="255,200,0";const _sh=(h,f)=>{const n=parseInt(h.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const m=f<0?0:255,p=Math.abs(f);r=Math.round(r+(m-r)*p);g=Math.round(g+(m-g)*p);b=Math.round(b+(m-b)*p);return "#"+((1<<24)|(r<<16)|(g<<8)|b).toString(16).slice(1)};const VX=0,VY=540,VW=1080,VH=600,BRY=258,TT=1180,TH=560,TW=880,W=1080,H=1920,FONT='"Noto Sans Tamil","Latha","Nirmala UI","Tamil Sangam MN",sans-serif';
 const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
 const $=s=>document.querySelector(s);
 const today=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return p(d.getDate())+"-"+p(d.getMonth()+1)+"-"+d.getFullYear()};
@@ -294,61 +294,67 @@ function HEADER(t,p){
   ctx.restore();
 }
 
-/* ---------- BREAKING NEWS: arrows strike from left & right into the band ---------- */
+/* ---------- BREAKING NEWS: full-band animate + slanted red lines fly in & touch text ---------- */
 function BRKBAND(it,t){
-  const y0=BRY,h=70,k=STILL?0:1,ws=(G.brk||"").trim().split(/\s+/),l=ws[0]||"",r=ws.slice(1).join(" ");
-  const e=STILL?1:ease((t-.6)/.5);
+  const y0=BRY,h=72,k=STILL?0:1,ws=(G.brk||"").trim().split(/\s+/),l=ws[0]||"",r=ws.slice(1).join(" ");
+  /* whole band entrance */
+  const e=STILL?1:ease((t-.45)/.55);
+  if(e<=0)return;
   let fs=56;const mw=q=>{ctx.font=`800 italic ${fs}px ${FONT}`;return ctx.measureText(q).width};
-  while(fs>26&&mw(l)+mw(r)+160>980)fs-=2;
-  const lw=mw(l)+70,rw=Math.max(mw(r)+70,50),tw=lw+rw,x0=(W-tw)/2,by=y0+h*.52+fs*.34;
-  const mid=x0+tw/2,cy=y0+h/2;
-  const cyc=(STILL?0:t)*1.15,ph=cyc%2.2,hit=ph>1.05&&ph<1.35,hitQ=hit?1-((ph-1.05)/.3):0;
-  const fly=Math.min(1,ph/1.05),fromL=-(1-ease(fly))*520,fromR=(1-ease(fly))*520;
-  ctx.save();
-  if(hitQ>0){ctx.save();ctx.globalAlpha=.25*hitQ;ctx.fillStyle=YEL;ctx.fillRect(x0-20,y0-6,tw+40,h+12);ctx.restore()}
-  const pl=1+.015*Math.sin(t*4)*k+(hitQ*.04);
-  ctx.save();ctx.translate(W/2,cy);ctx.scale(pl,pl);ctx.translate(-W/2,-cy);
-  ctx.globalAlpha=e;
-  const L=[[x0+18,y0],[x0+lw,y0],[x0+lw-18,y0+h],[x0,y0+h]];
-  ctx.save();ctx.shadowColor="rgba("+YR+",.9)";ctx.shadowBlur=8+14*hitQ;ctx.fillStyle=RG(x0,x0+lw);poly(L);ctx.fill();ctx.restore();
-  ctx.save();poly(L);ctx.clip();const sx=x0-80+((t*360)%(lw+220));ctx.fillStyle="rgba(255,255,255,.42)";poly([[sx,y0],[sx+44,y0],[sx+18,y0+h],[sx-26,y0+h]]);ctx.fill();ctx.restore();
-  ctx.fillStyle="#101010";ctx.textAlign="center";ctx.font=`800 italic ${fs}px ${FONT}`;ctx.fillText(l,x0+lw/2-2,by+(hitQ*2));
-  const R=[[x0+lw+4,y0],[x0+tw,y0],[x0+tw-18,y0+h],[x0+lw-14,y0+h]];
-  ctx.save();ctx.shadowColor="rgba(0,0,0,.22)";ctx.shadowBlur=10;ctx.fillStyle=PANEL;poly(R);ctx.fill();ctx.restore();
-  ctx.fillStyle=(k&&Math.floor(t*2.4)%2&&!STILL)?RED:INK;ctx.font=`800 italic ${fs}px ${FONT}`;ctx.fillText(r,x0+lw+rw/2-4,by-(hitQ*2));
-  ctx.globalAlpha=e*(.4+.6*Math.abs(Math.sin(t*5)));ctx.fillStyle=RED;
-  poly([[x0+2,y0],[x0+14,y0],[x0-6,y0+h],[x0-18,y0+h]]);ctx.fill();
-  poly([[x0+tw+6,y0],[x0+tw+18,y0],[x0+tw-2,y0+h],[x0+tw-14,y0+h]]);ctx.fill();
-  ctx.restore();
-  if(k&&e>.3){
-    ctx.save();ctx.globalAlpha=e*(ph<1.15?1:Math.max(0,1-(ph-1.15)/.5));
-    for(let i=0;i<3;i++){
-      const ox=fromL-i*38,oy=cy+(i-1)*10,sz=22-i*3;
-      ctx.save();ctx.translate(x0+ox,oy);
-      ctx.fillStyle=YEL;ctx.shadowColor="rgba("+YR+",.95)";ctx.shadowBlur=10;
-      poly([[0,0],[sz,sz*.55],[sz*.35,0],[sz,-sz*.55]]);ctx.fill();
-      ctx.fillStyle=RED;poly([[sz*.2,0],[sz+8,sz*.4],[sz*.5,0],[sz+8,-sz*.4]]);ctx.fill();
-      ctx.restore();
-    }
+  while(fs>26&&mw(l)+mw(r)+200>980)fs-=2;
+  const lw=mw(l)+70,rw=Math.max(mw(r)+70,50),tw=lw+rw,x0=(W-tw)/2,by=y0+h*.52+fs*.34,cy=y0+h/2,mid=x0+tw/2;
+  /* slanted line timing: start far, fly in, touch text, hold, repeat */
+  const cyc=STILL?1:(t*.9)%2.4, fly=STILL?1:Math.min(1,cyc/1.05), fE=ease(fly);
+  const touch=STILL?0:(cyc>1.05&&cyc<1.4)?1-((cyc-1.05)/.35):0;
+  const skew=18, lineW=28, gap=10;
+  /* left line rests just left of text; right just right of text */
+  const Lrest=x0-gap-lineW, Rrest=x0+tw+gap;
+  const Lx=Lrest-(1-fE)*(Lrest+80), Rx=Rrest+(1-fE)*(W-Rrest+80);
+  /* band pulse */
+  const pulse=1+.012*Math.sin(t*4.2)*k+touch*.03;
+  ctx.save();ctx.globalAlpha=e;ctx.translate(W/2,cy);ctx.scale(pulse*(.92+.08*e),pulse*(.92+.08*e));ctx.translate(-W/2,-cy);
+  /* full-width soft under-band (animated width) */
+  const bandW=tw+160+lineW*2, bx0=(W-bandW*e)/2, bw=bandW*e;
+  ctx.save();ctx.globalAlpha=e*.35;ctx.fillStyle=RED;ctx.fillRect(bx0,y0+h*.15,bw,h*.7);ctx.restore();
+  /* yellow-gold glow when lines touch */
+  if(touch>0){ctx.save();ctx.globalAlpha=.3*touch;ctx.fillStyle=YEL;ctx.shadowColor="rgba("+YR+",.95)";ctx.shadowBlur=18;ctx.fillRect(x0-30,y0-8,tw+60,h+16);ctx.restore()}
+  /* main badges */
+  const Lpoly=[[x0+skew,y0],[x0+lw,y0],[x0+lw-skew,y0+h],[x0,y0+h]];
+  ctx.save();ctx.shadowColor="rgba("+YR+",.85)";ctx.shadowBlur=8+12*touch;ctx.fillStyle=RG(x0,x0+lw);poly(Lpoly);ctx.fill();ctx.restore();
+  ctx.save();poly(Lpoly);ctx.clip();const sx=x0-60+((t*320)%(lw+180));ctx.fillStyle="rgba(255,255,255,.4)";poly([[sx,y0],[sx+40,y0],[sx+16,y0+h],[sx-24,y0+h]]);ctx.fill();ctx.restore();
+  ctx.fillStyle="#101010";ctx.textAlign="center";ctx.font=`800 italic ${fs}px ${FONT}`;ctx.fillText(l,x0+lw/2-4,by+touch*2);
+  const Rpoly=[[x0+lw+6,y0],[x0+tw,y0],[x0+tw-skew,y0+h],[x0+lw+6-skew,y0+h]];
+  ctx.save();ctx.shadowColor="rgba(0,0,0,.2)";ctx.shadowBlur=8;ctx.fillStyle=PANEL;poly(Rpoly);ctx.fill();ctx.restore();
+  ctx.fillStyle=(k&&Math.floor(t*2.5)%2&&!STILL)?RED:INK;ctx.font=`800 italic ${fs}px ${FONT}`;ctx.fillText(r,x0+lw+rw/2-2,by-touch*2);
+  /* ---- slanted red lines: fly from edges → touch text ---- */
+  const drawSlash=(x,fromLeft)=>{
+    const p=[[x+skew,y0-2],[x+lineW+skew,y0-2],[x+lineW,y0+h+2],[x,y0+h+2]];
+    ctx.save();
+    ctx.shadowColor="rgba(0,0,0,.35)";ctx.shadowBlur=6;
+    ctx.fillStyle=RED;poly(p);ctx.fill();
+    /* gold edge highlight */
+    ctx.shadowBlur=0;ctx.strokeStyle="rgba("+YR+",.75)";ctx.lineWidth=2.5;
+    if(fromLeft){ctx.beginPath();ctx.moveTo(x+lineW+skew,y0-2);ctx.lineTo(x+lineW,y0+h+2);ctx.stroke()}
+    else{ctx.beginPath();ctx.moveTo(x+skew,y0-2);ctx.lineTo(x,y0+h+2);ctx.stroke()}
+    /* inner white shimmer */
+    ctx.globalAlpha=.45;ctx.fillStyle="#fff";
+    const sh=x+((t*200)%(lineW+40))-20;
+    poly([[sh+skew*.5,y0],[sh+10+skew*.5,y0],[sh+10-skew*.3,y0+h],[sh-skew*.3,y0+h]]);ctx.fill();
+    ctx.restore();
+  };
+  if(fE>0.02||STILL){
+    ctx.save();ctx.globalAlpha=e*Math.min(1,fE*1.4);
+    drawSlash(Lx,true);
+    drawSlash(Rx,false);
     ctx.restore();
   }
-  if(k&&e>.3){
-    ctx.save();ctx.globalAlpha=e*(ph<1.15?1:Math.max(0,1-(ph-1.15)/.5));
-    for(let i=0;i<3;i++){
-      const ox=fromR+i*38,oy=cy+(i-1)*10,sz=22-i*3;
-      ctx.save();ctx.translate(x0+tw+ox,oy);
-      ctx.fillStyle=YEL;ctx.shadowColor="rgba("+YR+",.95)";ctx.shadowBlur=10;
-      poly([[0,0],[-sz,sz*.55],[-sz*.35,0],[-sz,-sz*.55]]);ctx.fill();
-      ctx.fillStyle=RED;poly([[-sz*.2,0],[-sz-8,sz*.4],[-sz*.5,0],[-sz-8,-sz*.4]]);ctx.fill();
-      ctx.restore();
-    }
-    ctx.restore();
-  }
-  if(hitQ>0){
-    ctx.save();ctx.globalAlpha=hitQ;
-    for(let i=0;i<8;i++){
-      const a=(i/8)*Math.PI*2+t,rr=30+hitQ*40,px=mid+Math.cos(a)*rr,py=cy+Math.sin(a)*rr*.6;
-      ctx.fillStyle=i%2?YEL:RED;ctx.beginPath();ctx.arc(px,py,3+hitQ*3,0,7);ctx.fill();
+  /* impact sparks when lines touch the text */
+  if(touch>0){
+    ctx.save();ctx.globalAlpha=touch;
+    for(let i=0;i<6;i++){
+      const a=(i/6)*Math.PI*2+t*3,rr=18+touch*28;
+      ctx.fillStyle=i%2?YEL:RED;ctx.beginPath();ctx.arc(x0-4+Math.cos(a)*rr*.4,cy+Math.sin(a)*rr*.5,2+touch*3,0,7);ctx.fill();
+      ctx.beginPath();ctx.arc(x0+tw+4+Math.cos(a+1)*rr*.4,cy+Math.sin(a+1)*rr*.5,2+touch*3,0,7);ctx.fill();
     }
     ctx.restore();
   }
@@ -695,7 +701,7 @@ $("#bAll").onclick=()=>runExport(items.map((_,i)=>i));
 $("#xCancel").onclick=()=>{xCancel=true};
 </script>
 
-<script>window.onAppTheme=function(t){var c=t.cv;RED=c.red;YEL=c.yel;GOLD=c.yel;PAGE=c.page;PANEL=c.panel;PANEL2=c.panel2;INK=c.ink;TKB=c.tkb;var q=parseInt(c.yel.slice(1),16);YR=(q>>16)+","+(q>>8&255)+","+(q&255)};</script>
+<script>window.onAppTheme=function(t){try{var c=(t&&t.cv)?t.cv:t;if(!c||!c.yel)return;RED=c.red||RED;YEL=c.yel;GOLD=c.yel;PAGE=c.page||PAGE;PANEL=c.panel||PANEL;PANEL2=c.panel2||PANEL2;INK=c.ink||INK;TKB=c.tkb||TKB;var q=parseInt(String(c.yel).replace("#",""),16);if(!isNaN(q))YR=(q>>16)+","+(q>>8&255)+","+(q&255);var r=document.documentElement;r.style.setProperty("--gold",YEL);r.style.setProperty("--warm",YEL);r.style.setProperty("--yel",YEL);r.style.setProperty("--red",RED)}catch(e){}};window.addEventListener("message",function(e){if(e.data&&e.data.appTheme&&typeof AppTheme==="undefined"){/* theme.js will handle */}});</script>
 <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.js"></script>
 <script src="theme.js"></script>
 <script>AppTheme.mount("#appThemes")</script>

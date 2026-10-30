@@ -27,13 +27,19 @@ html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil
 #subs::-webkit-scrollbar{display:none}
 .st{flex:none;border:0;border-radius:16px;padding:6px 12px;font:inherit;font-size:12px;font-weight:800;white-space:nowrap;color:#fff;background:#2a2a2a;cursor:pointer;transition:.2s}
 .st.on{background:var(--red);transform:scale(1.06)}
-.pg:after{content:"";position:absolute;inset:0;pointer-events:none;opacity:var(--fx,0);background:linear-gradient(90deg,rgba(0,0,0,.6),rgba(0,0,0,.05) 55%,rgba(255,255,255,.4))}
+.pg:after{content:"";position:absolute;inset:0;pointer-events:none;opacity:var(--fx,0);background:linear-gradient(225deg,rgba(255,255,255,.35) 0%,rgba(0,0,0,.05) 40%,rgba(0,0,0,.55) 100%)}
 #main{position:relative;flex:1;min-height:0}
 
-#book{position:absolute;inset:0;perspective:1800px}
-.pg{position:absolute;left:50%;top:50%;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.65);transform-origin:left center;backface-visibility:hidden;will-change:transform}
+#book{position:absolute;inset:0;perspective:2200px;transform-style:preserve-3d}
+.pg{position:absolute;left:50%;top:50%;background:#fff;box-shadow:0 10px 36px rgba(0,0,0,.55),-4px 0 18px rgba(0,0,0,.12);transform-origin:100% 100%;backface-visibility:hidden;will-change:transform,opacity;transform-style:preserve-3d}
 .pg canvas{display:block;width:100%;height:100%}
+.pg:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:var(--curl,0);background:linear-gradient(225deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,0) 32%,rgba(0,0,0,.18) 58%,rgba(0,0,0,.45) 100%);mix-blend-mode:multiply}
 #shade{position:absolute;inset:0;background:#000;opacity:0;z-index:2;pointer-events:none}
+#zBar{display:none;position:absolute;right:12px;bottom:72px;z-index:7;flex-direction:column;gap:8px}
+#zBar.on{display:flex}
+#zBar button{width:42px;height:42px;border:0;border-radius:50%;font:800 20px system-ui;color:#fff;background:rgba(0,0,0,.72);box-shadow:0 4px 12px rgba(0,0,0,.4);cursor:pointer}
+#zBar button:active{transform:scale(.92);background:var(--red,#d71920)}
+#zLvl{text-align:center;font-size:11px;font-weight:800;color:#fff;background:rgba(0,0,0,.55);border-radius:10px;padding:3px 0}
 #empty{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:radial-gradient(circle at 50% 35%,#2e2e2e,#141414)}
 .sheet{width:92px;height:118px;background:#fff;border-radius:6px;position:relative;box-shadow:0 8px 24px rgba(0,0,0,.6);animation:bob 2.2s ease-in-out infinite}
 .sheet:before{content:"";position:absolute;left:10px;right:10px;top:12px;height:14px;background:var(--red)}
@@ -89,8 +95,9 @@ html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil
   <div id="book"><div class="pg" id="pn_"></div><div class="pg" id="pc_"></div><div class="pg" id="pp_"></div></div>
   <div id="shade"></div>
   <div id="empty"><div class="sheet"></div><h2>NEWS STUDIO</h2><p>PDF-ஐ தேர்வு செய்தால் உண்மையான செய்தித்தாள் போல ஸ்வைப் செய்து புரட்டிப் படிக்கலாம்.</p><button class="big" id="pick">PDF தேர்வு செய்</button></div>
-  <div id="hint"><span><i>◀</i> ஸ்வைப் செய்து புரட்டவும் <i style="animation-direction:reverse">▶</i> &nbsp;|&nbsp; இருமுறை தட்டினால் பெரிதாகும்</span></div>
+  <div id="hint"><span><i>◀</i> ஸ்வைப் / மூலையில் இழுத்துப் புரட்டவும் <i style="animation-direction:reverse">▶</i> &nbsp;|&nbsp; இருமுறை தட்டி / + − பெரிதாக்க</span></div>
   <div id="load">ஏற்றுகிறது…</div>
+  <div id="zBar"><button type="button" id="zIn" title="பெரிதாக்கு">+</button><div id="zLvl">1×</div><button type="button" id="zOut" title="சிறிதாக்கு">−</button></div>
 </div>
 <div id="tv"></div><div id="bk"></div><div id="sec"></div><div id="pill"><span id="pgn">0 / 0</span></div><button id="fab" title="PDF மாற்று">PDF</button></div><div id="toast"></div>
 <input type="file" id="file" accept="application/pdf,.pdf" hidden>
@@ -123,35 +130,39 @@ async function setLayer(el,n){
   el.style.display='block';const i=await getInfo(n);if(el.dataset.n!=n)return;const f=fit(i);place(el,f.w,f.h);
   const c=await getCanvas(n);if(el.dataset.n!=n)return;if(el.firstChild!==c){el.innerHTML='';el.appendChild(c)}
 }
-function rest(){[[L.n,'',1,1],[L.c,'',1,3],[L.p,'rotateY(-100deg)',0,0]].forEach(([e,t,o,zi])=>{e.style.transform=t;e.style.opacity=o;e.style.zIndex=zi;e.style.setProperty("--fx",0)});shade.style.opacity=0}
-function loadAll(){size();cache.clear();rest();setLayer(L.c,cur);setLayer(L.n,cur+1);setLayer(L.p,cur-1);ui()}
-function ui(){const pn=$('#pgn');pn.textContent=(cur+1)+' / '+N;pn.classList.remove('pop');void pn.offsetWidth;pn.classList.add('pop')}
-/* ---------- page turn ---------- */
+function rest(){[[L.n,'',1,1],[L.c,'',1,3],[L.p,'rotateY(-105deg) rotateX(8deg) scale(.92)',0,0]].forEach(([e,t,o,zi])=>{e.style.transform=t;e.style.opacity=o;e.style.zIndex=zi;e.style.setProperty("--fx",0);e.style.setProperty("--curl",0)});shade.style.opacity=0}
+function loadAll(){size();cache.clear();rest();setLayer(L.c,cur);setLayer(L.n,cur+1);setLayer(L.p,cur-1);ui();zBarShow()}
+function ui(){const pn=$('#pgn');pn.textContent=(cur+1)+' / '+N;pn.classList.remove('pop');void pn.offsetWidth;pn.classList.add('pop');zBarShow()}
+/* ---------- page turn: right-bottom corner curl ---------- */
 function zIdx(d){if(d>0){L.n.style.zIndex=1;L.c.style.zIndex=3;L.p.style.zIndex=0}else{L.n.style.zIndex=0;L.c.style.zIndex=1;L.p.style.zIndex=3}}
-function turn(d,pr){let th;
-  if(d>0){L.c.style.transform=`rotateY(${-pr*100}deg)`;L.c.style.opacity=pr>.97?0:1;th=pr*100}
-  else{L.p.style.transform=`rotateY(${-(1-pr)*100}deg)`;L.p.style.opacity=pr<.03?0:1;th=(1-pr)*100}
-  const sn=Math.sin(th*Math.PI/180);shade.style.opacity=.6*sn;(d>0?L.c:L.p).style.setProperty("--fx",sn)}
-function anim(d,from,to,done){const t0=performance.now(),du=300*Math.max(.35,Math.abs(to-from));
-  (function f(t){const k=clamp((t-t0)/du,0,1),e=1-Math.pow(1-k,3);turn(d,from+(to-from)*e);k<1?requestAnimationFrame(f):done()})(t0)}
+function curlXF(pr){/* pr 0→1: bottom-right peel */const a=-pr*108,rx=pr*14,rz=-pr*10,sc=1-pr*.12;return`rotateY(${a}deg) rotateX(${rx}deg) rotateZ(${rz}deg) scale(${sc})`}
+function turn(d,pr){
+  if(d>0){L.c.style.transform=curlXF(pr);L.c.style.opacity=pr>.97?0:1;L.c.style.setProperty("--fx",pr*.95);L.c.style.setProperty("--curl",pr)}
+  else{const q=1-pr;L.p.style.transform=curlXF(q);L.p.style.opacity=pr<.03?0:1;L.p.style.setProperty("--fx",q*.95);L.p.style.setProperty("--curl",q)}
+  const sn=Math.sin(pr*Math.PI*.92);shade.style.opacity=.55*sn}
+function anim(d,from,to,done){const t0=performance.now(),du=420*Math.max(.4,Math.abs(to-from));
+  (function f(t){const k=clamp((t-t0)/du,0,1),e=1-Math.pow(1-k,3.2);turn(d,from+(to-from)*e);k<1?requestAnimationFrame(f):done()})(t0)}
 function commit(d){
   if(d>0){cur++;L={c:L.n,n:L.p,p:L.c}}else{cur--;L={c:L.p,n:L.c,p:L.n}}
   rest();d>0?setLayer(L.n,cur+1):setLayer(L.p,cur-1);busy=false;ui();dbSet('pg',cur);hideHint();
   [cur+2,cur-2].forEach(k=>{if(k>=0&&k<N)getCanvas(k)})}
 function go(d){if(busy||!pdf||z>1)return;if(d>0&&cur>=N-1||d<0&&cur<=0)return;busy=true;rest();zIdx(d);flip();anim(d,0,1,()=>commit(d))}
 function jump(n){if(!pdf)return;cur=clamp(n,0,N-1);dbSet('pg',cur);loadAll()}
-/* ---------- zoom / pan ---------- */
-const applyZ=()=>{book.style.transform=z===1&&!px&&!py?'':`translate(${px}px,${py}px) scale(${z})`};
+/* ---------- zoom / pan (reading) ---------- */
+const ZMAX=5;
+function zBarShow(){const b=$('#zBar');if(!b)return;b.classList.toggle('on',!!pdf);$('#zLvl').textContent=(Math.round(z*10)/10)+'×'}
+const applyZ=()=>{book.style.transform=z===1&&!px&&!py?'':`translate(${px}px,${py}px) scale(${z})`;zBarShow()};
 function clampPan(){const lx=(z-1)*SW/2,ly=(z-1)*SH/2;px=clamp(px,-lx,lx);py=clamp(py,-ly,ly)}
 function zoomAt(nz,cx,cy){const r=stage.getBoundingClientRect(),mx=cx-r.left-SW/2,my=cy-r.top-SH/2;px=mx-(nz/z)*(mx-px);py=my-(nz/z)*(my-py);z=nz;if(z<1.02){z=1;px=py=0}clampPan();applyZ()}
-function smooth(fn){book.style.transition='transform .25s';fn();setTimeout(()=>book.style.transition='',280)}
+function smooth(fn){book.style.transition='transform .28s cubic-bezier(.2,.8,.2,1)';fn();setTimeout(()=>book.style.transition='',300)}
+function zoomBtn(dir){if(!pdf)return;const r=stage.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;const nz=clamp(z*(dir>0?1.35:.74),1,ZMAX);smooth(()=>zoomAt(nz,cx,cy))}
 /* ---------- gestures ---------- */
 const ptrs=new Map();let g=null,pin=null,lastTap=0,tapT=0,tapXY=[0,0];
 stage.addEventListener('pointerdown',e=>{if(!pdf)return;stage.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(ptrs.size===2){const[a,b]=[...ptrs.values()];pin={d:Math.hypot(a.x-b.x,a.y-b.y)||1,z0:z};g=null;return}
   if(busy)return;g={x:e.clientX,y:e.clientY,t:Date.now(),moved:0,px,py,mode:null,dir:0,pr:0}});
 stage.addEventListener('pointermove',e=>{const p=ptrs.get(e.pointerId);if(!p)return;p.x=e.clientX;p.y=e.clientY;
-  if(pin&&ptrs.size>=2){const[a,b]=[...ptrs.values()];zoomAt(clamp(pin.z0*Math.hypot(a.x-b.x,a.y-b.y)/pin.d,1,4),(a.x+b.x)/2,(a.y+b.y)/2);return}
+  if(pin&&ptrs.size>=2){const[a,b]=[...ptrs.values()];zoomAt(clamp(pin.z0*Math.hypot(a.x-b.x,a.y-b.y)/pin.d,1,ZMAX),(a.x+b.x)/2,(a.y+b.y)/2);return}
   if(!g)return;const dx=e.clientX-g.x,dy=e.clientY-g.y;g.moved=Math.max(g.moved,Math.hypot(dx,dy));
   if(z>1){px=g.px+dx;py=g.py+dy;clampPan();applyZ();return}
   if(g.moved>8&&!g.mode)g.mode=Math.abs(dx)>=Math.abs(dy)?'h':'v';
@@ -163,16 +174,35 @@ const endP=e=>{ptrs.delete(e.pointerId);if(pin){if(ptrs.size<2)pin=null;g=null;r
   if(q.mode==='h'){const fast=Math.abs(e.clientX-q.x)/(Date.now()-q.t)>.5&&q.moved>30;
     if(q.ok&&(q.pr>.3||fast)){busy=true;flip();anim(q.dir,q.pr,1,()=>commit(q.dir))}else if(q.dir){busy=true;anim(q.dir,q.pr,0,()=>{busy=false;rest()})}return}
   if(q.moved<10&&e.type==='pointerup'){const now=Date.now();
-    if(now-lastTap<300&&Math.hypot(e.clientX-tapXY[0],e.clientY-tapXY[1])<40){clearTimeout(tapT);lastTap=0;smooth(()=>z>1?(z=1,px=py=0,applyZ()):zoomAt(2.6,e.clientX,e.clientY))}
-    else{lastTap=now;tapXY=[e.clientX,e.clientY];const r=stage.getBoundingClientRect(),rx=(e.clientX-r.left)/SW;
-      tapT=setTimeout(()=>{if(z===1){if(rx<.25)go(-1);else if(rx>.75)go(1)}},290)}}};
+    if(now-lastTap<320&&Math.hypot(e.clientX-tapXY[0],e.clientY-tapXY[1])<48){clearTimeout(tapT);lastTap=0;
+      smooth(()=>{if(z>=3.2){z=1;px=py=0;applyZ()}else if(z>1.4)zoomAt(3.6,e.clientX,e.clientY);else zoomAt(2.2,e.clientX,e.clientY)})}
+    else{lastTap=now;tapXY=[e.clientX,e.clientY];const r=stage.getBoundingClientRect(),rx=(e.clientX-r.left)/SW,ry=(e.clientY-r.top)/SH;
+      tapT=setTimeout(()=>{if(z===1){if(rx>.62&&ry>.55)go(1);else if(rx<.25)go(-1);else if(rx>.75)go(1)}},290)}}};
 stage.addEventListener('pointerup',endP);stage.addEventListener('pointercancel',endP);
-stage.addEventListener('wheel',e=>{if(!pdf)return;e.preventDefault();if(e.ctrlKey||e.metaKey)zoomAt(clamp(z*(e.deltaY<0?1.15:.87),1,4),e.clientX,e.clientY);else if(z>1){px-=e.deltaX;py-=e.deltaY;clampPan();applyZ()}else go(e.deltaY>0||e.deltaX>0?1:-1)},{passive:false});
-addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='PageDown')go(1);if(e.key==='ArrowLeft'||e.key==='PageUp')go(-1)});
+stage.addEventListener('wheel',e=>{if(!pdf)return;e.preventDefault();if(e.ctrlKey||e.metaKey||e.shiftKey)zoomAt(clamp(z*(e.deltaY<0?1.12:.89),1,ZMAX),e.clientX,e.clientY);else if(z>1){px-=e.deltaX;py-=e.deltaY;clampPan();applyZ()}else go(e.deltaY>0||e.deltaX>0?1:-1)},{passive:false});
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='PageDown')go(1);if(e.key==='ArrowLeft'||e.key==='PageUp')go(-1);if(e.key==='+'||e.key==='=')zoomBtn(1);if(e.key==='-'||e.key==='_')zoomBtn(-1)});
 /* ---------- controls ---------- */
 const today=()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return p(d.getDate())+'-'+p(d.getMonth()+1)+'-'+d.getFullYear()};
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.remove('on');void t.offsetWidth;t.classList.add('on')};
-let ac=null;function flip(){try{ac=ac||new AudioContext();const n=ac.sampleRate*.22,b=ac.createBuffer(1,n,ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2)*.3;const s=ac.createBufferSource();s.buffer=b;const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.value=2600;s.connect(f);f.connect(ac.destination);s.start()}catch(e){}}
+/* realistic paper-flip rustle via WebAudio */
+let ac=null;
+function flip(){
+  try{
+    ac=ac||new(window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==='suspended')ac.resume();
+    const sr=ac.sampleRate,len=Math.floor(sr*.38),buf=ac.createBuffer(2,len,sr);
+    for(let ch=0;ch<2;ch++){const d=buf.getChannelData(ch);let last=0;
+      for(let i=0;i<len;i++){const t=i/len,env=Math.pow(1-t,1.6)*(t<.12?t/.12:1);
+        const n=(Math.random()*2-1);last=last*.72+n*.28; /* soft brownish noise */
+        const crack=(Math.random()<.018? (Math.random()*2-1)*.9:0)*(t>.05&&t<.55?1:0);
+        d[i]=(last*.55+n*.25+crack)*.42*env*(ch?.9:1)}}
+    const src=ac.createBufferSource();src.buffer=buf;
+    const bp=ac.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1800;bp.Q.value=0.7;
+    const hp=ac.createBiquadFilter();hp.type='highpass';hp.frequency.value=400;
+    const g=ac.createGain();g.gain.setValueAtTime(.55,ac.currentTime);g.gain.exponentialRampToValueAtTime(.01,ac.currentTime+.4);
+    src.connect(hp);hp.connect(bp);bp.connect(g);g.connect(ac.destination);src.start()
+  }catch(e){}
+}
 let selDate=today();
 function setDlDate(s){selDate=s;$('#dlDate').textContent=s;const p=$('#datePick');if(p){const m=s.match(/^(\d{2})-(\d{2})-(\d{4})$/);if(m)p.value=m[3]+'-'+m[2]+'-'+m[1]}}
 setDlDate(today());
@@ -181,6 +211,7 @@ $('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(f)o
 stage.addEventListener('dragover',e=>e.preventDefault());
 stage.addEventListener('drop',async e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f&&/pdf/i.test(f.type+f.name))openBuf(await f.arrayBuffer(),f.name,0,true)});
 $('#pill').onclick=()=>{const v=prompt('பக்க எண் (1-'+N+')',cur+1);if(v&&!isNaN(v)){z=1;px=py=0;applyZ();jump(+v-1)}};
+$('#zIn').onclick=()=>zoomBtn(1);$('#zOut').onclick=()=>zoomBtn(-1);
 /* ---------- top bar: Toggle | Article | Shopping | Book Shelf | Sub Heading | Download ---------- */
 const TABS0=[['article','Article'],['shopping','Shopping'],['books','Books Shelf'],['sub','Sub Heading Title']];
 const ICO_TV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="13" rx="2"/><path d="M8 21h8"/><path d="M12 18v3"/></svg>';
