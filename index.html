@@ -12,9 +12,17 @@ html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil
 #bar:after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:4px;background:linear-gradient(90deg,var(--red),var(--deep,#7e0910))}
 .nb{position:relative;overflow:hidden;flex:none;min-width:72px;border:0;border-radius:12px;padding:5px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:inherit;font-size:11px;font-weight:800;line-height:1.15;color:#fff;background:linear-gradient(180deg,var(--acc1,#e0242b),var(--acc2,#a80d14));box-shadow:0 3px 8px rgba(215,25,32,.4);cursor:pointer}
 .nb svg{width:22px;height:22px;display:block;flex:none}
-#tvIcon{display:flex;align-items:center;justify-content:center;line-height:0}
-#tvIcon svg{width:22px;height:22px;display:block}
+.nb .ico{display:flex;align-items:center;justify-content:center;line-height:0}
+.nb .ico svg{width:24px;height:24px;display:block}
 .nb b{font-size:10px;font-weight:800}
+#bkMenu{position:relative;flex:none;display:flex;flex-direction:column;align-items:stretch}
+#bkMain{display:flex;flex-direction:column;align-items:center;gap:1px;border:0;border-radius:16px;padding:6px 14px 4px;font:inherit;font-size:12px;font-weight:800;color:#fff;background:var(--red,#d71920);cursor:pointer;min-width:88px}
+#bkMain .arr{font-size:9px;line-height:1;opacity:.9;animation:arrBounce 1.2s ease-in-out infinite}
+@keyframes arrBounce{50%{transform:translateY(3px)}}
+#bkDrop{display:none;position:absolute;top:calc(100% + 6px);left:0;z-index:20;min-width:140px;background:var(--panel,#fff);border:1px solid var(--line,#ececec);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);padding:6px;flex-direction:column;gap:4px}
+#bkDrop.on{display:flex}
+#bkDrop button{border:0;border-radius:10px;padding:8px 12px;font:inherit;font-size:12px;font-weight:800;text-align:left;background:#f3f3f3;color:var(--ink,#101010);cursor:pointer}
+#bkDrop button:active,#bkDrop button.on{background:var(--red);color:#fff}
 .nb:after{content:"";position:absolute;top:0;bottom:0;width:22px;left:-40px;background:rgba(255,255,255,.5);transform:skewX(-20deg);animation:shine 3s infinite}
 @keyframes shine{to{left:130%}}
 .nb.on{outline:3px solid var(--warm,#f7c61b);outline-offset:-3px}.nb:active{transform:scale(.95)}
@@ -78,10 +86,22 @@ html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil
 <nav id="bar">
   <button class="nb" id="bTv" type="button" aria-label="Mobile TV">
     <i class="live" id="tvLive"></i>
-    <span id="tvIcon"></span>
-    <b id="tvLabel">Mobile TV</b>
+    <span class="ico" id="tvIcon"></span>
+    <b>Mobile TV</b>
   </button>
-  <div id="subs"></div>
+  <button class="nb" id="bPaper" type="button" aria-label="E-Paper">
+    <span class="ico" id="paperIcon"></span>
+    <b>E-Paper</b>
+  </button>
+  <div id="subs">
+    <div id="bkMenu">
+      <button type="button" id="bkMain" aria-label="Book Shelf">
+        <span>Book Shelf</span>
+        <span class="arr">▼</span>
+      </button>
+      <div id="bkDrop"></div>
+    </div>
+  </div>
   <div id="dlWrap">
     <span id="dlDate" title="தேதி தேர்வு"></span>
     <button class="nb" id="bDl" type="button" aria-label="Download">
@@ -222,36 +242,53 @@ stage.addEventListener('dragover',e=>e.preventDefault());
 stage.addEventListener('drop',async e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f&&/pdf/i.test(f.type+f.name))openBuf(await f.arrayBuffer(),f.name,0,true)});
 $('#pill').onclick=()=>{const v=prompt('பக்க எண் (1-'+N+')',cur+1);if(v&&!isNaN(v)){z=1;px=py=0;applyZ();jump(+v-1)}};
 $('#zIn').onclick=()=>zoomBtn(1);$('#zOut').onclick=()=>zoomBtn(-1);
-/* ---------- top bar: Toggle | Article | Shopping | Book Shelf | Sub Heading | Download ---------- */
-const TABS0=[['article','Article'],['shopping','Shopping'],['books','Books Shelf'],['sub','Sub Heading Title']];
-const ICO_TV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="13" rx="2"/><path d="M8 21h8"/><path d="M12 18v3"/></svg>';
-const ICO_PAPER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a2 2 0 0 1 2 2v14l-4-3-4 3-4-3-4 3V6a2 2 0 0 1 2-2z"/><path d="M8 8h6M8 12h6"/></svg>';
-let names={},view='paper',ifr=null,bifr=null;try{names=JSON.parse(ls.get('np_tabs')||'{}')}catch(e){}
-function updateToggle(isTv){
-  const lab=$('#tvLabel'),ico=$('#tvIcon'),live=$('#tvLive'),btn=$('#bTv');
-  if(isTv){lab.textContent='E-Paper';ico.innerHTML=ICO_PAPER;btn.setAttribute('aria-label','E-Paper');if(live)live.style.display='none'}
-  else{lab.textContent='Mobile TV';ico.innerHTML=ICO_TV;btn.setAttribute('aria-label','Mobile TV');if(live)live.style.display=''}
-}
-updateToggle(false);
+/* ---------- top bar: Mobile TV | E-Paper | Book Shelf▼ | Download ---------- */
+const TABS0=[['books','Book Shelf'],['article','Article'],['shopping','Shopping'],['sub','Sub Heading Title']];
+const MORE_TABS=[['article','Article'],['shopping','Shopping'],['sub','Sub Heading Title']];
+/* realistic TV icon */
+const ICO_TV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="3.5" width="19" height="13.5" rx="2.2"/><rect x="4.2" y="5.2" width="15.6" height="9.2" rx="1" fill="currentColor" opacity=".18"/><path d="M8 20.5h8"/><path d="M12 17v3.5"/><circle cx="17.2" cy="7.2" r=".9" fill="currentColor" stroke="none"/></svg>';
+/* folded newspaper icon */
+const ICO_PAPER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5v12.2c0 .7.6 1.3 1.3 1.3h12.4"/><path d="M6.2 4.2h12.5c.8 0 1.4.6 1.4 1.4v12.6c0 .5-.4.9-.9.9H8.2"/><path d="M6.2 4.2v14"/><path d="M9.5 8h7.2M9.5 11h7.2M9.5 14h4.5"/><path d="M3 9.5h3.2"/></svg>';
+let names={},view='paper',ifr=null,bifr=null,bkOpen=false;try{names=JSON.parse(ls.get('np_tabs')||'{}')}catch(e){}
+$('#tvIcon').innerHTML=ICO_TV;
+$('#paperIcon').innerHTML=ICO_PAPER;
 function show(v){
-  view=v;const isSec=TABS0.some(t=>t[0]===v&&t[0]!=='books');
-  const isTv=v==='tv';
-  /* shared top bar stays visible for paper, TV, books, and sections */
+  view=v;const isSec=MORE_TABS.some(t=>t[0]===v);
+  const isTv=v==='tv', isPaper=v==='paper';
   $('#tv').classList.toggle('on',isTv);
-  $('#bk').classList.toggle('on',v==='books');$('#sec').classList.toggle('on',isSec);$('#bTv').classList.toggle('on',isTv);
-  updateToggle(isTv);
-  document.querySelectorAll('.st').forEach(b=>b.classList.toggle('on',b.dataset.id===v));
+  $('#bk').classList.toggle('on',v==='books');$('#sec').classList.toggle('on',isSec);
+  $('#bTv').classList.toggle('on',isTv);
+  $('#bPaper').classList.toggle('on',isPaper);
   if(isTv&&!ifr){ifr=document.createElement('iframe');ifr.allow='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';ifr.src='news.html';$('#tv').appendChild(ifr)}
   if(v==='books'&&!bifr){bifr=document.createElement('iframe');bifr.allow='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';bifr.src='book.html';$('#bk').appendChild(bifr)}
-  if(isSec)renderSec(v)
+  if(isSec)renderSec(v);
+  /* highlight dropdown items */
+  document.querySelectorAll('#bkDrop button').forEach(b=>b.classList.toggle('on',b.dataset.id===v));
+  if(v!=='books'&&!isSec)closeBkMenu();
 }
 function renderSec(id){const sc=$('#sec');sc.innerHTML='<h2></h2><div class="body" contenteditable="true" data-ph="இங்கே தொட்டு உள்ளடக்கத்தை எழுதவும் / ஒட்டவும்"></div>';
-  sc.querySelector('h2').textContent=names[id]||TABS0.find(t=>t[0]===id)[1];const b=sc.querySelector('.body');b.textContent=ls.get('np_s_'+id)||'';b.oninput=()=>ls.set('np_s_'+id,b.innerText)}
-(function(){const w=$('#subs');TABS0.forEach(([id,def])=>{const b=document.createElement('button');b.className='st';b.dataset.id=id;b.textContent=names[id]||def;let T,long=false;
-  b.onpointerdown=()=>{long=false;T=setTimeout(()=>{long=true;const v=prompt('பட்டன் பெயர்',b.textContent);if(v&&v.trim()){names[id]=v.trim();ls.set('np_tabs',JSON.stringify(names));b.textContent=v.trim();if(view===id)renderSec(id)}},700)};
-  ['pointerup','pointerleave','pointercancel'].forEach(n=>b.addEventListener(n,()=>clearTimeout(T)));
-  b.onclick=()=>{if(long){long=false;return}show(view===id?'paper':id)};w.appendChild(b)})})();
-$('#bTv').onclick=()=>show(view==='tv'?'paper':'tv');
+  const def=(MORE_TABS.find(t=>t[0]===id)||TABS0.find(t=>t[0]===id)||[id,id])[1];
+  sc.querySelector('h2').textContent=names[id]||def;const b=sc.querySelector('.body');b.textContent=ls.get('np_s_'+id)||'';b.oninput=()=>ls.set('np_s_'+id,b.innerText)}
+function closeBkMenu(){bkOpen=false;$('#bkDrop').classList.remove('on');const a=$('#bkMain .arr');if(a)a.textContent='▼'}
+function openBkMenu(){bkOpen=true;$('#bkDrop').classList.add('on');const a=$('#bkMain .arr');if(a)a.textContent='▲'}
+(function buildBkMenu(){
+  const drop=$('#bkDrop');
+  /* Book Shelf itself opens books studio */
+  const all=[['books','Book Shelf'],...MORE_TABS];
+  all.forEach(([id,def])=>{
+    const b=document.createElement('button');b.type='button';b.dataset.id=id;b.textContent=names[id]||def;
+    let T,long=false;
+    b.onpointerdown=()=>{long=false;T=setTimeout(()=>{long=true;const v=prompt('பட்டன் பெயர்',b.textContent);if(v&&v.trim()){names[id]=v.trim();ls.set('np_tabs',JSON.stringify(names));b.textContent=v.trim();if(view===id)renderSec(id)}},700)};
+    ['pointerup','pointerleave','pointercancel'].forEach(n=>b.addEventListener(n,()=>clearTimeout(T)));
+    b.onclick=()=>{if(long){long=false;return}show(view===id?'paper':id);closeBkMenu()};
+    drop.appendChild(b);
+  });
+})();
+$('#bkMain').onclick=e=>{e.stopPropagation();if(bkOpen){closeBkMenu();show(view==='books'?'paper':'books')}else openBkMenu()};
+document.addEventListener('click',e=>{if(bkOpen&&!e.target.closest('#bkMenu'))closeBkMenu()});
+$('#bTv').onclick=()=>show('tv');
+$('#bPaper').onclick=()=>show('paper');
+$('#bPaper').classList.add('on');
 $('#bDl').onclick=()=>{if(!curBuf){toast('முதலில் PDF-ஐ upload செய்யவும்');$('#file').click();return}
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([curBuf],{type:'application/pdf'}));a.download='Theekkathir-'+selDate+'.pdf';document.body.appendChild(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast('PDF பதிவிறக்கம் ஆகிறது')};
