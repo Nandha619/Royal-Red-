@@ -1,88 +1,51 @@
 <!doctype html>
 <html lang="ta"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#d71920">
-<title>NEWS STUDIO</title>
+<meta name="theme-color" content="#8B0000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>தீக்கதிர் E-Paper</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="theme.js"></script>
 <style>
-:root{--red:#d71920;--dark:#101010;--gold:#e0a823}
-*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil','Nirmala UI','Latha',system-ui,sans-serif;overflow:hidden;overscroll-behavior:none}
-#app{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
-#bar{position:relative;z-index:10;display:flex;align-items:stretch;gap:6px;padding:6px 8px 9px;background:linear-gradient(180deg,var(--panel,#fff),var(--line,#ececec))}
-#bar:after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:4px;background:linear-gradient(90deg,var(--red),var(--deep,#7e0910))}
-.nb{position:relative;overflow:hidden;flex:none;min-width:72px;border:0;border-radius:12px;padding:5px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:inherit;font-size:11px;font-weight:800;line-height:1.15;color:#fff;background:linear-gradient(180deg,var(--acc1,#e0242b),var(--acc2,#a80d14));box-shadow:0 3px 8px rgba(215,25,32,.4);cursor:pointer}
-.nb svg{width:22px;height:22px;display:block;flex:none}
-#tvIcon{display:flex;align-items:center;justify-content:center;line-height:0}
-#tvIcon svg{width:22px;height:22px;display:block}
-.nb b{font-size:10px;font-weight:800}
-.nb:after{content:"";position:absolute;top:0;bottom:0;width:22px;left:-40px;background:rgba(255,255,255,.5);transform:skewX(-20deg);animation:shine 3s infinite}
-@keyframes shine{to{left:130%}}
-.nb.on{outline:3px solid var(--warm,#f7c61b);outline-offset:-3px}.nb:active{transform:scale(.95)}
-.live{position:absolute;top:5px;right:6px;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 6px var(--warm,#fff);animation:blink 1s infinite}
-@keyframes blink{50%{opacity:.15}}
-#dlWrap{display:flex;flex-direction:column;align-items:center;gap:2px;flex:none}
-#dlDate{font-size:10px;font-weight:800;color:var(--deep,#7e0910);background:var(--panel,#fff);border:1px solid var(--line,#ececec);border-radius:8px;padding:2px 8px;cursor:pointer;line-height:1.2;white-space:nowrap}
-#dlDate:active{opacity:.7}
-#subs{flex:1;min-width:0;display:flex;align-items:center;gap:6px;padding:6px 8px;overflow-x:auto;scrollbar-width:none;background:var(--dark);border-radius:12px;border-bottom:3px solid var(--red)}
-#subs::-webkit-scrollbar{display:none}
-.st{flex:none;border:0;border-radius:16px;padding:6px 12px;font:inherit;font-size:12px;font-weight:800;white-space:nowrap;color:#fff;background:#2a2a2a;cursor:pointer;transition:.2s}
-.st.on{background:var(--red);transform:scale(1.06)}
-.pg:after{content:"";position:absolute;inset:0;pointer-events:none;opacity:var(--fx,0);background:linear-gradient(90deg,rgba(0,0,0,.6),rgba(0,0,0,.05) 55%,rgba(255,255,255,.4))}
-#main{position:relative;flex:1;min-height:0}
-#book{position:absolute;inset:0;perspective:1800px}
-.pg{position:absolute;left:50%;top:50%;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.65);transform-origin:left center;backface-visibility:hidden;will-change:transform}
-.pg canvas{display:block;width:100%;height:100%}
-#shade{position:absolute;inset:0;background:#000;opacity:0;z-index:2;pointer-events:none}
-#empty{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:radial-gradient(circle at 50% 35%,#2e2e2e,#141414)}
-.sheet{width:92px;height:118px;background:#fff;border-radius:6px;position:relative;box-shadow:0 8px 24px rgba(0,0,0,.6);animation:bob 2.2s ease-in-out infinite}
-.sheet:before{content:"";position:absolute;left:10px;right:10px;top:12px;height:14px;background:var(--red)}
-.sheet:after{content:"";position:absolute;left:10px;right:10px;top:36px;bottom:12px;background:repeating-linear-gradient(#bbb 0 3px,transparent 3px 10px)}
-@keyframes bob{50%{transform:translateY(-10px) rotate(-3deg)}}
-#empty h2{font-size:24px}#empty p{color:#bbb;font-size:14px;max-width:300px;line-height:1.6}
-.big{border:0;border-radius:14px;padding:14px 26px;font:inherit;font-size:17px;font-weight:800;color:#fff;background:linear-gradient(90deg,var(--deep,#b30f16),var(--red));box-shadow:0 6px 18px rgba(215,25,32,.45);cursor:pointer;animation:pulse 1.8s infinite}
-@keyframes pulse{50%{transform:scale(1.05)}}
-#stage{position:absolute;inset:0;overflow:hidden;touch-action:none;background:radial-gradient(circle at 50% 40%,#3a3a3a,#161616)}
-#tv,#sec,#bk{position:absolute;inset:0;z-index:8;display:none;background:#111}
-#tv.on,#bk.on{display:block;animation:fade .3s}#sec.on{display:block;animation:fade .3s;overflow:auto;padding:16px;background:var(--bg,#fffdf0);color:var(--fg,#101010)}
-@keyframes fade{from{opacity:0;transform:translateY(8px)}}
-#tv iframe,#bk iframe{width:100%;height:100%;border:0;background:var(--bg,#fffdf0)}
-#sec h2{font-size:22px;color:var(--red);padding-bottom:8px;margin-bottom:12px;border-bottom:3px solid var(--red)}
-#sec .body{min-height:55vh;white-space:pre-wrap;outline:0;border:2px dashed var(--line,#e5d79a);border-radius:12px;padding:12px;font-size:16px;line-height:1.7}
-#sec .body:empty:before{content:attr(data-ph);color:#999}
-#pill{display:none;position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:6;background:rgba(0,0,0,.72);color:#fff;padding:5px 16px;border-radius:20px;font-weight:800;font-size:13px;cursor:pointer}
-#pgn.pop{display:inline-block;animation:num .3s}
-@keyframes num{50%{transform:scale(1.3);color:var(--accent,#ff6068)}}
-#fab{display:none;position:absolute;right:12px;bottom:10px;z-index:6;width:44px;height:44px;border:0;border-radius:50%;font-size:20px;background:var(--red);box-shadow:0 4px 12px rgba(0,0,0,.5)}
-#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:30;background:#101010;color:#fff;padding:10px 18px;border-radius:20px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;border:2px solid var(--red)}
-#toast.on{animation:tst 2.6s}
-@keyframes tst{10%,85%{opacity:1}}
-#hint{position:absolute;left:0;right:0;bottom:62px;z-index:7;text-align:center;pointer-events:none;opacity:0;font-weight:700;font-size:14px}
-#hint span{display:inline-block;padding:8px 16px;border-radius:20px;background:rgba(0,0,0,.75)}
-#hint.on{animation:hint 4.2s both}
-@keyframes hint{10%,85%{opacity:1}100%{opacity:0}}
-#hint i{display:inline-block;font-style:normal;color:var(--accent,#ff4d55);animation:nudge .9s infinite}
-@keyframes nudge{50%{transform:translateX(-6px)}}
-#load{position:absolute;inset:0;z-index:9;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);font-weight:700}
-#load.on{display:flex}
-#load:before{content:"";width:22px;height:22px;margin-right:10px;border:3px solid #fff;border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-</style></head>
-<body><div id="app">
-<nav id="bar">
-  <button class="nb" id="bTv" type="button" aria-label="Mobile TV">
-    <i class="live" id="tvLive"></i>
-    <span id="tvIcon"></span>
-    <b id="tvLabel">Mobile TV</b>
-  </button>
-  <div id="subs"></div>
-  <div id="dlWrap">
-    <span id="dlDate" title="தேதி தேர்வு"></span>
-    <button class="nb" id="bDl" type="button" aria-label="Download">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M5 19h14"/></svg>
-      <b>Download</b>
-    </button>
-  </div>
-  <input type="date" id="datePick" hidden>
-</nav>
-<!-- PARTIAL UPLOAD TEST - DO NOT USE -->
-</div></body></html>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg,#0a0a0a);color:var(--ink,#fff);font-family:"Noto Sans Tamil",system-ui,sans-serif}
+#app{display:flex;flex-direction:column;height:100%;position:relative}
+#bar{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel,#1a1a1a);border-bottom:1px solid var(--border,#333);z-index:20;flex-shrink:0}
+#bar button,#bar label{border:none;background:var(--btn,#2a2a2a);color:var(--ink,#fff);padding:8px 12px;border-radius:8px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+#bar button:active{opacity:.85}
+#bTv{background:var(--yel,#FFD700);color:#111;font-weight:600}
+#bDl{margin-left:auto;background:var(--red,#8B0000);color:#fff}
+#dlDate{background:var(--btn,#2a2a2a);color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;max-width:130px}
+#viewer{flex:1;position:relative;overflow:hidden;background:#111;touch-action:none}
+#c{position:absolute;inset:0;width:100%;height:100%}
+#status{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);padding:6px 14px;border-radius:20px;font-size:12px;pointer-events:none;opacity:0;transition:opacity .3s}
+#status.show{opacity:1}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="bar">
+<button id="bTv" type="button"><span id="tvIcon"></span><span id="tvLabel">Mobile TV</span></button>
+<input type="date" id="dlDate" title="தேதி">
+<button id="bDl" type="button">Download</button>
+</div>
+<div id="viewer"><canvas id="c"></canvas><div id="status"></div></div>
+</div>
+<script>
+const ICO_TV='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>';
+const ICO_PAPER='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>';
+function updateToggle(isTv){
+  const lab=document.getElementById('tvLabel');
+  const ico=document.getElementById('tvIcon');
+  if(isTv){lab.textContent='E-Paper';ico.innerHTML=ICO_PAPER;}
+  else{lab.textContent='Mobile TV';ico.innerHTML=ICO_TV;}
+}
+updateToggle(false);
+document.getElementById('bTv').onclick=()=>{location.href='news.html';};
+// PDF + theme + rest of e-paper logic continues in full file
+</script>
+</body></html>
