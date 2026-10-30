@@ -91,18 +91,20 @@ html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil
   font:inherit;font-size:14px;font-weight:800;color:#fff;cursor:pointer;
   background:rgba(0,0,0,.28);box-shadow:0 2px 10px rgba(0,0,0,.2);
   transition:background .3s,transform .2s;-webkit-tap-highlight-color:transparent;
+  animation:modePulse 1.6s ease-in-out infinite;
 }
-.mode-btn:active{transform:scale(.95)}
+.mode-btn:active{transform:scale(.95);animation:none}
+@keyframes modePulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(224,168,35,.55),0 2px 10px rgba(0,0,0,.2);transform:scale(1)}
+  50%{box-shadow:0 0 0 10px rgba(224,168,35,0),0 2px 14px rgba(0,0,0,.25);transform:scale(1.04)}
+}
 .mode-btn .ico{font-size:22px;line-height:1;transition:transform .35s cubic-bezier(.4,0,.2,1)}
 .mode-btn .lbl{font-size:13px;font-weight:800;letter-spacing:.3px}
-.mode-btn[data-mode="tv"]{background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid #e0a823}
-.mode-btn[data-mode="paper"]{background:linear-gradient(135deg,#fff,#f5e6e6);color:var(--red,#d71920);border:2px solid #fff}
-.mode-btn[data-mode="paper"] .lbl{color:var(--red,#d71920)}
-.mode-btn .live-dot{
-  position:absolute;top:8px;right:10px;width:8px;height:8px;border-radius:50%;
-  background:#0f0;box-shadow:0 0 6px #0f0;animation:blink 1s infinite;
-}
-.mode-btn[data-mode="paper"] .live-dot{display:none}
+.mode-btn[data-mode="paper"]{background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid #e0a823;color:#fff}
+.mode-btn[data-mode="paper"] .lbl{color:#fff}
+.mode-btn[data-mode="tv"]{background:linear-gradient(135deg,#fff,#f5e6e6);color:var(--red,#d71920);border:2px solid #fff}
+.mode-btn[data-mode="tv"] .lbl{color:var(--red,#d71920)}
+.mode-btn .live-dot{display:none}
 .shelf-btn{
   width:46px;height:46px;border-radius:50%;border:2.5px solid #fff;
   background:var(--red,#d71920);font-size:22px;cursor:pointer;
@@ -139,10 +141,10 @@ html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil
 <body><div id="app">
 <nav id="bar">
   <div class="top-switch-wrap">
-    <button class="mode-btn" id="modeBtn" data-mode="paper" type="button" aria-label="Toggle Mobile TV / E-Paper">
+    <button class="mode-btn" id="modeBtn" data-mode="paper" type="button" aria-label="Switch mode">
       <span class="live-dot" id="liveDot"></span>
-      <span class="ico" id="modeIco">🗞️</span>
-      <span class="lbl" id="modeLbl">E-Paper</span>
+      <span class="ico" id="modeIco">📺</span>
+      <span class="lbl" id="modeLbl">Mobile TV</span>
     </button>
     <button class="shelf-btn" id="shelfBtn" type="button" aria-label="Book Shelf">📚</button>
   </div>
@@ -313,8 +315,16 @@ function show(v){
   $('#bk').classList.toggle('on',v==='books');$('#sec').classList.toggle('on',isSec);
   const mb=$('#modeBtn');
   if(mb){
-    if(isTv){mb.dataset.mode='tv';$('#modeIco').textContent='📺';$('#modeLbl').textContent='Mobile TV';}
-    else if(isPaper){mb.dataset.mode='paper';$('#modeIco').textContent='🗞️';$('#modeLbl').textContent='E-Paper';}
+    /* Button shows the OTHER mode (click target) */
+    if(isTv){
+      mb.dataset.mode='tv';
+      $('#modeIco').textContent='🗞️';
+      $('#modeLbl').textContent='E-Paper';
+    } else if(isPaper){
+      mb.dataset.mode='paper';
+      $('#modeIco').textContent='📺';
+      $('#modeLbl').textContent='Mobile TV';
+    }
   }
   if(isTv&&!ifr){ifr=document.createElement('iframe');ifr.allow='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';ifr.src='news.html';$('#tv').appendChild(ifr)}
   if(v==='books'&&!bifr){bifr=document.createElement('iframe');bifr.allow='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';bifr.src='book.html';$('#bk').appendChild(bifr)}
