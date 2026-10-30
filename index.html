@@ -263,8 +263,9 @@ const ICO_TV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 /* folded newspaper icon */
 const ICO_PAPER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5v12.2c0 .7.6 1.3 1.3 1.3h12.4"/><path d="M6.2 4.2h12.5c.8 0 1.4.6 1.4 1.4v12.6c0 .5-.4.9-.9.9H8.2"/><path d="M6.2 4.2v14"/><path d="M9.5 8h7.2M9.5 11h7.2M9.5 14h4.5"/><path d="M3 9.5h3.2"/></svg>';
 let names={},view='paper',ifr=null,bifr=null,bkOpen=false;try{names=JSON.parse(ls.get('np_tabs')||'{}')}catch(e){}
-$('#tvIcon').innerHTML=ICO_TV;
-$('#paperIcon').innerHTML=ICO_PAPER;
+/* icons now inside switch – no longer needed */
+// $('#tvIcon').innerHTML=ICO_TV;
+// $('#paperIcon').innerHTML=ICO_PAPER;
 function show(v){
   view=v;const isSec=MORE_TABS.some(t=>t[0]===v);
   const isTv=v==='tv', isPaper=v==='paper';
