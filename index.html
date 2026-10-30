@@ -1,51 +1,301 @@
 <!doctype html>
 <html lang="ta"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#8B0000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>தீக்கதிர் E-Paper</title>
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="theme.js"></script>
+<meta name="theme-color" content="#d71920">
+<title>NEWS STUDIO</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:var(--bg,#0a0a0a);color:var(--ink,#fff);font-family:"Noto Sans Tamil",system-ui,sans-serif}
-#app{display:flex;flex-direction:column;height:100%;position:relative}
-#bar{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--panel,#1a1a1a);border-bottom:1px solid var(--border,#333);z-index:20;flex-shrink:0}
-#bar button,#bar label{border:none;background:var(--btn,#2a2a2a);color:var(--ink,#fff);padding:8px 12px;border-radius:8px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
-#bar button:active{opacity:.85}
-#bTv{background:var(--yel,#FFD700);color:#111;font-weight:600}
-#bDl{margin-left:auto;background:var(--red,#8B0000);color:#fff}
-#dlDate{background:var(--btn,#2a2a2a);color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;max-width:130px}
-#viewer{flex:1;position:relative;overflow:hidden;background:#111;touch-action:none}
-#c{position:absolute;inset:0;width:100%;height:100%}
-#status{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);padding:6px 14px;border-radius:20px;font-size:12px;pointer-events:none;opacity:0;transition:opacity .3s}
-#status.show{opacity:1}
-.hidden{display:none!important}
-</style>
-</head>
-<body>
-<div id="app">
-<div id="bar">
-<button id="bTv" type="button"><span id="tvIcon"></span><span id="tvLabel">Mobile TV</span></button>
-<input type="date" id="dlDate" title="தேதி">
-<button id="bDl" type="button">Download</button>
+:root{--red:#d71920;--dark:#101010;--gold:#e0a823}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil','Nirmala UI','Latha',system-ui,sans-serif;overflow:hidden;overscroll-behavior:none}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+#bar{position:relative;z-index:10;display:flex;align-items:stretch;gap:6px;padding:6px 8px 9px;background:linear-gradient(180deg,var(--panel,#fff),var(--line,#ececec))}
+#bar:after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:4px;background:linear-gradient(90deg,var(--red),var(--deep,#7e0910))}
+.nb{position:relative;overflow:hidden;flex:none;min-width:72px;border:0;border-radius:12px;padding:5px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:inherit;font-size:11px;font-weight:800;line-height:1.15;color:#fff;background:linear-gradient(180deg,var(--acc1,#e0242b),var(--acc2,#a80d14));box-shadow:0 3px 8px rgba(215,25,32,.4);cursor:pointer}
+.nb svg{width:22px;height:22px;display:block;flex:none}
+#tvIcon{display:flex;align-items:center;justify-content:center;line-height:0}
+#tvIcon svg{width:22px;height:22px;display:block}
+.nb b{font-size:10px;font-weight:800}
+.nb:after{content:"";position:absolute;top:0;bottom:0;width:22px;left:-40px;background:rgba(255,255,255,.5);transform:skewX(-20deg);animation:shine 3s infinite}
+@keyframes shine{to{left:130%}}
+.nb.on{outline:3px solid var(--warm,#f7c61b);outline-offset:-3px}.nb:active{transform:scale(.95)}
+.live{position:absolute;top:5px;right:6px;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 6px var(--warm,#fff);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.15}}
+#dlWrap{display:flex;flex-direction:column;align-items:center;gap:2px;flex:none}
+#dlDate{font-size:10px;font-weight:800;color:var(--deep,#7e0910);background:var(--panel,#fff);border:1px solid var(--line,#ececec);border-radius:8px;padding:2px 8px;cursor:pointer;line-height:1.2;white-space:nowrap}
+#dlDate:active{opacity:.7}
+#subs{flex:1;min-width:0;display:flex;align-items:center;gap:6px;padding:6px 8px;overflow-x:auto;scrollbar-width:none;background:var(--dark);border-radius:12px;border-bottom:3px solid var(--red)}
+#subs::-webkit-scrollbar{display:none}
+.st{flex:none;border:0;border-radius:16px;padding:6px 12px;font:inherit;font-size:12px;font-weight:800;white-space:nowrap;color:#fff;background:#2a2a2a;cursor:pointer;transition:.2s}
+.st.on{background:var(--red);transform:scale(1.06)}
+.pg:after{content:"";position:absolute;inset:0;pointer-events:none;opacity:var(--fx,0);background:linear-gradient(90deg,rgba(0,0,0,.6),rgba(0,0,0,.05) 55%,rgba(255,255,255,.4))}
+#main{position:relative;flex:1;min-height:0}
+
+#book{position:absolute;inset:0;perspective:1800px}
+.pg{position:absolute;left:50%;top:50%;background:#fff;box-shadow:0 8px 28px rgba(0,0,0,.65);transform-origin:left center;backface-visibility:hidden;will-change:transform}
+.pg canvas{display:block;width:100%;height:100%}
+#shade{position:absolute;inset:0;background:#000;opacity:0;z-index:2;pointer-events:none}
+#empty{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:radial-gradient(circle at 50% 35%,#2e2e2e,#141414)}
+.sheet{width:92px;height:118px;background:#fff;border-radius:6px;position:relative;box-shadow:0 8px 24px rgba(0,0,0,.6);animation:bob 2.2s ease-in-out infinite}
+.sheet:before{content:"";position:absolute;left:10px;right:10px;top:12px;height:14px;background:var(--red)}
+.sheet:after{content:"";position:absolute;left:10px;right:10px;top:36px;bottom:12px;background:repeating-linear-gradient(#bbb 0 3px,transparent 3px 10px)}
+@keyframes bob{50%{transform:translateY(-10px) rotate(-3deg)}}
+#empty h2{font-size:24px}#empty p{color:#bbb;font-size:14px;max-width:300px;line-height:1.6}
+.big{border:0;border-radius:14px;padding:14px 26px;font:inherit;font-size:17px;font-weight:800;color:#fff;background:linear-gradient(90deg,var(--deep,#b30f16),var(--red));box-shadow:0 6px 18px rgba(215,25,32,.45);cursor:pointer;animation:pulse 1.8s infinite}
+@keyframes pulse{50%{transform:scale(1.05)}}
+#stage{position:absolute;inset:0;overflow:hidden;touch-action:none;background:radial-gradient(circle at 50% 40%,#3a3a3a,#161616)}
+#tv,#sec,#bk{position:absolute;inset:0;z-index:8;display:none;background:#111}
+#tv.on,#bk.on{display:block;animation:fade .3s}#sec.on{display:block;animation:fade .3s;overflow:auto;padding:16px;background:var(--bg,#fffdf0);color:var(--fg,#101010)}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}}
+#tv iframe,#bk iframe{width:100%;height:100%;border:0;background:var(--bg,#fffdf0)}
+#sec h2{font-size:22px;color:var(--red);padding-bottom:8px;margin-bottom:12px;border-bottom:3px solid var(--red)}
+#sec .body{min-height:55vh;white-space:pre-wrap;outline:0;border:2px dashed var(--line,#e5d79a);border-radius:12px;padding:12px;font-size:16px;line-height:1.7}
+#sec .body:empty:before{content:attr(data-ph);color:#999}
+#pill{display:none;position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:6;background:rgba(0,0,0,.72);color:#fff;padding:5px 16px;border-radius:20px;font-weight:800;font-size:13px;cursor:pointer}
+#pgn.pop{display:inline-block;animation:num .3s}
+@keyframes num{50%{transform:scale(1.3);color:var(--accent,#ff6068)}}
+#fab{display:none;position:absolute;right:12px;bottom:10px;z-index:6;width:44px;height:44px;border:0;border-radius:50%;font-size:20px;background:var(--red);box-shadow:0 4px 12px rgba(0,0,0,.5)}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:30;background:#101010;color:#fff;padding:10px 18px;border-radius:20px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;border:2px solid var(--red)}
+#toast.on{animation:tst 2.6s}
+@keyframes tst{10%,85%{opacity:1}}
+#hint{position:absolute;left:0;right:0;bottom:62px;z-index:7;text-align:center;pointer-events:none;opacity:0;font-weight:700;font-size:14px}
+#hint span{display:inline-block;padding:8px 16px;border-radius:20px;background:rgba(0,0,0,.75)}
+#hint.on{animation:hint 4.2s both}
+@keyframes hint{10%,85%{opacity:1}100%{opacity:0}}
+#hint i{display:inline-block;font-style:normal;color:var(--accent,#ff4d55);animation:nudge .9s infinite}
+@keyframes nudge{50%{transform:translateX(-6px)}}
+#load{position:absolute;inset:0;z-index:9;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);font-weight:700}
+#load.on{display:flex}
+#load:before{content:"";width:22px;height:22px;margin-right:10px;border:3px solid #fff;border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style></head>
+<body><div id="app">
+<nav id="bar">
+  <button class="nb" id="bTv" type="button" aria-label="Mobile TV">
+    <i class="live" id="tvLive"></i>
+    <span id="tvIcon"></span>
+    <b id="tvLabel">Mobile TV</b>
+  </button>
+  <div id="subs"></div>
+  <div id="dlWrap">
+    <span id="dlDate" title="தேதி தேர்வு"></span>
+    <button class="nb" id="bDl" type="button" aria-label="Download">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M5 19h14"/></svg>
+      <b>Download</b>
+    </button>
+  </div>
+  <input type="date" id="datePick" hidden>
+</nav>
+<div id="main"><div id="stage">
+  <div id="book"><div class="pg" id="pn_"></div><div class="pg" id="pc_"></div><div class="pg" id="pp_"></div></div>
+  <div id="shade"></div>
+  <div id="empty"><div class="sheet"></div><h2>NEWS STUDIO</h2><p>PDF-ஐ தேர்வு செய்தால் உண்மையான செய்தித்தாள் போல ஸ்வைப் செய்து புரட்டிப் படிக்கலாம்.</p><button class="big" id="pick">PDF தேர்வு செய்</button></div>
+  <div id="hint"><span><i>◀</i> ஸ்வைப் செய்து புரட்டவும் <i style="animation-direction:reverse">▶</i> &nbsp;|&nbsp; இருமுறை தட்டினால் பெரிதாகும்</span></div>
+  <div id="load">ஏற்றுகிறது…</div>
 </div>
-<div id="viewer"><canvas id="c"></canvas><div id="status"></div></div>
+<div id="tv"></div><div id="bk"></div><div id="sec"></div><div id="pill"><span id="pgn">0 / 0</span></div><button id="fab" title="PDF மாற்று">PDF</button></div><div id="toast"></div>
+<input type="file" id="file" accept="application/pdf,.pdf" hidden>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-const ICO_TV='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>';
-const ICO_PAPER='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>';
+const $=s=>document.querySelector(s),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const stage=$('#stage'),book=$('#book'),shade=$('#shade');
+let curBuf=null,curName="",L={c:$('#pc_'),n:$('#pn_'),p:$('#pp_')},pdf=null,N=0,cur=0,z=1,px=0,py=0,busy=false,SW=0,SH=0,info={},cache=new Map();
+/* ---------- storage ---------- */
+const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+const idb=()=>new Promise((res,rej)=>{const r=indexedDB.open('epaper',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=rej});
+async function dbSet(k,v){try{(await idb()).transaction('kv','readwrite').objectStore('kv').put(v,k)}catch(e){}}
+async function dbGet(k){try{const d=await idb();return await new Promise(r=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)})}catch(e){return null}}
+/* ---------- pdf rendering ---------- */
+function size(){const r=stage.getBoundingClientRect();SW=r.width;SH=r.height}
+async function getInfo(n){if(info[n])return info[n];const pg=await pdf.getPage(n+1),v=pg.getViewport({scale:1});return info[n]={pg,w:v.width,h:v.height}}
+function fit(i){const s=Math.min(SW/i.w,SH/i.h);return{w:Math.floor(i.w*s),h:Math.floor(i.h*s),s}}
+function getCanvas(n){
+  if(cache.has(n))return cache.get(n);
+  const pr=(async()=>{const i=await getInfo(n),f=fit(i);let sc=f.s*Math.min(devicePixelRatio||1,3)*2.2;sc=Math.min(sc,3800/Math.max(i.w,i.h));
+    const vp=i.pg.getViewport({scale:sc}),c=document.createElement('canvas');c.width=Math.floor(vp.width);c.height=Math.floor(vp.height);
+    await i.pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;return c})();
+  cache.set(n,pr);[...cache.keys()].forEach(k=>{if(Math.abs(k-cur)>3)cache.delete(k)});return pr;
+}
+function place(el,w,h){el.style.width=w+'px';el.style.height=h+'px';el.style.marginLeft=-w/2+'px';el.style.marginTop=-h/2+'px'}
+async function setLayer(el,n){
+  el.dataset.n=n;
+  if(n<0||n>=N){el.style.display='none';el.innerHTML='';return}
+  el.style.display='block';const i=await getInfo(n);if(el.dataset.n!=n)return;const f=fit(i);place(el,f.w,f.h);
+  const c=await getCanvas(n);if(el.dataset.n!=n)return;if(el.firstChild!==c){el.innerHTML='';el.appendChild(c)}
+}
+function rest(){[[L.n,'',1,1],[L.c,'',1,3],[L.p,'rotateY(-100deg)',0,0]].forEach(([e,t,o,zi])=>{e.style.transform=t;e.style.opacity=o;e.style.zIndex=zi;e.style.setProperty("--fx",0)});shade.style.opacity=0}
+function loadAll(){size();cache.clear();rest();setLayer(L.c,cur);setLayer(L.n,cur+1);setLayer(L.p,cur-1);ui()}
+function ui(){const pn=$('#pgn');pn.textContent=(cur+1)+' / '+N;pn.classList.remove('pop');void pn.offsetWidth;pn.classList.add('pop')}
+/* ---------- page turn ---------- */
+function zIdx(d){if(d>0){L.n.style.zIndex=1;L.c.style.zIndex=3;L.p.style.zIndex=0}else{L.n.style.zIndex=0;L.c.style.zIndex=1;L.p.style.zIndex=3}}
+function turn(d,pr){let th;
+  if(d>0){L.c.style.transform=`rotateY(${-pr*100}deg)`;L.c.style.opacity=pr>.97?0:1;th=pr*100}
+  else{L.p.style.transform=`rotateY(${-(1-pr)*100}deg)`;L.p.style.opacity=pr<.03?0:1;th=(1-pr)*100}
+  const sn=Math.sin(th*Math.PI/180);shade.style.opacity=.6*sn;(d>0?L.c:L.p).style.setProperty("--fx",sn)}
+function anim(d,from,to,done){const t0=performance.now(),du=300*Math.max(.35,Math.abs(to-from));
+  (function f(t){const k=clamp((t-t0)/du,0,1),e=1-Math.pow(1-k,3);turn(d,from+(to-from)*e);k<1?requestAnimationFrame(f):done()})(t0)}
+function commit(d){
+  if(d>0){cur++;L={c:L.n,n:L.p,p:L.c}}else{cur--;L={c:L.p,n:L.c,p:L.n}}
+  rest();d>0?setLayer(L.n,cur+1):setLayer(L.p,cur-1);busy=false;ui();dbSet('pg',cur);hideHint();
+  [cur+2,cur-2].forEach(k=>{if(k>=0&&k<N)getCanvas(k)})}
+function go(d){if(busy||!pdf||z>1)return;if(d>0&&cur>=N-1||d<0&&cur<=0)return;busy=true;rest();zIdx(d);flip();anim(d,0,1,()=>commit(d))}
+function jump(n){if(!pdf)return;cur=clamp(n,0,N-1);dbSet('pg',cur);loadAll()}
+/* ---------- zoom / pan ---------- */
+const applyZ=()=>{book.style.transform=z===1&&!px&&!py?'':`translate(${px}px,${py}px) scale(${z})`};
+function clampPan(){const lx=(z-1)*SW/2,ly=(z-1)*SH/2;px=clamp(px,-lx,lx);py=clamp(py,-ly,ly)}
+function zoomAt(nz,cx,cy){const r=stage.getBoundingClientRect(),mx=cx-r.left-SW/2,my=cy-r.top-SH/2;px=mx-(nz/z)*(mx-px);py=my-(nz/z)*(my-py);z=nz;if(z<1.02){z=1;px=py=0}clampPan();applyZ()}
+function smooth(fn){book.style.transition='transform .25s';fn();setTimeout(()=>book.style.transition='',280)}
+/* ---------- gestures ---------- */
+const ptrs=new Map();let g=null,pin=null,lastTap=0,tapT=0,tapXY=[0,0];
+stage.addEventListener('pointerdown',e=>{if(!pdf)return;stage.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size===2){const[a,b]=[...ptrs.values()];pin={d:Math.hypot(a.x-b.x,a.y-b.y)||1,z0:z};g=null;return}
+  if(busy)return;g={x:e.clientX,y:e.clientY,t:Date.now(),moved:0,px,py,mode:null,dir:0,pr:0}});
+stage.addEventListener('pointermove',e=>{const p=ptrs.get(e.pointerId);if(!p)return;p.x=e.clientX;p.y=e.clientY;
+  if(pin&&ptrs.size>=2){const[a,b]=[...ptrs.values()];zoomAt(clamp(pin.z0*Math.hypot(a.x-b.x,a.y-b.y)/pin.d,1,4),(a.x+b.x)/2,(a.y+b.y)/2);return}
+  if(!g)return;const dx=e.clientX-g.x,dy=e.clientY-g.y;g.moved=Math.max(g.moved,Math.hypot(dx,dy));
+  if(z>1){px=g.px+dx;py=g.py+dy;clampPan();applyZ();return}
+  if(g.moved>8&&!g.mode)g.mode=Math.abs(dx)>=Math.abs(dy)?'h':'v';
+  if(g.mode!=='h')return;
+  const d=dx<0?1:-1;if(d!==g.dir){g.dir=d;rest();zIdx(d)}
+  const ok=d>0?cur<N-1:cur>0;g.pr=ok?clamp(Math.abs(dx)/(SW*.8),0,1):Math.min(.06,Math.abs(dx)/SW*.2);g.ok=ok;if(ok||d>0)turn(d,g.pr)});
+const endP=e=>{ptrs.delete(e.pointerId);if(pin){if(ptrs.size<2)pin=null;g=null;return}
+  if(!g)return;const q=g;g=null;
+  if(q.mode==='h'){const fast=Math.abs(e.clientX-q.x)/(Date.now()-q.t)>.5&&q.moved>30;
+    if(q.ok&&(q.pr>.3||fast)){busy=true;flip();anim(q.dir,q.pr,1,()=>commit(q.dir))}else if(q.dir){busy=true;anim(q.dir,q.pr,0,()=>{busy=false;rest()})}return}
+  if(q.moved<10&&e.type==='pointerup'){const now=Date.now();
+    if(now-lastTap<300&&Math.hypot(e.clientX-tapXY[0],e.clientY-tapXY[1])<40){clearTimeout(tapT);lastTap=0;smooth(()=>z>1?(z=1,px=py=0,applyZ()):zoomAt(2.6,e.clientX,e.clientY))}
+    else{lastTap=now;tapXY=[e.clientX,e.clientY];const r=stage.getBoundingClientRect(),rx=(e.clientX-r.left)/SW;
+      tapT=setTimeout(()=>{if(z===1){if(rx<.25)go(-1);else if(rx>.75)go(1)}},290)}}};
+stage.addEventListener('pointerup',endP);stage.addEventListener('pointercancel',endP);
+stage.addEventListener('wheel',e=>{if(!pdf)return;e.preventDefault();if(e.ctrlKey||e.metaKey)zoomAt(clamp(z*(e.deltaY<0?1.15:.87),1,4),e.clientX,e.clientY);else if(z>1){px-=e.deltaX;py-=e.deltaY;clampPan();applyZ()}else go(e.deltaY>0||e.deltaX>0?1:-1)},{passive:false});
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='PageDown')go(1);if(e.key==='ArrowLeft'||e.key==='PageUp')go(-1)});
+/* ---------- controls ---------- */
+const today=()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return p(d.getDate())+'-'+p(d.getMonth()+1)+'-'+d.getFullYear()};
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.remove('on');void t.offsetWidth;t.classList.add('on')};
+let ac=null;function flip(){try{ac=ac||new AudioContext();const n=ac.sampleRate*.22,b=ac.createBuffer(1,n,ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2)*.3;const s=ac.createBufferSource();s.buffer=b;const f=ac.createBiquadFilter();f.type='bandpass';f.frequency.value=2600;s.connect(f);f.connect(ac.destination);s.start()}catch(e){}}
+let selDate=today();
+function setDlDate(s){selDate=s;$('#dlDate').textContent=s;const p=$('#datePick');if(p){const m=s.match(/^(\d{2})-(\d{2})-(\d{4})$/);if(m)p.value=m[3]+'-'+m[2]+'-'+m[1]}}
+setDlDate(today());
+['#pick','#fab'].forEach(s=>$(s).onclick=()=>$('#file').click());
+$('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(f)openBuf(await f.arrayBuffer(),f.name,0,true)};
+stage.addEventListener('dragover',e=>e.preventDefault());
+stage.addEventListener('drop',async e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f&&/pdf/i.test(f.type+f.name))openBuf(await f.arrayBuffer(),f.name,0,true)});
+$('#pill').onclick=()=>{const v=prompt('பக்க எண் (1-'+N+')',cur+1);if(v&&!isNaN(v)){z=1;px=py=0;applyZ();jump(+v-1)}};
+/* ---------- top bar: Toggle | Article | Shopping | Book Shelf | Sub Heading | Download ---------- */
+const TABS0=[['article','Article'],['shopping','Shopping'],['books','Books Shelf'],['sub','Sub Heading Title']];
+const ICO_TV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="13" rx="2"/><path d="M8 21h8"/><path d="M12 18v3"/></svg>';
+const ICO_PAPER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a2 2 0 0 1 2 2v14l-4-3-4 3-4-3-4 3V6a2 2 0 0 1 2-2z"/><path d="M8 8h6M8 12h6"/></svg>';
+let names={},view='paper',ifr=null,bifr=null;try{names=JSON.parse(ls.get('np_tabs')||'{}')}catch(e){}
 function updateToggle(isTv){
-  const lab=document.getElementById('tvLabel');
-  const ico=document.getElementById('tvIcon');
-  if(isTv){lab.textContent='E-Paper';ico.innerHTML=ICO_PAPER;}
-  else{lab.textContent='Mobile TV';ico.innerHTML=ICO_TV;}
+  const lab=$('#tvLabel'),ico=$('#tvIcon'),live=$('#tvLive'),btn=$('#bTv');
+  if(isTv){lab.textContent='E-Paper';ico.innerHTML=ICO_PAPER;btn.setAttribute('aria-label','E-Paper');if(live)live.style.display='none'}
+  else{lab.textContent='Mobile TV';ico.innerHTML=ICO_TV;btn.setAttribute('aria-label','Mobile TV');if(live)live.style.display=''}
 }
 updateToggle(false);
-document.getElementById('bTv').onclick=()=>{location.href='news.html';};
-// PDF + theme + rest of e-paper logic continues in full file
+function show(v){
+  view=v;const isSec=TABS0.some(t=>t[0]===v&&t[0]!=='books');
+  const isTv=v==='tv';
+  /* shared top bar stays visible for paper, TV, books, and sections */
+  $('#tv').classList.toggle('on',isTv);
+  $('#bk').classList.toggle('on',v==='books');$('#sec').classList.toggle('on',isSec);$('#bTv').classList.toggle('on',isTv);
+  updateToggle(isTv);
+  document.querySelectorAll('.st').forEach(b=>b.classList.toggle('on',b.dataset.id===v));
+  if(isTv&&!ifr){ifr=document.createElement('iframe');ifr.allow='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';ifr.src='news.html';$('#tv').appendChild(ifr)}
+  if(v==='books'&&!bifr){bifr=document.createElement('iframe');bifr.allow='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';bifr.src='book.html';$('#bk').appendChild(bifr)}
+  if(isSec)renderSec(v)
+}
+function renderSec(id){const sc=$('#sec');sc.innerHTML='<h2></h2><div class="body" contenteditable="true" data-ph="இங்கே தொட்டு உள்ளடக்கத்தை எழுதவும் / ஒட்டவும்"></div>';
+  sc.querySelector('h2').textContent=names[id]||TABS0.find(t=>t[0]===id)[1];const b=sc.querySelector('.body');b.textContent=ls.get('np_s_'+id)||'';b.oninput=()=>ls.set('np_s_'+id,b.innerText)}
+(function(){const w=$('#subs');TABS0.forEach(([id,def])=>{const b=document.createElement('button');b.className='st';b.dataset.id=id;b.textContent=names[id]||def;let T,long=false;
+  b.onpointerdown=()=>{long=false;T=setTimeout(()=>{long=true;const v=prompt('பட்டன் பெயர்',b.textContent);if(v&&v.trim()){names[id]=v.trim();ls.set('np_tabs',JSON.stringify(names));b.textContent=v.trim();if(view===id)renderSec(id)}},700)};
+  ['pointerup','pointerleave','pointercancel'].forEach(n=>b.addEventListener(n,()=>clearTimeout(T)));
+  b.onclick=()=>{if(long){long=false;return}show(view===id?'paper':id)};w.appendChild(b)})})();
+$('#bTv').onclick=()=>show(view==='tv'?'paper':'tv');
+$('#bDl').onclick=()=>{if(!curBuf){toast('முதலில் PDF-ஐ upload செய்யவும்');$('#file').click();return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([curBuf],{type:'application/pdf'}));a.download='Theekkathir-'+selDate+'.pdf';document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast('PDF பதிவிறக்கம் ஆகிறது')};
+$('#dlDate').onclick=()=>{$('#datePick').showPicker?$('#datePick').showPicker():$('#datePick').click()};
+$('#datePick').onchange=e=>{const v=e.target.value;if(!v)return;const[y,m,d]=v.split('-');setDlDate(d+'-'+m+'-'+y)};
+addEventListener('message',e=>{if(e.data&&e.data.goto==='paper')show('paper')});
+function hideHint(){$('#hint').classList.remove('on')}
+async function openBuf(buf,name,page,save){
+  $('#load').classList.add('on');
+  try{
+    if(typeof pdfjsLib==='undefined')throw new Error('pdf.js');
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    pdf=await pdfjsLib.getDocument({data:new Uint8Array(buf.slice(0))}).promise;
+    N=pdf.numPages;cur=clamp(page,0,N-1);info={};z=1;px=py=0;applyZ();busy=false;
+    curBuf=buf;curName=name;$('#empty').style.display='none';$('#pill').style.display='block';$('#fab').style.display='block';show('paper');
+    if(save){dbSet('pdf',{name,buf});dbSet('pg',cur)}
+    loadAll();const h=$('#hint');h.classList.remove('on');void h.offsetWidth;h.classList.add('on');
+  }catch(err){alert('PDF திறக்க முடியவில்லை. இணைய இணைப்பு (pdf.js) அல்லது கோப்பைச் சரிபார்க்கவும்.')}
+  $('#load').classList.remove('on');
+}
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(pdf){z=1;px=py=0;applyZ();loadAll()}},250)});
+(async()=>{const d=await dbGet('pdf');if(d&&d.buf){const p=await dbGet('pg');openBuf(d.buf,d.name,p||0,false)}})();
+</script><script src="theme.js"></script>
+<script>AppTheme.mount&&AppTheme.get&&(function(){})();</script>
+<style>
+/* Owner-only local login gate. This is a convenience lock, not tamper-proof DRM. */
+#ownerGate{position:fixed;inset:0;z-index:999999;background:radial-gradient(ellipse at top,#4a0a10 0%,#1c0508 55%,#0a0204 100%);display:flex;align-items:center;justify-content:center;padding:20px;font-family:"Noto Sans Tamil","Latha","Nirmala UI",sans-serif;color:#13233c}
+#ownerGate[hidden]{display:none!important}
+#ownerCard{width:min(100%,420px);background:#fff;border-radius:22px;padding:28px 24px;box-shadow:0 25px 80px #0008;text-align:center}
+#ownerLogo{width:76px;height:76px;border-radius:20px;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(145deg,#FFD84D,#E0A400);color:#101010;font-size:34px;font-weight:900;box-shadow:0 8px 24px #e0a40044}
+#ownerCard h1{font-size:23px;margin:8px 0 4px;color:#101b31}
+#ownerCard .sub{font-size:13px;color:#65718a;margin:0 0 22px}
+#ownerCard label{text-align:left;color:#33415b;font-weight:700;margin:12px 0;gap:6px}
+#ownerCard input{background:#f7f9fc;border:1px solid #d5deed;border-radius:10px;padding:12px;color:#17233a}
+#ownerCard button{width:100%;margin-top:12px;border-radius:10px;background:var(--accent,#B3121A);color:var(--on,#fff);padding:13px}
+#ownerCard .hint{font-size:12px;color:#66738b;margin-top:15px;line-height:1.6}
+#ownerMsg{min-height:22px;font-size:13px;color:#c51c2c;margin-top:8px}
+#ownerLockBtn{position:fixed;right:12px;bottom:12px;z-index:99990;border-radius:999px;padding:9px 13px;box-shadow:0 3px 12px #0003;font-size:13px}
+</style>
+<div id="ownerGate" role="dialog" aria-modal="true" aria-labelledby="ownerTitle">
+  <section id="ownerCard">
+    <div id="ownerLogo">தீ</div>
+    <h1 id="ownerTitle">NEWS STUDIO</h1>
+    <p class="sub" id="ownerSubtitle">உரிமையாளர் உள்நுழைவு</p>
+    <form id="ownerForm" autocomplete="on">
+      <label>பயனர்பெயர்<input id="ownerUser" name="username" autocomplete="username" required maxlength="50" placeholder="உங்கள் பயனர்பெயர்"></label>
+      <label>கடவுச்சொல்<input id="ownerPass" name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="குறைந்தது 8 எழுத்துகள்"></label>
+      <label id="ownerConfirmWrap" hidden>கடவுச்சொல்லை மீண்டும் உள்ளிடவும்<input id="ownerConfirm" type="password" autocomplete="new-password" minlength="8" placeholder="உறுதிப்படுத்தவும்"></label>
+      <button id="ownerSubmit" type="submit">உள்நுழை</button>
+      <div id="ownerMsg" role="status" aria-live="polite"></div>
+    </form>
+    <p class="hint" id="ownerHint">இந்தச் சாதனத்தில் மட்டுமே உள்நுழைவு விவரங்கள் சேமிக்கப்படும். கடவுச்சொல்லை மறந்தால் தரவு இழப்பைத் தவிர்க்க முன்கூட்டியே backup வைத்திருங்கள்.</p>
+  </section>
+</div>
+<button id="ownerLockBtn" type="button" hidden>🔒 பூட்டு / வெளியேறு</button>
+<script>
+(()=>{
+ const gate=document.getElementById('ownerGate'),form=document.getElementById('ownerForm'),user=document.getElementById('ownerUser'),pass=document.getElementById('ownerPass'),confirm=document.getElementById('ownerConfirm'),confirmWrap=document.getElementById('ownerConfirmWrap'),submit=document.getElementById('ownerSubmit'),msg=document.getElementById('ownerMsg'),subtitle=document.getElementById('ownerSubtitle'),hint=document.getElementById('ownerHint'),lock=document.getElementById('ownerLockBtn');
+ const KEY='tk_owner_auth_v1'; let setup=false,failures=0,nextTry=0;
+ const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){return null}};
+ const bytesToHex=b=>Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+ const hexToBytes=h=>new Uint8Array((h.match(/.{1,2}/g)||[]).map(x=>parseInt(x,16)));
+ async function digest(password,salt){
+   if(!crypto.subtle) throw new Error('இந்த WebView பாதுகாப்பான கடவுச்சொல் சரிபார்ப்பை ஆதரிக்கவில்லை. Android System WebView-ஐ புதுப்பிக்கவும்.');
+   const enc=new TextEncoder(),key=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveBits']);
+   return bytesToHex(await crypto.subtle.deriveBits({name:'PBKDF2',salt:hexToBytes(salt),iterations:210000,hash:'SHA-256'},key,256));
+ }
+ function show(){setup=!read();gate.hidden=false;lock.hidden=true;confirmWrap.hidden=!setup;subtitle.textContent=setup?'முதல் முறை — உரிமையாளர் கணக்கை உருவாக்கவும்':'உரிமையாளர் உள்நுழைவு';submit.textContent=setup?'கணக்கை உருவாக்கி திறக்கவும்':'உள்நுழை';hint.textContent=setup?'பயனர்பெயர் மற்றும் குறைந்தது 8 எழுத்துகளுள்ள வலுவான கடவுச்சொல்லை அமைக்கவும். இவை இந்தச் சாதனத்தில் சேமிக்கப்படும்.':'தனிப்பட்ட பயன்பாட்டிற்கான உள்நுழைவு. கடவுச்சொல்லை யாருடனும் பகிர வேண்டாம்.';msg.textContent='';pass.value='';confirm.value='';setTimeout(()=>user.focus(),100)}
+ async function unlock(){gate.hidden=true;lock.hidden=false;}
+ form.addEventListener('submit',async e=>{e.preventDefault();msg.textContent='';if(Date.now()<nextTry){msg.textContent='சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.';return}const u=user.value.trim(),p=pass.value;if(!u||p.length<8){msg.textContent='பயனர்பெயரை உள்ளிட்டு, குறைந்தது 8 எழுத்துகள் கொண்ட கடவுச்சொல்லைப் பயன்படுத்தவும்.';return}submit.disabled=true;
+ try{
+  if(setup){if(p!==confirm.value){msg.textContent='இரண்டு கடவுச்சொற்களும் ஒன்றாக இல்லை.';return}const salt=bytesToHex(crypto.getRandomValues(new Uint8Array(16))),hash=await digest(p,salt);localStorage.setItem(KEY,JSON.stringify({username:u,salt,hash,version:1}));await unlock();}
+  else{const rec=read();if(!rec||u!==rec.username||await digest(p,rec.salt)!==rec.hash){failures++;if(failures>=5){nextTry=Date.now()+30000;failures=0}msg.textContent='பயனர்பெயர் அல்லது கடவுச்சொல் சரியில்லை.';return}failures=0;await unlock()}
+ }catch(err){msg.textContent='பிழை: '+(err.message||'உள்நுழைவு செயல்படவில்லை');if(setup)localStorage.removeItem(KEY)}finally{submit.disabled=false}
+ });
+ lock.addEventListener('click',()=>{show()});
+ // Always require owner login after a page/app reload.
+ show();
+ // Re-lock when the app returns from background after a short absence.
+ let hiddenAt=0;document.addEventListener('visibilitychange',()=>{if(document.hidden){hiddenAt=Date.now()}else if(hiddenAt&&Date.now()-hiddenAt>120000&&gate.hidden){show()}});
+})();
 </script>
+
+
+<style>#ownerLockBtn{left:12px!important;right:auto!important;bottom:12px!important;opacity:.9;background:var(--accent,#B3121A);color:var(--on,#fff);border:0;font:inherit;font-weight:700}</style>
+
+
 </body></html>
