@@ -2,11 +2,11 @@
 (function () {
   var KEY = 'app_theme_v1';
   var CV = {
-    royal:   { red: '#C1121F', yel: '#E8B23A', gold: '#8E0E15', page: '#F8ECEC', panel: '#FFFFFF', panel2: '#F6E3E3', ink: '#2B0A0E', tkb: '#2A0508' },
-    night:   { red: '#E23744', yel: '#FFCC33', gold: '#C9242F', page: '#150708', panel: '#2A1215', panel2: '#1E0D0F', ink: '#FBEDEE', tkb: '#070203' },
+    royal:   { red: '#C1121F', yel: '#E0A823', gold: '#8E0E15', page: '#F8ECEC', panel: '#FFFFFF', panel2: '#F6E3E3', ink: '#2B0A0E', tkb: '#2A0508' },
+    night:   { red: '#E23744', yel: '#FFD54F', gold: '#C9242F', page: '#150708', panel: '#2A1215', panel2: '#1E0D0F', ink: '#FBEDEE', tkb: '#070203' },
     sun:     { red: '#D71920', yel: '#FFC800', gold: '#D71920', page: '#F3F3F3', panel: '#FFFFFF', panel2: '#F1F1F1', ink: '#101010', tkb: '#070707' },
-    ink:     { red: '#2B2A8C', yel: '#F2A900', gold: '#1B2160', page: '#EEF0FB', panel: '#FFFFFF', panel2: '#E3E6F6', ink: '#17153A', tkb: '#0A0D2E' },
-    emerald: { red: '#0F6B57', yel: '#F6D56F', gold: '#05342C', page: '#EAF5F0', panel: '#FFFFFF', panel2: '#DCEEE6', ink: '#07281F', tkb: '#042019' }
+    ink:     { red: '#2B2A8C', yel: '#8E9CFF', gold: '#1B2160', page: '#EEF0FB', panel: '#FFFFFF', panel2: '#E3E6F6', ink: '#17153A', tkb: '#0A0D2E' },
+    emerald: { red: '#0F6B57', yel: '#7DDB9A', gold: '#05342C', page: '#EAF5F0', panel: '#FFFFFF', panel2: '#DCEEE6', ink: '#07281F', tkb: '#042019' }
   };
   var T = [
     { id: 'royal', name: 'ராயல் சிவப்பு', mode: 'light', bg: '#FBF1F1', panel: '#FFFFFF', fg: '#2B0A0E', muted: '#7A5257', line: '#EBCFD1', field: '#FFF8F8', accent: '#B3121A', on: '#FFFFFF', gold: '#E0A823', goldText: '#8E6A00', deep: '#7A0C14', dark: '#2B0A0E', acc1: '#D4202B', acc2: '#8E0E15', cv: CV.royal },

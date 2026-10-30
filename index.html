@@ -95,7 +95,7 @@ html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil
   <div id="book"><div class="pg" id="pn_"></div><div class="pg" id="pc_"></div><div class="pg" id="pp_"></div></div>
   <div id="shade"></div>
   <div id="empty"><div class="sheet"></div><h2>NEWS STUDIO</h2><p>PDF-ஐ தேர்வு செய்தால் உண்மையான செய்தித்தாள் போல ஸ்வைப் செய்து புரட்டிப் படிக்கலாம்.</p><button class="big" id="pick">PDF தேர்வு செய்</button></div>
-  <div id="hint"><span><i>◀</i> ஸ்வைப் / மூலையில் இழுத்துப் புரட்டவும் <i style="animation-direction:reverse">▶</i> &nbsp;|&nbsp; இருமுறை தட்டி / + − பெரிதாக்க</span></div>
+  <div id="hint"><span><i>◀</i> ஸ்வைப் / கீழிருந்து இழுத்து மடித்துப் புரட்டவும் <i style="animation-direction:reverse">▶</i> &nbsp;|&nbsp; இருமுறை தட்டி / + − பெரிதாக்க</span></div>
   <div id="load">ஏற்றுகிறது…</div>
   <div id="zBar"><button type="button" id="zIn" title="பெரிதாக்கு">+</button><div id="zLvl">1×</div><button type="button" id="zOut" title="சிறிதாக்கு">−</button></div>
 </div>
@@ -135,7 +135,7 @@ function loadAll(){size();cache.clear();rest();setLayer(L.c,cur);setLayer(L.n,cu
 function ui(){const pn=$('#pgn');pn.textContent=(cur+1)+' / '+N;pn.classList.remove('pop');void pn.offsetWidth;pn.classList.add('pop');zBarShow()}
 /* ---------- page turn: right-bottom corner curl ---------- */
 function zIdx(d){if(d>0){L.n.style.zIndex=1;L.c.style.zIndex=3;L.p.style.zIndex=0}else{L.n.style.zIndex=0;L.c.style.zIndex=1;L.p.style.zIndex=3}}
-function curlXF(pr){/* pr 0→1: bottom-right peel */const a=-pr*108,rx=pr*14,rz=-pr*10,sc=1-pr*.12;return`rotateY(${a}deg) rotateX(${rx}deg) rotateZ(${rz}deg) scale(${sc})`}
+function curlXF(pr){/* pr 0→1: bottom-right fold, peel right→left */const a=-pr*118,rx=pr*22,rz=-pr*12,sc=1-pr*.1,sy=1-pr*.04;return`rotateY(${a}deg) rotateX(${rx}deg) rotateZ(${rz}deg) scale(${sc},${sy})`}
 function turn(d,pr){
   if(d>0){L.c.style.transform=curlXF(pr);L.c.style.opacity=pr>.97?0:1;L.c.style.setProperty("--fx",pr*.95);L.c.style.setProperty("--curl",pr)}
   else{const q=1-pr;L.p.style.transform=curlXF(q);L.p.style.opacity=pr<.03?0:1;L.p.style.setProperty("--fx",q*.95);L.p.style.setProperty("--curl",q)}
@@ -165,14 +165,24 @@ stage.addEventListener('pointermove',e=>{const p=ptrs.get(e.pointerId);if(!p)ret
   if(pin&&ptrs.size>=2){const[a,b]=[...ptrs.values()];zoomAt(clamp(pin.z0*Math.hypot(a.x-b.x,a.y-b.y)/pin.d,1,ZMAX),(a.x+b.x)/2,(a.y+b.y)/2);return}
   if(!g)return;const dx=e.clientX-g.x,dy=e.clientY-g.y;g.moved=Math.max(g.moved,Math.hypot(dx,dy));
   if(z>1){px=g.px+dx;py=g.py+dy;clampPan();applyZ();return}
-  if(g.moved>8&&!g.mode)g.mode=Math.abs(dx)>=Math.abs(dy)?'h':'v';
+  if(g.moved>8&&!g.mode){
+    /* upward / bottom-pull → fold turn next page; horizontal swipe as usual */
+    if(Math.abs(dy)>=Math.abs(dx)&&dy<-12){g.mode='fold';g.dir=1}
+    else if(Math.abs(dy)>=Math.abs(dx)&&dy>12){g.mode='fold';g.dir=-1}
+    else g.mode='h';
+  }
+  if(g.mode==='fold'){
+    const d=g.dir;if(d!==g._zd){g._zd=d;rest();zIdx(d)}
+    const dist=Math.abs(dy);
+    const ok=d>0?cur<N-1:cur>0;g.pr=ok?clamp(dist/(SH*.55),0,1):Math.min(.06,dist/SH*.2);g.ok=ok;if(ok)turn(d,g.pr);return}
   if(g.mode!=='h')return;
   const d=dx<0?1:-1;if(d!==g.dir){g.dir=d;rest();zIdx(d)}
   const ok=d>0?cur<N-1:cur>0;g.pr=ok?clamp(Math.abs(dx)/(SW*.8),0,1):Math.min(.06,Math.abs(dx)/SW*.2);g.ok=ok;if(ok||d>0)turn(d,g.pr)});
 const endP=e=>{ptrs.delete(e.pointerId);if(pin){if(ptrs.size<2)pin=null;g=null;return}
   if(!g)return;const q=g;g=null;
-  if(q.mode==='h'){const fast=Math.abs(e.clientX-q.x)/(Date.now()-q.t)>.5&&q.moved>30;
-    if(q.ok&&(q.pr>.3||fast)){busy=true;flip();anim(q.dir,q.pr,1,()=>commit(q.dir))}else if(q.dir){busy=true;anim(q.dir,q.pr,0,()=>{busy=false;rest()})}return}
+  if(q.mode==='h'||q.mode==='fold'){const dist=q.mode==='fold'?Math.abs(e.clientY-q.y):Math.abs(e.clientX-q.x);
+    const fast=dist/(Date.now()-q.t)>.45&&q.moved>28;
+    if(q.ok&&(q.pr>.28||fast)){busy=true;flip();anim(q.dir,q.pr,1,()=>commit(q.dir))}else if(q.dir){busy=true;anim(q.dir,q.pr,0,()=>{busy=false;rest()})}return}
   if(q.moved<10&&e.type==='pointerup'){const now=Date.now();
     if(now-lastTap<320&&Math.hypot(e.clientX-tapXY[0],e.clientY-tapXY[1])<48){clearTimeout(tapT);lastTap=0;
       smooth(()=>{if(z>=3.2){z=1;px=py=0;applyZ()}else if(z>1.4)zoomAt(3.6,e.clientX,e.clientY);else zoomAt(2.2,e.clientX,e.clientY)})}
