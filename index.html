@@ -167,22 +167,43 @@ html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil
 .top-switch-wrap .nb:after{display:none!important}
 .top-switch-wrap .nb svg{width:22px;height:22px}
 .top-switch-wrap .nb b{font-size:10px!important}
+
+.slot-btn{
+  flex:1;min-width:0;height:48px;border:0;border-radius:11px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  font:inherit;font-size:11px;font-weight:800;color:#fff;
+  background:transparent;box-shadow:none;
+  transition:background .25s,transform .2s,opacity .25s;
+  -webkit-tap-highlight-color:transparent;padding:4px 6px;line-height:1.15;
+}
+.slot-btn:active{transform:scale(.96)}
+.slot-btn .ico{font-size:20px;line-height:1}
+.slot-btn .lbl{font-size:10px;font-weight:800;letter-spacing:.2px}
+.slot-btn.empty{opacity:.35;cursor:default;pointer-events:none}
+.slot-btn.empty .ico{font-size:18px}
+.slot-btn:not(.empty):hover{background:rgba(255,255,255,.1)}
+.shelf-btn .ico{font-size:22px;line-height:1}
+.shelf-btn .lbl{font-size:10px;font-weight:800}
+@media (max-width:480px){
+  .slot-btn{height:46px}
+  .slot-btn .ico{font-size:18px}
+  .slot-btn .lbl{font-size:9px}
+}
 </style></head>
 <body><div id="app">
 <nav id="bar">
   <div class="top-switch-wrap">
     <button class="mode-btn" id="modeBtn" data-mode="paper" type="button" aria-label="Switch mode">
-      <span class="live-dot" id="liveDot"></span>
       <span class="ico" id="modeIco">📺</span>
       <span class="lbl" id="modeLbl">Mobile TV</span>
     </button>
     <button class="shelf-btn" id="shelfBtn" type="button" aria-label="Book Shelf">
-      <span style="font-size:22px;line-height:1">📚</span>
-      <span class="lbl" style="font-size:10px;font-weight:800">Shelf</span>
+      <span class="ico">📚</span>
+      <span class="lbl">Shelf</span>
     </button>
-    <button class="nb" id="bDl" type="button" aria-label="Download">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M5 19h14"/></svg>
-      <b>Download</b>
+    <button class="slot-btn" id="slotBtn" type="button" aria-label="Download">
+      <span class="ico" id="slotIco">⬇</span>
+      <span class="lbl" id="slotLbl">Download</span>
     </button>
   </div>
   <div id="subs" style="display:none">
@@ -346,9 +367,9 @@ function show(v){
   const isTv=v==='tv', isPaper=v==='paper';
   $('#tv').classList.toggle('on',isTv);
   $('#bk').classList.toggle('on',v==='books');$('#sec').classList.toggle('on',isSec);
-  const mb=$('#modeBtn');
+  const mb=$('#modeBtn'), sb=$('#slotBtn');
   if(mb){
-    /* Button shows the OTHER mode (click target) */
+    /* Button 1 = switch target (other mode) */
     if(isTv){
       mb.dataset.mode='tv';
       $('#modeIco').textContent='🗞️';
@@ -357,6 +378,20 @@ function show(v){
       mb.dataset.mode='paper';
       $('#modeIco').textContent='📺';
       $('#modeLbl').textContent='Mobile TV';
+    }
+  }
+  /* Button 3 = Download on E-Paper, empty placeholder on Mobile TV */
+  if(sb){
+    if(isPaper){
+      sb.classList.remove('empty');
+      sb.setAttribute('aria-label','Download');
+      $('#slotIco').textContent='⬇';
+      $('#slotLbl').textContent='Download';
+    } else {
+      sb.classList.add('empty');
+      sb.setAttribute('aria-label','Soon');
+      $('#slotIco').textContent='○';
+      $('#slotLbl').textContent='Soon';
     }
   }
   if(isTv&&!ifr){ifr=document.createElement('iframe');ifr.allow='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';ifr.src='news.html';$('#tv').appendChild(ifr)}
@@ -403,9 +438,13 @@ if(shelfBtn){
   });
 }
 show('paper');
-$('#bDl').onclick=()=>{if(!curBuf){toast('முதலில் PDF-ஐ upload செய்யவும்');$('#file').click();return}
+const slotBtn=$('#slotBtn');
+if(slotBtn){slotBtn.onclick=()=>{
+  if(slotBtn.classList.contains('empty'))return;
+  if(!curBuf){toast('முதலில் PDF-ஐ upload செய்யவும்');$('#file').click();return}
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([curBuf],{type:'application/pdf'}));a.download='Theekkathir-'+selDate+'.pdf';document.body.appendChild(a);a.click();
-  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast('PDF பதிவிறக்கம் ஆகிறது')};
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast('PDF பதிவிறக்கம் ஆகிறது');
+}}
 $('#dlDate').onclick=()=>{$('#datePick').showPicker?$('#datePick').showPicker():$('#datePick').click()};
 $('#datePick').onchange=e=>{const v=e.target.value;if(!v)return;const[y,m,d]=v.split('-');setDlDate(d+'-'+m+'-'+y)};
 addEventListener('message',e=>{if(e.data&&e.data.goto==='paper')show('paper')});
