@@ -1,0 +1,1169 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>புத்தக வீடியோ ஸ்டுடியோ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Thambi+2:wght@500..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Tamil:wght@500..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+Tamil:wght@500..800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kavivanar&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mukta+Malar:wght@500;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Madurai:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tiro+Tamil&display=swap">
+<style>
+/* Layout: sticky phone-shaped preview on the left, stacked editing panels and export card on the right. */
+:root {
+  --bg: #F6F5FB;
+  --panel: #FFFFFF;
+  --fg: #17153A;
+  --muted: #5E5C80;
+  --line: #E2E0F0;
+  --field: #FBFAFF;
+  --accent: #3B2FC9;
+  --on-accent: #FFFFFF;
+  --warm: #F2A900;
+  --danger: #B3261E;
+  --font-ui: "Noto Sans Tamil", system-ui, sans-serif;
+  --font-display: "Baloo Thambi 2", "Noto Sans Tamil", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1030; --panel: #171944; --fg: #EEEDFF; --muted: #A3A1CC; --line: #2B2D66;
+    --field: #121438; --accent: #9A91FF; --on-accent: #0F1030; --warm: #FFC043; --danger: #FF8A80;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1030; --panel: #171944; --fg: #EEEDFF; --muted: #A3A1CC; --line: #2B2D66;
+  --field: #121438; --accent: #9A91FF; --on-accent: #0F1030; --warm: #FFC043; --danger: #FF8A80;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-ui); font-size: 15px; line-height: 1.55;
+  padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1120px; margin: 0 auto; }
+header.top { display: flex; flex-direction: column; gap: 4px; margin-bottom: 20px; }
+header.top h1 { font-family: var(--font-display); font-size: clamp(26px, 5vw, 36px); line-height: 1.2; margin: 0; font-weight: 800; text-wrap: balance; }
+header.top p { margin: 0; color: var(--muted); max-width: 62ch; }
+.shell { display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 900px) { .shell { grid-template-columns: minmax(0, 400px) minmax(0, 1fr); } .stage { position: sticky; top: 16px; } }
+.stage { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.phone { position: relative; width: min(100%, 400px); aspect-ratio: 9 / 16; margin: 0 auto; border-radius: 26px; overflow: hidden; background: #0A0D2E; box-shadow: 0 18px 44px rgba(20, 16, 80, .28); }
+.phone canvas { width: 100%; height: 100%; display: block; }
+.safe { position: absolute; left: 0; right: 0; pointer-events: none; background: repeating-linear-gradient(135deg, rgba(255, 80, 80, .28) 0 8px, rgba(255, 80, 80, .12) 8px 16px); color: #fff; font-size: 11px; display: flex; align-items: center; justify-content: center; text-shadow: 0 1px 2px rgba(0, 0, 0, .7); }
+.safe.t { top: 0; height: 7.8%; } .safe.b { bottom: 0; height: 6.8%; }
+.player { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; width: min(100%, 400px); margin: 0 auto; }
+.player input[type=range] { width: 100%; accent-color: var(--accent); }
+.player .tl { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; min-width: 7.5em; text-align: right; }
+.row2 { display: flex; flex-wrap: wrap; gap: 8px 16px; width: min(100%, 400px); margin: 0 auto; align-items: center; justify-content: space-between; color: var(--muted); font-size: 13px; }
+.side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.exp { order: 0; } .panels { order: 1; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+@media (max-width: 899px) { .exp { order: 2; } }
+.card, details.pn { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+.card { padding: 16px; }
+details.pn > summary { cursor: pointer; list-style: none; padding: 14px 16px; font-family: var(--font-display); font-weight: 700; font-size: 18px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+details.pn > summary::-webkit-details-marker { display: none; }
+details.pn > summary::after { content: "+"; font-size: 22px; color: var(--accent); line-height: 1; }
+details.pn[open] > summary::after { content: "\2212"; }
+details.pn > .body { padding: 2px 16px 16px; display: grid; gap: 12px; }
+.grid2 { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+label.f { display: grid; gap: 4px; min-width: 0; }
+label.f > span, .lab { font-size: 13px; font-weight: 600; color: var(--muted); }
+input[type=text], select, textarea { width: 100%; min-width: 0; font: inherit; color: var(--fg); background: var(--field); border: 1px solid var(--line); border-radius: 9px; padding: 9px 11px; }
+input[type=text]:focus-visible, select:focus-visible, button:focus-visible, summary:focus-visible, input[type=color]:focus-visible, input[type=range]:focus-visible, input[type=checkbox]:focus-visible, label.btn:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
+.btn { font: inherit; font-weight: 700; cursor: pointer; border-radius: 10px; border: 1px solid var(--line); background: var(--field); color: var(--fg); padding: 9px 14px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-align: center; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.small { padding: 5px 10px; font-size: 13px; border-radius: 8px; }
+.btn.warn { color: var(--danger); }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.checks { display: grid; gap: 8px 16px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.checks label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.checks input { width: 18px; height: 18px; accent-color: var(--accent); }
+.up { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.up .st { color: var(--muted); font-size: 13px; min-width: 0; overflow-wrap: anywhere; }
+.thumb { width: 54px; height: 54px; border-radius: 9px; border: 1px solid var(--line); background: var(--field) center / contain no-repeat; flex: none; }
+.thumb.cv { width: 40px; height: 60px; background-size: cover; }
+.book { border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 10px; background: var(--field); }
+.bh { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.bh strong { font-family: var(--font-display); font-size: 16px; }
+.bh .dur { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.bt { display: flex; gap: 6px; }
+.themes { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+.sw { border: 2px solid var(--line); border-radius: 12px; padding: 8px; background: var(--field); cursor: pointer; font: inherit; color: var(--fg); display: grid; gap: 6px; text-align: left; }
+.sw[aria-pressed=true] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; }
+.sw i { display: block; height: 30px; border-radius: 7px; position: relative; }
+.sw i b { position: absolute; right: 6px; top: 6px; width: 18px; height: 18px; border-radius: 50%; }
+.sw span { font-size: 13px; font-weight: 700; }
+.colors { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.colors label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); font-weight: 600; }
+input[type=color] { width: 38px; height: 30px; border: 1px solid var(--line); border-radius: 7px; padding: 2px; background: var(--field); }
+.bar { height: 10px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.bar > div { height: 100%; width: 0%; background: var(--accent); transition: width .2s; }
+.msg { color: var(--muted); font-size: 13px; min-height: 1.4em; overflow-wrap: anywhere; }
+.msg.err { color: var(--danger); font-weight: 600; }
+.exp h2 { font-family: var(--font-display); font-size: 20px; margin: 0 0 4px; }
+.exp video { width: min(100%, 260px); border-radius: 12px; background: #000; display: block; }
+.hint { color: var(--muted); font-size: 13px; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .bar > div { transition: none; } }
+.side{gap:10px}.panels{gap:8px!important}details.pn>summary{padding:10px 14px!important;font-size:17px!important}details.pn>.body{gap:8px!important;padding:0 14px 12px!important}.card{padding:12px!important}header.top{margin-bottom:12px!important}.shell{gap:16px!important}.checks{gap:6px 12px!important}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>புத்தக வீடியோ ஸ்டுடியோ</h1>
+    <p>புத்தக அறிமுகம், புத்தகத் திருவிழா விளம்பரம் ஆகியவற்றுக்கான 9:16 வீடியோ. எல்லா எழுத்துகள், படங்கள், நிறங்களையும் மாற்றி, MP4 ஆகப் பதிவிறக்குங்கள்.</p>
+  </header>
+
+  <div class="shell">
+    <section class="stage" aria-label="முன்னோட்டம்">
+      <div class="phone" id="phone">
+        <canvas id="cv" width="720" height="1280"></canvas>
+        <div class="safe t" id="safeT" hidden>WhatsApp மேல் பட்டை</div>
+        <div class="safe b" id="safeB" hidden>பதில் பட்டை</div>
+      </div>
+      <div class="player">
+        <button class="btn primary small" id="play" type="button" aria-label="இயக்கு">இயக்கு</button>
+        <input type="range" id="seek" min="0" max="90" step="0.1" value="3.2" aria-label="நேரம்">
+        <span class="tl" id="tl">0:03 / 1:30</span>
+      </div>
+      <div class="row2">
+        <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="safeChk"> பாதுகாப்பு மண்டலம் காட்டு</label>
+        <button class="btn small" id="restart" type="button">முதலிலிருந்து</button>
+      </div>
+      <p class="hint" style="width:min(100%,400px);margin:0 auto">முன்னோட்டத்தில் ஒலி இல்லை. பேசுபவர் வீடியோவின் ஒலி MP4 ஏற்றுமதியில் சேரும்.</p>
+    </section>
+
+    <div class="side">
+      <section class="card exp" aria-label="MP4 ஏற்றுமதி">
+        <h2>MP4 ஏற்றுமதி</h2>
+        <div class="grid2" style="margin-top:8px">
+          <label class="f"><span>தரம்</span>
+            <select id="res" data-p="res">
+              <option value="720">720 × 1280 (பரிந்துரை, சிறிய கோப்பு)</option>
+              <option value="1080">1080 × 1920 (அதிக தெளிவு, நீண்ட நேரம்)</option>
+            </select>
+          </label>
+          <label class="f"><span>வீடியோ நீளம் (எவ்வளவு நேரம் சேமிக்க வேண்டும்)</span>
+            <select id="dur" data-p="dur">
+              <option value="15">15 வினாடி</option><option value="20">20 வினாடி</option><option value="30">30 வினாடி</option><option value="45">45 வினாடி</option><option value="60">1 நிமிடம்</option><option value="90">1½ நிமிடம் (90 வினாடி)</option><option value="120">2 நிமிடம்</option><option value="180">3 நிமிடம்</option><option value="240">4 நிமிடம்</option><option value="300">5 நிமிடம்</option>
+            </select>
+          </label>
+          <label class="f"><span>உருவாக்கும் வேகம்</span>
+            <select id="fps" data-p="fps">
+              <option value="20">மிக வேகம் (20 fps)</option><option value="24">வேகம் (24 fps, பரிந்துரை)</option><option value="30">மென்மையாக (30 fps, மெதுவு)</option>
+            </select>
+          </label>
+          <div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap">
+            <button class="btn primary" id="exportBtn" type="button">MP4 உருவாக்கு</button>
+            <button class="btn warn" id="cancelBtn" type="button" hidden>நிறுத்து</button>
+          </div>
+        </div>
+        <div class="bar" style="margin-top:12px" aria-hidden="true"><div id="prog"></div></div>
+        <p class="msg" id="expMsg" role="status" aria-live="polite">தயார். உருவாக்கும் போது இந்தத் தாவலைத் திறந்தே வைத்திருங்கள். 720p-க்கு சில நிமிடங்கள் ஆகலாம்.</p>
+        <div id="result" hidden style="display:grid;gap:10px">
+          <video id="outVid" controls playsinline></video>
+          <div class="up">
+            <button class="btn primary" id="saveBtn" type="button">MP4 சேமி</button>
+            <span class="st" id="sizeTxt"></span>
+          </div>
+        </div>
+      </section>
+
+      <div class="panels"><details class="pn" open style="order:-1"><summary>கட்டாயம் தேவையானவை</summary><div class="body"><p class="hint">தேர்ந்தெடுத்தவை மட்டுமே வீடியோவில் வரும்; மீதமுள்ள இடத்தை பேசுபவர் எடுத்துக்கொள்வார்.</p><div class="checks"><label><input type="checkbox" data-p="show.speakerTag"> பேசுபவர் பெயர் பட்டை</label><label><input type="checkbox" data-p="show.logo"> லோகோ</label><label><input type="checkbox" data-p="show.orgName"> நிறுவனப் பெயர்</label><label><input type="checkbox" data-p="show.title"> புத்தகத் தலைப்பு</label><label><input type="checkbox" data-p="show.cover"> முன் அட்டை</label><label><input type="checkbox" data-p="show.back"> பின் அட்டை</label><label><input type="checkbox" data-p="show.author"> எழுத்தாளர்</label><label><input type="checkbox" data-p="show.publisher"> பதிப்பகம்</label><label><input type="checkbox" data-p="show.genre"> புத்தக வகை</label><label><input type="checkbox" data-p="show.price"> விலை</label><label><input type="checkbox" data-p="show.discount"> தள்ளுபடி % (பெரியது)</label><label><input type="checkbox" data-p="show.contact"> தொடர்புப் பட்டை</label><label><input type="checkbox" data-p="show.qr"> QR (தேவைப்பட்டால் மட்டும்)</label><label><input type="checkbox" data-p="show.cta"> அழைப்பு வரி</label><label><input type="checkbox" data-p="show.dots"> முன்னேற்றப் புள்ளிகள்</label></div><span class="lab">தேவைப்பட்டால் மட்டும்</span><div class="checks"><label><input type="checkbox" data-p="show.festival"> திருவிழா பெயர்</label><label><input type="checkbox" data-p="show.date"> தேதி</label><label><input type="checkbox" data-p="show.place"> இடம்</label><label><input type="checkbox" data-p="show.stall"> அரங்க எண்</label></div></div></details>
+        <details class="pn" open>
+          <summary>பொதுத் தகவல்</summary>
+          <div class="body">
+            <div class="up">
+              <div class="thumb" id="logoThumb"></div>
+              <label class="btn small" for="logoFile">PNG லோகோ பதிவேற்று</label>
+              <input type="file" id="logoFile" data-file="logo" accept="image/*" hidden>
+              <button class="btn small warn" type="button" data-act="rmlogo">லோகோவை நீக்கு</button>
+              <label class="f" style="flex:1 1 100%"><span>PNG லோகோ அளவு (உயரம்)</span><input type="range" data-p="logoSize" min="90" max="240" step="10"></label>
+              <span class="st" id="logoSt">PNG லோகோ இல்லை — நிறுவனப் பெயர் எழுத்தாக வரும்</span>
+            </div>
+            <div class="grid2">
+              <label class="f"><span>நிறுவனம் / பதிப்பகம் பெயர்</span><input type="text" id="f-org" data-p="org"></label>
+              <label class="f"><span>திருவிழா பெயர்</span><input type="text" id="f-fest" data-p="fest"></label>
+              <label class="f"><span>தேதி</span><input type="text" id="f-date" data-p="date"></label>
+              <label class="f"><span>இடம்</span><input type="text" id="f-place" data-p="place"></label>
+              <label class="f"><span>அரங்க எண் (Stall No.)</span><input type="text" id="f-stall" data-p="stall"></label>
+              <label class="f"><span>அழைப்பு வரி</span><input type="text" id="f-cta" data-p="cta"></label>
+            </div>
+            
+          </div>
+        </details>
+
+        <details class="pn" open>
+          <summary>பேசுபவர்</summary>
+          <div class="body">
+            <div class="up">
+              <div class="thumb" id="spThumb"></div>
+              <label class="btn small" for="spFile">வீடியோ / படம் பதிவேற்று</label>
+              <input type="file" id="spFile" data-file="speaker" accept="video/*,image/*" hidden>
+              <button class="btn small warn" type="button" data-act="rmspeaker">நீக்கு</button>
+              <span class="st" id="spSt">இன்னும் பதிவேற்றப்படவில்லை</span>
+            </div>
+            <div class="grid2">
+              <label class="f"><span>பேசுபவர் பெயர்</span><input type="text" id="f-spName" data-p="spName"></label>
+              <label class="f"><span>பதவி / அறிமுகம்</span><input type="text" id="f-spRole" data-p="spRole"></label>
+            </div>
+            
+            <p class="hint">வீடியோ தேர்ந்தெடுத்த நீளத்தை விடக் குறைவாக இருந்தால் மீண்டும் மீண்டும் ஓடும், ஒலியும் அதனுடன் சேர்ந்து ஓடும்.</p>
+          </div>
+        </details>
+
+        <details class="pn" open>
+          <summary>புத்தகங்கள்</summary>
+          <div class="body">
+            <p class="hint" id="slotHint"></p>
+            <div id="books" style="display:grid;gap:12px"></div>
+            <div class="up"><button class="btn primary" type="button" data-act="addbook" id="addBook">புத்தகம் சேர்</button></div>
+            
+          </div>
+        </details>
+
+        <details class="pn">
+          <summary>தொடர்பு மற்றும் QR</summary>
+          <div class="body">
+            <div class="grid2">
+              <label class="f"><span>வாட்ஸ்அப் எண்</span><input type="text" id="f-wa" data-p="wa" inputmode="tel"></label>
+              <label class="f"><span>இணையதளம்</span><input type="text" id="f-web" data-p="web"></label>
+              <label class="f"><span>இன்ஸ்டாகிராம் ID</span><input type="text" id="f-ig" data-p="ig"></label>
+              <label class="f"><span>QR இணைப்பு (காலியாக இருந்தால் வாட்ஸ்அப் எண்)</span><input type="text" id="f-qr" data-p="qr"></label>
+            </div>
+            
+          </div>
+        </details>
+
+        <details class="pn" open style="order:-2">
+          <summary>தீம் / வடிவமைப்பு</summary>
+          <div class="body">
+            <span class="lab">ஆப் தீம் (முழு ஆப்)</span><div id="appThemes"></div><span class="lab">வீடியோ தீம்</span><div class="themes" id="themes"></div>
+            <div class="colors">
+              <label>பின்னணி 1 <input type="color" id="c-bg1" data-p="custom.bg1"></label>
+              <label>பின்னணி 2 <input type="color" id="c-bg2" data-p="custom.bg2"></label>
+              <label>சிறப்பு நிறம் <input type="color" id="c-accent" data-p="custom.accent"></label>
+              <label>எழுத்து <input type="color" id="c-text" data-p="custom.text"></label>
+            </div>
+            <label class="f"><span>தலைப்பு எழுத்துரு</span>
+              <select id="fontSel" data-p="font"></select>
+            </label>
+            <div class="up">
+              <label class="btn small" for="musicFile">பின்னணி இசை</label>
+              <input type="file" id="musicFile" data-file="music" accept="audio/*" hidden>
+              <button class="btn small warn" type="button" data-act="rmmusic">நீக்கு</button>
+              <span class="st" id="musicSt">இசை இல்லை</span>
+            </div>
+            <label class="f"><span>இசை ஒலி அளவு</span><input type="range" id="musicVol" data-p="musicVol" min="0" max="1" step="0.05"></label>
+          </div>
+        </details>
+
+        <details class="pn">
+          <summary>சொற்களை மாற்று</summary>
+          <div class="body">
+            <div class="grid2">
+              <label class="f"><span>தேதி லேபிள்</span><input type="text" id="l-date" data-p="labels.date"></label>
+              <label class="f"><span>இடம் லேபிள்</span><input type="text" id="l-place" data-p="labels.place"></label>
+              <label class="f"><span>அரங்கு லேபிள்</span><input type="text" id="l-stall" data-p="labels.stall"></label>
+              <label class="f"><span>எழுத்தாளர் லேபிள்</span><input type="text" id="l-author" data-p="labels.author"></label>
+              <label class="f"><span>பதிப்பகம் லேபிள்</span><input type="text" id="l-publisher" data-p="labels.publisher"></label>
+              <label class="f"><span>தள்ளுபடி சொல்</span><input type="text" id="l-off" data-p="labels.off"></label>
+              <label class="f"><span>வாட்ஸ்அப் லேபிள்</span><input type="text" id="l-wa" data-p="labels.wa"></label>
+              <label class="f"><span>இணையம் லேபிள்</span><input type="text" id="l-web" data-p="labels.web"></label>
+              <label class="f"><span>இன்ஸ்டா லேபிள்</span><input type="text" id="l-ig" data-p="labels.ig"></label>
+            </div>
+            <div class="up"><button class="btn warn small" type="button" id="resetBtn">எல்லாவற்றையும் இயல்புநிலைக்கு மாற்று</button></div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.js"></script>
+<script>
+(function () {
+'use strict';
+var TOTAL = 90, VW = 1080, VH = 1920, KEY = 'puthaga-video-studio-v2';
+
+/* ---------- helpers ---------- */
+var $ = function (s, r) { return (r || document).querySelector(s); };
+var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+var clamp = function (x, a, b) { a = a === undefined ? 0 : a; b = b === undefined ? 1 : b; return Math.min(b, Math.max(a, x)); };
+var eo3 = function (x) { x = clamp(x); return 1 - Math.pow(1 - x, 3); };
+var eob = function (x) { x = clamp(x); var c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+var clone = function (o) { return JSON.parse(JSON.stringify(o)); };
+var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+var uid = function () { return 'b' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); };
+var digits = function (s) { return String(s || '').replace(/[^\d]/g, ''); };
+function hex2rgb(h) { h = String(h).replace('#', ''); if (h.length === 3) h = h.split('').map(function (c) { return c + c; }).join(''); var n = parseInt(h, 16) || 0; return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+function rgba(h, a) { var c = hex2rgb(h); return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+function lum(h) { var c = hex2rgb(h).map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+function onColor(h) { return lum(h) > 0.42 ? '#15133A' : '#FFFFFF'; }
+
+/* ---------- defaults & state ---------- */
+var THEMES = [
+  { id: 'royal', name: 'ராயல் சிவப்பு', fx: 'premium', font: 'Baloo Thambi 2', bg1: '#8E0E1A', bg2: '#2A0408', accent: '#F0B93B', text: '#FFF6E8' },
+  { id: 'vintage', name: 'பழைய காகிதம்', fx: 'vintage', font: 'Noto Serif Tamil', bg1: '#E9D8AE', bg2: '#C8AB74', card: '#F6EBD0', accent: '#8E2B1B', text: '#3A2814' },
+  { id: 'premium', name: 'பிரீமியம் கண்ணாடி 3D', fx: 'premium', font: 'Baloo Thambi 2', bg1: '#2A1B63', bg2: '#07061C', accent: '#F2C96B', text: '#FFFFFF' },
+  { id: 'matte', name: 'மேட் பூச்சு', fx: 'matte', font: 'Anek Tamil', bg1: '#2F3338', bg2: '#2F3338', accent: '#E0A458', text: '#EFEAE0' },
+  { id: 'white', name: 'வெள்ளை காகிதம்', fx: 'white', font: 'Anek Tamil', bg1: '#FFFFFF', bg2: '#F1F0EB', card: '#FFFFFF', accent: '#1F3A8A', text: '#1B1B1F' },
+  { id: 'library', name: 'புத்தக நூலகம்', fx: 'library', font: 'Noto Serif Tamil', bg1: '#3B2314', bg2: '#190D06', card: '#2A170C', accent: '#E3B04B', text: '#FBEFD5' },
+  { id: 'ink', name: 'மை நீலம்', bg1: '#1B2160', bg2: '#0A0D2E', accent: '#FFC043', text: '#FFF8E8' },
+  { id: 'turmeric', name: 'மஞ்சள்', bg1: '#FFD24A', bg2: '#F4A81D', accent: '#2B2A8C', text: '#1A1840' },
+  { id: 'emerald', name: 'மரகதம்', bg1: '#0F6B57', bg2: '#05342C', accent: '#F6D56F', text: '#F2FFF7' },
+  { id: 'hibiscus', name: 'செம்பருத்தி', bg1: '#9B1F52', bg2: '#4A0F2B', accent: '#FFD36B', text: '#FFF2F3' }
+];
+var FONTS = [
+  ['Baloo Thambi 2', 'பலூ தம்பி (தடித்த)'], ['Anek Tamil', 'அனேக் தமிழ்'], ['Noto Serif Tamil', 'நோட்டோ செரிஃப்'],
+  ['Kavivanar', 'கவிவாணர் (கையெழுத்து)'], ['Mukta Malar', 'முக்தா மலர்'], ['Hind Madurai', 'ஹிந்த் மதுரை'], ['Tiro Tamil', 'திரோ தமிழ்']
+];
+var DEFAULT = {
+  org: 'உங்கள் பதிப்பகம்', fest: 'புத்தகத் திருவிழா 2027', date: 'ஜன 8 – 19', place: 'YMCA மைதானம், நந்தனம்', stall: 'F-24',
+  cta: 'இப்போதே வாங்குங்கள்', spName: 'பேசுபவர் பெயர்', spRole: 'ஆசிரியர்',
+  wa: '+91 98765 43210', web: 'www.yourwebsite.com', ig: '@yourhandle', qr: '',
+  labels: { date: 'தேதி', place: 'இடம்', stall: 'அரங்கு எண்', author: 'எழுத்தாளர்', publisher: 'பதிப்பகம்', off: 'தள்ளுபடி', wa: 'வாட்ஸ்அப்', web: 'இணையம்', ig: 'இன்ஸ்டா' },
+  theme: 'royal', custom: { bg1: '#1B2160', bg2: '#0A0D2E', accent: '#FFC043', text: '#FFF8E8' }, font: 'Baloo Thambi 2',
+  show: { logo: true, orgName: true, festival: false, date: false, place: false, stall: false, title: true, cover: true, back: true, author: true, publisher: true, genre: true, price: true, discount: true, speakerTag: true, contact: true, qr: false, cta: true, dots: true },
+  res: '720', dur: 90, fps: 24, musicVol: 0.2, logoSize: 150,
+  books: [
+    { id: 'b1', title: 'நிலா முற்றத்து நினைவுகள்', author: 'மாலதி சேகர்', publisher: 'உங்கள் பதிப்பகம்', genre: 'சிறுகதைகள்', oldP: '250', newP: '199' },
+    { id: 'b2', title: 'காலத்தின் கரையில்', author: 'அருண்மொழி', publisher: 'உங்கள் பதிப்பகம்', genre: 'நாவல்', oldP: '320', newP: '275' },
+    { id: 'b3', title: 'எளிய தமிழில் அறிவியல்', author: 'முனைவர் இளங்கோ', publisher: 'உங்கள் பதிப்பகம்', genre: 'அறிவியல்', oldP: '180', newP: '150' }
+  ]
+};
+function merge(base, s) {
+  for (var k in s) {
+    if (k === 'books') { if (Array.isArray(s.books) && s.books.length) base.books = s.books; }
+    else if (s[k] && typeof s[k] === 'object' && !Array.isArray(s[k]) && base[k] && typeof base[k] === 'object') base[k] = Object.assign(base[k], s[k]);
+    else base[k] = s[k];
+  }
+  return base;
+}
+function loadState() {
+  try { var raw = localStorage.getItem(KEY); if (raw) { var st = merge(clone(DEFAULT), JSON.parse(raw)); if (!st.v3) { st.v3 = 1; st.show.qr = false; } return st; } } catch (e) {}
+  return clone(DEFAULT);
+}
+var state = loadState();
+TOTAL = clamp(+state.dur || 90, 10, 300); state.dur = TOTAL;
+var saveT = 0;
+function scheduleSave() { clearTimeout(saveT); saveT = setTimeout(function () { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }, 400); }
+function getPath(p) { return p.split('.').reduce(function (o, k) { return o == null ? o : o[k]; }, state); }
+function setPath(p, v) { var ks = p.split('.'), o = state; for (var i = 0; i < ks.length - 1; i++) o = o[ks[i]]; o[ks[ks.length - 1]] = v; }
+function curTheme() { if (state.theme === 'custom') return state.custom; return THEMES.filter(function (t) { return t.id === state.theme; })[0] || THEMES[0]; }
+
+/* ---------- media (not persisted) ---------- */
+var media = { logo: null, speaker: null, music: null, covers: {}, backs: {} };
+function imgFromFile(file) {
+  return new Promise(function (res, rej) {
+    var u = URL.createObjectURL(file), im = new Image();
+    im.onload = function () { res({ img: im, url: u, name: file.name }); };
+    im.onerror = function () { rej(new Error('image')); };
+    im.src = u;
+  });
+}
+function videoFromFile(file) {
+  return new Promise(function (res, rej) {
+    var u = URL.createObjectURL(file), v = document.createElement('video');
+    v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; v.crossOrigin = 'anonymous';
+    v.onloadeddata = function () { res({ el: v, url: u, name: file.name }); };
+    v.onerror = function () { rej(new Error('video')); };
+    v.src = u;
+  });
+}
+
+/* ---------- canvas drawing ---------- */
+var FAM = function () { return '"' + state.font + '", "Noto Sans Tamil", sans-serif'; };
+var SANS = '"Noto Sans Tamil", sans-serif';
+function sf(ctx, size, weight, fam) { ctx.font = weight + ' ' + size + 'px ' + (fam || FAM()); }
+function fitSize(ctx, s, maxW, size, min, weight, fam) { var z = size; sf(ctx, z, weight, fam); while (z > min && ctx.measureText(s).width > maxW) { z -= 2; sf(ctx, z, weight, fam); } return z; }
+function text(ctx, s, x, y, o) {
+  if (!s) return 0;
+  var z = o.size;
+  if (o.maxW) z = fitSize(ctx, s, o.maxW, o.size, o.min || Math.round(o.size * 0.55), o.weight || 700, o.fam); else sf(ctx, o.size, o.weight || 700, o.fam);
+  ctx.fillStyle = o.color; ctx.textAlign = o.align || 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(s, x, y);
+  return z;
+}
+function shineText(ctx, s, x, y, size, th, t, maxW) {
+  sf(ctx, size, 800); var w = Math.min(ctx.measureText(s).width, maxW), x0 = x - w / 2;
+  var c = ((t * 0.5) % 1.8) - 0.4, a = clamp(c - 0.18), m = clamp(c), b = clamp(c + 0.18);
+  var g = ctx.createLinearGradient(x0, 0, x0 + w, 0);
+  g.addColorStop(0, th.text); g.addColorStop(a, th.text); g.addColorStop(m, th.accent); g.addColorStop(b, th.text); g.addColorStop(1, th.text);
+  var pu = (Math.sin(t * 3) + 1) / 2;
+  ctx.save(); ctx.shadowColor = rgba(th.accent, 0.35 + 0.4 * pu); ctx.shadowBlur = 10 + 16 * pu;
+  text(ctx, s, x, y, { size: size, weight: 800, color: g, align: 'center' });
+  ctx.restore();
+}
+function wrap(ctx, s, maxW) {
+  var words = s.split(/\s+/).filter(Boolean), lines = [], cur = '';
+  words.forEach(function (w) { var tst = cur ? cur + ' ' + w : w; if (cur && ctx.measureText(tst).width > maxW) { lines.push(cur); cur = w; } else cur = tst; });
+  if (cur) lines.push(cur);
+  return lines;
+}
+function rr(ctx, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function drawCover(ctx, im, iw, ih, x, y, w, h, fx, fy) {
+  if (!iw || !ih) return;
+  var s = Math.max(w / iw, h / ih), sw = w / s, sh = h / s;
+  ctx.drawImage(im, (iw - sw) * fx, (ih - sh) * fy, sw, sh, x, y, w, h);
+}
+function money(v) { var d = digits(v); return d ? '₹' + d : ''; }
+
+/* ---------- style helpers ---------- */
+var _s = 11, _n = null;
+function rnd() { _s = _s * 16807 % 2147483647; return _s / 2147483647; }
+function calm(th) { return th.fx === 'matte' || th.fx === 'vintage' || th.fx === 'white' || th.fx === 'library'; }
+function grain(ctx, k) {
+  if (!_n) { _n = document.createElement('canvas'); _n.width = _n.height = 200; var x = _n.getContext('2d'), d = x.createImageData(200, 200); for (var i = 0; i < d.data.length; i += 4) { var v = rnd() * 255 | 0; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 40; } x.putImageData(d, 0, 0); }
+  ctx.save(); ctx.globalAlpha *= k; ctx.fillStyle = ctx.createPattern(_n, 'repeat'); ctx.fillRect(0, 0, VW, VH); ctx.restore();
+}
+function burst(ctx, r, n, k) { ctx.beginPath(); for (var i = 0; i < n * 2; i++) { var a = Math.PI * i / n, q = i % 2 ? r * k : r; if (i) ctx.lineTo(Math.cos(a) * q, Math.sin(a) * q); else ctx.moveTo(q, 0); } ctx.closePath(); }
+function chip(ctx, x, y, w, h, th) {
+  ctx.save();
+  if (th.fx === 'premium') { var g = ctx.createLinearGradient(x, y, x, y + h); g.addColorStop(0, '#FFF1B8'); g.addColorStop(0.5, th.accent); g.addColorStop(1, '#B98A22'); ctx.shadowColor = rgba(th.accent, 0.55); ctx.shadowBlur = 20; ctx.fillStyle = g; }
+  else { if (!calm(th)) { ctx.shadowColor = rgba(th.accent, 0.5); ctx.shadowBlur = 16; } ctx.fillStyle = th.accent; }
+  rr(ctx, x, y, w, h, h / 2); ctx.fill(); ctx.restore();
+}
+function panel(ctx, x, y, w, h, r, th, t) {
+  var fx = th.fx; ctx.save();
+  if (fx === 'white') { ctx.shadowColor = 'rgba(0,0,0,.16)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 6; ctx.fillStyle = '#FFFFFF'; rr(ctx, x, y, w, h, r); ctx.fill(); ctx.shadowColor = 'transparent'; ctx.strokeStyle = 'rgba(0,0,0,.1)'; ctx.lineWidth = 2; rr(ctx, x, y, w, h, r); ctx.stroke(); }
+  else if (fx === 'library') { ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 20; ctx.shadowOffsetY = 8; ctx.fillStyle = rgba('#1E0F06', 0.86); rr(ctx, x, y, w, h, r); ctx.fill(); ctx.shadowColor = 'transparent'; ctx.strokeStyle = th.accent; ctx.lineWidth = 2.5; rr(ctx, x, y, w, h, r); ctx.stroke(); ctx.strokeStyle = rgba(th.accent, 0.4); ctx.lineWidth = 1.5; rr(ctx, x + 7, y + 7, w - 14, h - 14, Math.max(3, r - 5)); ctx.stroke(); }
+  else if (fx === 'matte') { ctx.fillStyle = rgba(th.text, 0.09); rr(ctx, x, y, w, h, r); ctx.fill(); }
+  else if (fx === 'vintage') {
+    ctx.shadowColor = 'rgba(60,35,10,.35)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 5; ctx.fillStyle = th.card; rr(ctx, x, y, w, h, r); ctx.fill();
+    ctx.shadowColor = 'transparent'; ctx.strokeStyle = rgba(th.accent, 0.8); ctx.lineWidth = 2; rr(ctx, x + 6, y + 6, w - 12, h - 12, Math.max(3, r - 5)); ctx.stroke();
+  } else if (fx === 'premium') {
+    var g = ctx.createLinearGradient(x, y, x + w * 0.5, y + h); g.addColorStop(0, rgba('#FFFFFF', 0.24)); g.addColorStop(0.55, rgba('#FFFFFF', 0.08)); g.addColorStop(1, rgba(th.accent, 0.14));
+    ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 34; ctx.shadowOffsetY = 14; ctx.fillStyle = g; rr(ctx, x, y, w, h, r); ctx.fill(); ctx.shadowColor = 'transparent';
+    ctx.save(); rr(ctx, x, y, w, h, r); ctx.clip(); var bx = x - 200 + ((t * 0.22) % 1) * (w + 400), sg = ctx.createLinearGradient(bx - 80, y, bx + 80, y + h); sg.addColorStop(0, 'rgba(255,255,255,0)'); sg.addColorStop(0.5, 'rgba(255,255,255,.2)'); sg.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = sg; ctx.fillRect(x, y, w, h); ctx.restore();
+    var s2 = ctx.createLinearGradient(x, y, x, y + h); s2.addColorStop(0, 'rgba(255,255,255,.7)'); s2.addColorStop(0.3, 'rgba(255,255,255,.12)'); s2.addColorStop(1, rgba(th.accent, 0.35)); ctx.strokeStyle = s2; ctx.lineWidth = 2.5; rr(ctx, x, y, w, h, r); ctx.stroke();
+  } else { ctx.fillStyle = rgba(th.text, 0.1); rr(ctx, x, y, w, h, r); ctx.fill(); ctx.strokeStyle = rgba(th.accent, 0.6); ctx.lineWidth = 2.5; rr(ctx, x, y, w, h, r); ctx.stroke(); }
+  ctx.restore();
+}
+
+function drawBg(ctx, t, th) {
+  var fx = th.fx, g = ctx.createLinearGradient(0, 0, 0, VH); g.addColorStop(0, th.bg1); g.addColorStop(1, th.bg2);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
+  if (fx === 'white') { grain(ctx, 0.5); ctx.fillStyle = 'rgba(60,90,160,.07)'; for (var ly = 170; ly < VH; ly += 64) ctx.fillRect(0, ly, VW, 2); ctx.fillStyle = 'rgba(200,60,60,.14)'; ctx.fillRect(100, 0, 2, VH); return; }
+  if (fx === 'library') {
+    var pal = ['#7A2E22', '#2F4A3A', '#31405E', '#8A6A2A', '#5A3A5E', '#3F2A1C', '#6E3B2A'];
+    for (var sr = 0; sr < 5; sr++) {
+      var py = 330 + sr * 390, bx0 = -10 - (sr * 17) % 30, n0 = 0;
+      while (bx0 < VW) { var bw = 34 + (n0 * 37 + sr * 11) % 38, bh = 220 + (n0 * 53 + sr * 29) % 120; ctx.fillStyle = pal[(n0 + sr * 3) % 7]; ctx.fillRect(bx0, py - bh, bw - 3, bh); ctx.fillStyle = 'rgba(227,176,75,.55)'; ctx.fillRect(bx0, py - bh + 30, bw - 3, 4); ctx.fillRect(bx0, py - 40, bw - 3, 4); bx0 += bw; n0++; }
+      ctx.fillStyle = '#2A1709'; ctx.fillRect(0, py, VW, 24); ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(0, py + 24, VW, 14);
+    }
+    ctx.fillStyle = 'rgba(14,7,3,.58)'; ctx.fillRect(0, 0, VW, VH);
+    var fl = 0.2 + 0.04 * Math.sin(t * 3) + 0.02 * Math.sin(t * 7.3), lg = ctx.createRadialGradient(540, 760, 60, 540, 760, 900); lg.addColorStop(0, 'rgba(255,196,110,' + fl + ')'); lg.addColorStop(1, 'rgba(255,196,110,0)'); ctx.fillStyle = lg; ctx.fillRect(0, 0, VW, VH);
+    grain(ctx, 0.35); return;
+  }
+  if (fx === 'matte') { grain(ctx, 0.6); return; }
+  if (fx === 'vintage') {
+    grain(ctx, 1);
+    var v = ctx.createRadialGradient(540, 960, 520, 540, 960, 1300); v.addColorStop(0, 'rgba(80,45,10,0)'); v.addColorStop(1, 'rgba(80,45,10,.5)'); ctx.fillStyle = v; ctx.fillRect(0, 0, VW, VH);
+    ctx.fillStyle = 'rgba(80,50,15,.08)'; ctx.fillRect(538, 0, 4, VH); ctx.fillRect(0, 958, VW, 4);
+    ctx.fillStyle = 'rgba(91,58,18,.25)'; for (var k = 0; k < 14; k++) { ctx.beginPath(); ctx.arc((k * 197 + 80) % VW, (k * 421 + 120 + t * 5 * (k % 3)) % VH, 2 + k % 3, 0, 7); ctx.fill(); }
+    return;
+  }
+  if (fx === 'premium') {
+    var cols = ['#7B5CFF', '#22D3EE', th.accent];
+    for (var i = 0; i < 7; i++) {
+      var r = 150 + (i * 37) % 140, x = 540 + Math.sin(t * 0.35 + i * 1.9) * 430, y = 200 + ((i * 290 + t * 26) % 1600);
+      var rg = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.05, x, y, r); rg.addColorStop(0, rgba('#FFFFFF', 0.22)); rg.addColorStop(0.35, rgba(cols[i % 3], 0.22)); rg.addColorStop(1, rgba(cols[i % 3], 0));
+      ctx.fillStyle = rg; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+    }
+    return;
+  }
+  var r0 = ctx.createRadialGradient(540, 700, 40, 540, 700, 820); r0.addColorStop(0, rgba(th.accent, 0.2)); r0.addColorStop(1, rgba(th.accent, 0));
+  ctx.fillStyle = r0; ctx.fillRect(0, 0, VW, VH);
+  for (var j = 0; j < 16; j++) {
+    var sp = 16 + (j * 7) % 22, size = 44 + (j * 13) % 44, bx = (j * 173 + 60) % VW, by = (VH + 220) - ((t * sp + j * 211) % (VH + 440));
+    ctx.save(); ctx.translate(bx, by); ctx.rotate(Math.sin(t * 0.4 + j) * 0.6);
+    ctx.globalAlpha = 0.05 + (j % 3) * 0.015; ctx.fillStyle = th.text;
+    rr(ctx, -size * 0.36, -size / 2, size * 0.72, size, 6); ctx.fill();
+    ctx.globalAlpha *= 1.8; ctx.fillRect(-size * 0.36 + 6, -size / 2 + 8, 5, size - 16);
+    ctx.restore();
+  }
+}
+
+function drawLogo(ctx, t, th, ink, a) {
+  var S = state, h = 112, cy = 176, L = media.logo, imgW = h;
+  if (L) imgW = Math.min(340, h * L.img.width / L.img.height);
+  var name = S.show.orgName ? S.org : '', nameW = 0;
+  if (name) { fitSize(ctx, name, 760, 44, 26, 800); nameW = ctx.measureText(name).width; }
+  var gap = name ? 22 : 0, total = imgW + gap + nameW, x0 = 540 - total / 2;
+  var pulse = (Math.sin(t * 2.2) + 1) / 2;
+  ctx.save(); ctx.globalAlpha = a; var sc = 0.88 + 0.12 * a;
+  ctx.translate(540, cy); ctx.scale(sc, sc); ctx.translate(-540, -cy);
+  ctx.save(); ctx.shadowColor = rgba(th.accent, 0.45 + 0.45 * pulse); ctx.shadowBlur = calm(th) ? 0 : 22 + 28 * pulse;
+  if (L) { ctx.drawImage(L.img, x0, cy - h / 2, imgW, h); }
+  else {
+    var cx = x0 + h / 2;
+    ctx.fillStyle = th.accent; ctx.beginPath(); ctx.arc(cx, cy, h / 2, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+  if (!L) {
+    var cx2 = x0 + h / 2; ctx.fillStyle = ink;
+    ctx.beginPath(); ctx.moveTo(cx2, cy - 16); ctx.quadraticCurveTo(cx2 - 22, cy - 32, cx2 - 42, cy - 24); ctx.lineTo(cx2 - 42, cy + 28); ctx.quadraticCurveTo(cx2 - 22, cy + 20, cx2, cy + 36); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(cx2, cy - 16); ctx.quadraticCurveTo(cx2 + 22, cy - 32, cx2 + 42, cy - 24); ctx.lineTo(cx2 + 42, cy + 28); ctx.quadraticCurveTo(cx2 + 22, cy + 20, cx2, cy + 36); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = th.accent; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(cx2, cy - 14); ctx.lineTo(cx2, cy + 34); ctx.stroke();
+    var ph = (t % 3.6) / 3.6, bx = x0 - 60 + ph * (h + 120);
+    ctx.save(); ctx.beginPath(); ctx.arc(cx2, cy, h / 2, 0, Math.PI * 2); ctx.clip();
+    var g = ctx.createLinearGradient(bx - 40, 0, bx + 40, 0); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, 'rgba(255,255,255,.5)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g; ctx.fillRect(bx - 60, cy - h / 2, 120, h); ctx.restore();
+  }
+  if (name) text(ctx, name, x0 + imgW + gap, cy + 2, { size: 44, weight: 800, color: th.text, maxW: 760, min: 26 });
+  ctx.restore();
+}
+
+
+
+function drawHead(ctx, t, th, a, y, hh) {
+  var L = (state.show.logo && media.logo) ? media.logo : null, cy = y + hh / 2;
+  ctx.save(); ctx.globalAlpha = a; var sc = 0.9 + 0.1 * a; ctx.translate(540, cy); ctx.scale(sc, sc); ctx.translate(-540, -cy);
+  if (L) {
+    var sz = Math.min(state.logoSize || 150, y + hh - 6), w = Math.min(1000, sz * L.img.width / L.img.height), h = w * L.img.height / L.img.width;
+    ctx.save(); if (!calm(th)) { ctx.shadowColor = rgba(th.accent, 0.5); ctx.shadowBlur = 26; } ctx.drawImage(L.img, 540 - w / 2, y + hh - h, w, h); ctx.restore();
+  } else text(ctx, state.org, 540, cy + 2, { size: 56, weight: 800, color: th.text, align: 'center', maxW: 960, min: 28 });
+  ctx.restore();
+}
+function festParts() { var S = state, p = [], sh = S.show; if (sh.festival && S.fest) p.push([S.fest, 1]); if (sh.date && S.date) p.push([S.date]); if (sh.place && S.place) p.push([S.place]); if (sh.stall && S.stall) p.push([S.labels.stall + ' ' + S.stall]); return p; }
+function drawFest(ctx, t, th, a, y, p) {
+  var sz, tw = 0, sep = '  ·  ';
+  for (sz = 30; sz > 16; sz -= 2) { sf(ctx, sz, 800); tw = p.reduce(function (s, q, i) { return s + ctx.measureText(q[0]).width + (i ? ctx.measureText(sep).width : 0); }, 0); if (tw <= 940) break; }
+  ctx.save(); ctx.globalAlpha = a; ctx.translate((1 - a) * -120, 0);
+  panel(ctx, 40, y, 1000, 60, 30, th, t);
+  var x = 540 - tw / 2; sf(ctx, sz, 800); ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  p.forEach(function (q, i) { if (i) { ctx.fillStyle = rgba(th.text, 0.5); ctx.fillText(sep, x, y + 32); x += ctx.measureText(sep).width; } ctx.fillStyle = q[1] ? th.accent : th.text; ctx.fillText(q[0], x, y + 32); x += ctx.measureText(q[0]).width; });
+  ctx.restore();
+}
+
+function drawSpeaker(ctx, t, th, ink, a, o, R) {
+  var S = state, fx = th.fx, m = (fx === 'vintage' || fx === 'white' || fx === 'library') ? 14 : 0, x = 30 + m, w = 1020 - 2 * m, y = R[0] + m, h = R[1] - 2 * m, sp = media.speaker, rad = fx === 'matte' ? 34 : 50;
+  ctx.save(); ctx.globalAlpha = a; var sc = 0.96 + 0.04 * a; ctx.translate(540, y + h / 2); ctx.scale(sc, sc);
+  if (fx === 'premium') ctx.transform(1, Math.sin(t * 0.9) * 0.005, Math.sin(t * 0.7) * 0.012, 1, 0, 0);
+  ctx.translate(-540, -(y + h / 2));
+  if (fx === 'premium') { for (var d = 20; d > 0; d -= 5) { ctx.fillStyle = rgba(th.accent, 0.1 + (20 - d) * 0.012); rr(ctx, x, y + d, w, h, rad); ctx.fill(); } }
+  else if (fx === 'vintage' || fx === 'white' || fx === 'library') { ctx.save(); ctx.shadowColor = 'rgba(50,30,10,.5)'; ctx.shadowBlur = 22; ctx.shadowOffsetY = 9; ctx.fillStyle = th.card; rr(ctx, x - m, y - m, w + 2 * m, h + 2 * m, rad + 8); ctx.fill(); ctx.restore(); }
+  else if (fx !== 'matte') { ctx.save(); ctx.shadowColor = rgba(th.accent, 0.4); ctx.shadowBlur = 44; ctx.fillStyle = rgba(th.text, 0.1); rr(ctx, x, y, w, h, rad); ctx.fill(); ctx.restore(); }
+  ctx.save(); rr(ctx, x, y, w, h, rad); ctx.clip();
+  var drawn = false;
+  if (sp && sp.kind === 'image') { drawCover(ctx, sp.img, sp.img.naturalWidth, sp.img.naturalHeight, x, y, w, h, 0.5, 0.2); drawn = true; }
+  else if (sp && sp.kind === 'video' && sp.el.readyState >= 2 && sp.el.videoWidth) { drawCover(ctx, sp.el, sp.el.videoWidth, sp.el.videoHeight, x, y, w, h, 0.5, 0.2); drawn = true; }
+  if (!drawn) {
+    ctx.fillStyle = rgba(th.text, 0.12); ctx.fillRect(x, y, w, h); ctx.fillStyle = rgba(th.text, 0.24);
+    ctx.beginPath(); ctx.arc(540, y + h * 0.38, 120, 0, 7); ctx.fill(); ctx.beginPath(); ctx.ellipse(540, y + h * 0.92, 270, 230, 0, 0, 7); ctx.fill();
+    if (o.preview) text(ctx, 'பேசுபவர் வீடியோ / படம் இங்கே', 540, y + 70, { size: 32, weight: 600, color: rgba(th.text, 0.75), align: 'center', maxW: 760, fam: SANS });
+  }
+  if (fx === 'vintage') { ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgba(150,100,40,.28)'; ctx.fillRect(x, y, w, h); ctx.globalCompositeOperation = 'source-over'; grain(ctx, 0.8); }
+  if (fx === 'premium') { var sg = ctx.createLinearGradient(x, y, x + w * 0.7, y + h * 0.5); sg.addColorStop(0, 'rgba(255,255,255,.16)'); sg.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = sg; ctx.fillRect(x, y, w, h); }
+  if (S.show.speakerTag && (S.spName || S.spRole)) {
+    var two = S.spName && S.spRole, bh = two ? 108 : 80, mg = 26, bw = w - 2 * mg, by = y + h - bh - mg, ta = eo3((t - 0.8) / 0.7), bx = x + mg - (1 - ta) * w, ir = fx === 'matte' ? 22 : 30, lite = fx === 'vintage' || fx === 'white' || fx === 'library';
+    ctx.save();
+    if (lite) { ctx.shadowColor = 'rgba(0,0,0,.3)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 4; ctx.fillStyle = th.card; rr(ctx, bx, by, bw, bh, ir); ctx.fill(); ctx.shadowColor = 'transparent'; ctx.strokeStyle = th.accent; ctx.lineWidth = 3; rr(ctx, bx + 7, by + 7, bw - 14, bh - 14, ir - 6); ctx.stroke(); }
+    else if (fx === 'premium') { var bg = ctx.createLinearGradient(bx, by, bx, by + bh); bg.addColorStop(0, 'rgba(255,255,255,.3)'); bg.addColorStop(1, 'rgba(20,12,70,.8)'); ctx.fillStyle = bg; rr(ctx, bx, by, bw, bh, ir); ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 2; rr(ctx, bx, by, bw, bh, ir); ctx.stroke(); }
+    else { ctx.fillStyle = th.accent; rr(ctx, bx, by, bw, bh, ir); ctx.fill(); }
+    ctx.restore();
+    var nc = lite ? th.text : fx === 'premium' ? '#FFFFFF' : ink, rc = (lite || fx === 'premium') ? th.accent : rgba(ink, 0.85);
+    if (S.spName) text(ctx, S.spName, bx + 38, by + (two ? 42 : bh / 2 + 2), { size: 46, weight: 800, color: nc, maxW: bw - 76, min: 24 });
+    if (S.spRole) text(ctx, S.spRole, bx + 38, by + (two ? 82 : bh / 2 + 2), { size: 28, weight: 700, color: rc, maxW: bw - 76, min: 18 });
+  }
+  ctx.restore();
+  ctx.save();
+  if (fx === 'premium') { var b2 = ctx.createLinearGradient(x, y, x + w, y + h); b2.addColorStop(0, '#FFFFFF'); b2.addColorStop(0.5, th.accent); b2.addColorStop(1, 'rgba(255,255,255,.4)'); ctx.strokeStyle = b2; ctx.lineWidth = 5; }
+  else if (fx === 'vintage') { ctx.strokeStyle = rgba(th.text, 0.55); ctx.lineWidth = 2; }
+  else if (fx === 'white') { ctx.strokeStyle = 'rgba(0,0,0,.12)'; ctx.lineWidth = 2; }
+  else if (fx === 'library') { ctx.strokeStyle = rgba(th.accent, 0.75); ctx.lineWidth = 3; rr(ctx, x - m, y - m, w + 2 * m, h + 2 * m, rad + 8); ctx.stroke(); ctx.strokeStyle = th.accent; ctx.lineWidth = 5; }
+  else { ctx.strokeStyle = th.accent; ctx.lineWidth = 6; if (fx !== 'matte') { var pu = (Math.sin(t * 2) + 1) / 2; ctx.shadowColor = rgba(th.accent, 0.35 + 0.3 * pu); ctx.shadowBlur = 20 + 14 * pu; } }
+  rr(ctx, x, y, w, h, rad); ctx.stroke(); ctx.restore();
+  if (fx === 'vintage') [[x + 60, y + 6, -0.5], [x + w - 60, y + 6, 0.5]].forEach(function (q) { ctx.save(); ctx.translate(q[0], q[1]); ctx.rotate(q[2]); ctx.fillStyle = 'rgba(225,200,130,.82)'; ctx.fillRect(-52, -15, 104, 30); ctx.restore(); });
+  ctx.restore();
+}
+
+function titleLines(ctx, s) { var size = 54, lines = []; for (; size >= 36; size -= 2) { sf(ctx, size, 800); lines = wrap(ctx, s, 980); if (lines.length <= 2) break; } return [size, lines.slice(0, 2)]; }
+function titleH(ctx) { var m = 1; state.books.forEach(function (b) { if (b.title) { var r = titleLines(ctx, b.title); m = Math.max(m, r[1].length * r[0] * 1.2 + 4); } }); return Math.ceil(m); }
+function drawTitle(ctx, t, th, p, exit, book, R) {
+  var a = Math.min(p, exit); if (a <= 0 || !book.title) return;
+  var size = 54, lines = [];
+  for (; size >= 36; size -= 2) { sf(ctx, size, 800); lines = wrap(ctx, book.title, 980); if (lines.length <= 2) break; }
+  lines = lines.slice(0, 2);
+  var lh = size * 1.2, cy = R[0] + R[1] / 2;
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(0, (1 - p) * 30);
+  lines.forEach(function (ln, i) {
+    var yy = cy - lh * lines.length / 2 + lh * i + lh / 2;
+    if (th.fx === 'premium') for (var k = 7; k > 0; k--) text(ctx, ln, 540, yy + k, { size: size, weight: 800, color: 'rgba(0,0,0,.28)', align: 'center' });
+    text(ctx, ln, 540, yy, { size: size, weight: 800, color: th.text, align: 'center' });
+  });
+  ctx.restore();
+}
+
+function pctOf(b) { var o = parseInt(digits(b.oldP), 10), n = parseInt(digits(b.newP), 10); return o > 0 && n > 0 && o > n ? Math.round((o - n) / o * 100) : 0; }
+function drawBackPh(ctx, x, y, w, h, th) {
+  var on = onColor(th.accent); ctx.fillStyle = th.accent; ctx.fillRect(x, y, w, h); ctx.fillStyle = rgba(on, 0.5);
+  for (var i = 0; i < 6; i++) ctx.fillRect(x + 16, y + 30 + i * 22, i % 3 === 2 ? w * 0.5 : w - 32, 8);
+  ctx.fillStyle = '#FFFFFF'; ctx.fillRect(x + w - 82, y + h - 60, 66, 42); ctx.fillStyle = '#111';
+  for (var j = 0; j < 12; j++) ctx.fillRect(x + w - 78 + j * 5, y + h - 56, 2 + (j % 3), 34);
+}
+function drawBookBox(ctx, t, th, cl, x, y, w, h, ca, cp, im, ph, dir, spin, im2, ph2) {
+  if (ca <= 0) return;
+  var fx = th.fx, cx = x + w / 2, cy = y + h / 2;
+  ctx.save(); ctx.globalAlpha = ca; ctx.translate(cx, cy + (1 - eob(cp)) * 120 + (cl ? 0 : Math.sin(t * 1.6 + dir) * 5));
+  if (fx === 'premium') { var ang = 0.5 * Math.sin(t * 1.2 + dir); ctx.transform(Math.cos(ang), Math.sin(ang) * 0.07, 0, 1, 0, 0); } else ctx.rotate(cl ? 0 : Math.sin(t * 1.1 + dir) * 0.012 - (1 - eo3(cp)) * 0.14 * dir);
+  var face = 0; if (spin) { var cs = Math.cos(spin); ctx.scale(Math.max(0.03, Math.abs(cs)), 1); face = cs < 0 ? 1 : 0; }
+  ctx.translate(-cx, -cy);
+  if (fx === 'premium') for (var d = 14; d > 0; d -= 3) { ctx.fillStyle = rgba(th.accent, 0.35); rr(ctx, x + d * 0.8 * dir, y + d * 0.3, w, h, 12); ctx.fill(); }
+  ctx.save(); if (fx !== 'matte') { ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = fx === 'premium' ? 30 : 16; ctx.shadowOffsetY = 12; } ctx.fillStyle = th.bg2; rr(ctx, x, y, w, h, 12); ctx.fill(); ctx.restore();
+  ctx.save(); rr(ctx, x, y, w, h, 12); ctx.clip();
+  var fi = face ? im2 : im, fph = face ? ph2 : ph; if (fi) drawCover(ctx, fi.img, fi.img.naturalWidth, fi.img.naturalHeight, x, y, w, h, 0.5, 0.5); else fph();
+  var sx = dir > 0 ? x : x + w, g = ctx.createLinearGradient(sx, 0, sx + 22 * dir, 0); g.addColorStop(0, 'rgba(0,0,0,.38)'); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(dir > 0 ? x : x + w - 22, y, 22, h);
+  ctx.restore(); ctx.strokeStyle = 'rgba(255,255,255,.28)'; ctx.lineWidth = 2; rr(ctx, x, y, w, h, 12); ctx.stroke(); ctx.restore();
+}
+function drawInfo(ctx, t, lt, th, ink, exit, book, R) {
+  var S = state, sh = S.show, cl = calm(th), y0 = R[0], H = R[1], CW = 224, CH = 336, cy0 = y0, x0 = 30, x1 = 1050;
+  var li = function (s, d) { return Math.min(eo3((lt - s) / d), exit); };
+  var sp0 = (t % 20) - 12, spin = 0;
+  if (sp0 >= 0 && sp0 < 1.8 && lt > 1.3 && exit >= 1) spin = Math.PI * (1 - Math.cos(Math.PI * sp0 / 1.8));
+  if (sh.cover) { drawBookBox(ctx, t, th, cl, 30, cy0, CW, CH, Math.min(eo3((lt - 0.1) / 0.6), exit), clamp((lt - 0.1) / 1), media.covers[book.id], function () { drawCoverPlaceholder(ctx, 30, cy0, CW, CH, book, th); }, 1, spin, media.backs[book.id], function () { drawBackPh(ctx, 30, cy0, CW, CH, th); }); x0 = 30 + CW + 14; }
+  if (sh.back) { var bkx = 1050 - CW; drawBookBox(ctx, t, th, cl, bkx, cy0, CW, CH, Math.min(eo3((lt - 0.3) / 0.6), exit), clamp((lt - 0.3) / 1), media.backs[book.id], function () { drawBackPh(ctx, bkx, cy0, CW, CH, th); }, -1, spin, media.covers[book.id], function () { drawCoverPlaceholder(ctx, bkx, cy0, CW, CH, book, th); }); x1 = bkx - 14; }
+  var tx = x0, W = x1 - x0, items = [], gp = 8;
+  var add = function (h, f) { items.push({ h: h, f: f }); };
+  if (sh.title && book.title) { var tz = 46, tls = []; for (; tz >= 30; tz -= 2) { sf(ctx, tz, 800); tls = wrap(ctx, book.title, W); if (tls.length <= 2) break; } tz = Math.max(tz, 30); tls = tls.slice(0, 3); var tlh = tz * 1.2; add(tls.length * tlh + 4, function (yy) { tls.forEach(function (ln, i) { var ly = yy + tlh * (i + 0.5) + 2; if (th.fx === 'premium') for (var k = 6; k > 0; k--) text(ctx, ln, tx + W / 2, ly + k, { size: tz, weight: 800, color: 'rgba(0,0,0,.28)', align: 'center' }); shineText(ctx, ln, tx + W / 2, ly, tz, th, t, W); }); }); }
+  if (sh.genre && book.genre) add(44, function (yy) { sf(ctx, 27, 800); var gw = Math.min(W, ctx.measureText(book.genre).width + 48); chip(ctx, tx + (W - gw) / 2, yy, gw, 44, th); text(ctx, book.genre, tx + W / 2, yy + 23, { size: 27, weight: 800, color: ink, align: 'center', maxW: W - 30, min: 16 }); });
+  if (sh.author && book.author) add(62, function (yy) { text(ctx, S.labels.author, tx + W / 2, yy + 9, { size: 20, weight: 700, color: rgba(th.text, 0.7), align: 'center', fam: SANS }); text(ctx, book.author, tx + W / 2, yy + 41, { size: 40, weight: 800, color: th.text, align: 'center', maxW: W, min: 22 }); });
+  if (sh.publisher && book.publisher) add(58, function (yy) { text(ctx, S.labels.publisher, tx + W / 2, yy + 9, { size: 20, weight: 700, color: rgba(th.text, 0.7), align: 'center', fam: SANS }); text(ctx, book.publisher, tx + W / 2, yy + 38, { size: 34, weight: 700, color: th.text, align: 'center', maxW: W, min: 20 }); });
+  var tot = items.reduce(function (s, i) { return s + i.h; }, 0) + gp * Math.max(0, items.length - 1), yy = y0 + (H - tot) / 2;
+  items.forEach(function (it, k) { var p = li(0.25 + 0.15 * k, 0.6); if (p > 0) { ctx.save(); ctx.globalAlpha = p; ctx.translate((1 - p) * 40, 0); it.f(yy); ctx.restore(); } yy += it.h + gp; });
+}
+function drawInfoOld2(ctx, t, lt, th, ink, exit, book, R) {
+  var S = state, sh = S.show, fx = th.fx, y0 = R[0], H = R[1], cl = calm(th), CW = 150, CH = 225, cy0 = y0 + (H - CH) / 2, x0 = 40, x1 = 1040;
+  var li = function (s, d) { return Math.min(eo3((lt - s) / d), exit); };
+  var pct = sh.discount ? pctOf(book) : 0;
+  if (sh.cover) { drawBookBox(ctx, t, th, cl, 40, cy0, CW, CH, Math.min(eo3((lt - 0.1) / 0.6), exit), clamp((lt - 0.1) / 1), media.covers[book.id], function () { drawCoverPlaceholder(ctx, 40, cy0, CW, CH, book, th); }, 1); x0 = 40 + CW + 24; }
+  if (sh.back) { var bkx = 1040 - CW; drawBookBox(ctx, t, th, cl, bkx, cy0, CW, CH, Math.min(eo3((lt - 0.3) / 0.6), exit), clamp((lt - 0.3) / 1), media.backs[book.id], function () { drawBackPh(ctx, bkx, cy0, CW, CH, th); }, -1); x1 = bkx - 24; }
+  var rad = Math.min(104, H / 2), tx = x0, W = (pct ? x1 - 2 * rad - 16 : x1) - x0, items = [], gp = 6;
+  var add = function (h, f) { items.push({ h: h, f: f }); };
+  if (sh.genre && book.genre) add(40, function (yy) { sf(ctx, 25, 800); var gw = Math.min(W, ctx.measureText(book.genre).width + 44); chip(ctx, tx, yy, gw, 40, th); text(ctx, book.genre, tx + gw / 2, yy + 21, { size: 25, weight: 800, color: ink, align: 'center', maxW: W - 30, min: 16 }); });
+  if (sh.author && book.author) add(54, function (yy) { text(ctx, S.labels.author, tx, yy + 8, { size: 19, weight: 700, color: rgba(th.text, 0.7), fam: SANS }); text(ctx, book.author, tx, yy + 36, { size: 34, weight: 800, color: th.text, maxW: W, min: 20 }); });
+  if (sh.publisher && book.publisher) add(50, function (yy) { text(ctx, S.labels.publisher, tx, yy + 8, { size: 19, weight: 700, color: rgba(th.text, 0.7), fam: SANS }); text(ctx, book.publisher, tx, yy + 34, { size: 30, weight: 700, color: th.text, maxW: W, min: 18 }); });
+  var oldS = money(book.oldP), newS = money(book.newP);
+  if (sh.price && (oldS || newS)) add(66, function (yy) {
+    var cy = yy + 33, px = tx;
+    if (oldS && newS) { sf(ctx, 28, 700); var ow = ctx.measureText(oldS).width; text(ctx, oldS, px, cy, { size: 28, weight: 700, color: rgba(th.text, 0.7) }); ctx.strokeStyle = rgba(th.text, 0.85); ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(px - 3, cy + 2); ctx.lineTo(px + ow + 3, cy - 3); ctx.stroke(); px += ow + 10; text(ctx, '→', px, cy - 2, { size: 32, weight: 700, color: th.accent }); px += 40; }
+    var shown = newS || oldS; sf(ctx, 44, 800); var cw = Math.max(130, ctx.measureText(shown).width + 40), pu = cl ? 1 : 1 + 0.03 * Math.sin(t * 4);
+    ctx.save(); ctx.translate(px + cw / 2, cy); ctx.scale(pu, pu); ctx.translate(-(px + cw / 2), -cy); chip(ctx, px, cy - 29, cw, 58, th); text(ctx, shown, px + cw / 2, cy + 2, { size: 44, weight: 800, color: ink, align: 'center' }); ctx.restore();
+  });
+  var tot = items.reduce(function (s, i) { return s + i.h; }, 0) + gp * Math.max(0, items.length - 1), yy = y0 + (H - tot) / 2;
+  items.forEach(function (it, k) { var p = li(0.25 + 0.15 * k, 0.6); if (p > 0) { ctx.save(); ctx.globalAlpha = p; ctx.translate((1 - p) * 40, 0); it.f(yy); ctx.restore(); } yy += it.h + gp; });
+  if (pct) {
+    var bp = Math.min(eob((lt - 0.9) / 0.6), 1) * exit;
+    if (bp > 0) {
+      var bs = bp * (cl ? 1 : 1 + 0.04 * Math.sin(t * 4 + 1)) * rad / 112, pt = pct + '%';
+      ctx.save(); ctx.translate(x1 - rad, y0 + H / 2); ctx.rotate(fx === 'vintage' ? -0.2 : -0.12); ctx.scale(bs, bs);
+      if (fx === 'premium') {
+        ctx.transform(Math.cos(0.4 * Math.sin(t * 1.4)), 0, Math.sin(t * 1.1) * 0.05, 1, 0, 0);
+        for (var e = 14; e > 0; e -= 2) { ctx.save(); ctx.translate(e * 0.5, e); burst(ctx, 112, 18, 0.9); ctx.fillStyle = e > 8 ? '#6B4A0E' : '#9A7216'; ctx.fill(); ctx.restore(); }
+        var bg = ctx.createRadialGradient(-30, -40, 10, 0, 0, 120); bg.addColorStop(0, '#FFF6CC'); bg.addColorStop(0.5, th.accent); bg.addColorStop(1, '#B98A22'); ctx.shadowColor = rgba(th.accent, 0.6); ctx.shadowBlur = 26; burst(ctx, 112, 18, 0.9); ctx.fillStyle = bg; ctx.fill(); ctx.shadowBlur = 0;
+      } else { burst(ctx, 112, 18, 0.9); ctx.fillStyle = th.accent; ctx.fill(); }
+      ctx.strokeStyle = rgba(ink, 0.5); ctx.lineWidth = fx === 'vintage' ? 4 : 3; ctx.beginPath(); ctx.arc(0, 0, 88, 0, 7); ctx.stroke();
+      if (fx === 'premium') for (var q = 5; q > 0; q--) text(ctx, pt, q * 0.6, -14 + q, { size: 88, weight: 800, color: 'rgba(90,60,5,.45)', align: 'center', maxW: 150 });
+      text(ctx, pt, 0, -14, { size: 88, weight: 800, color: ink, align: 'center', maxW: 150 });
+      text(ctx, S.labels.off, 0, 52, { size: 28, weight: 800, color: ink, align: 'center', maxW: 130, min: 14, fam: SANS });
+      ctx.restore();
+    }
+  }
+}
+function drawInfoOld(ctx, t, lt, th, ink, exit, book, R) {
+  var S = state, sh = S.show, fx = th.fx, y0 = R[0], H = R[1], cl = calm(th), x0 = 40;
+  var li = function (s, d) { return Math.min(eo3((lt - s) / d), exit); };
+  var pct = sh.discount ? pctOf(book) : 0;
+  if (sh.cover) {
+    var cp = clamp((lt - 0.1) / 1), ca = Math.min(eo3((lt - 0.1) / 0.6), exit), cx = 122, cy = y0 + 125;
+    if (ca > 0) {
+      ctx.save(); ctx.globalAlpha = ca; ctx.translate(cx, cy + (1 - eob(cp)) * 120 + (cl ? 0 : Math.sin(t * 1.6) * 5));
+      if (fx === 'premium') { var ang = 0.5 * Math.sin(t * 1.2); ctx.transform(Math.cos(ang), Math.sin(ang) * 0.07, 0, 1, 0, 0); } else ctx.rotate(cl ? 0 : Math.sin(t * 1.1) * 0.012 - (1 - eo3(cp)) * 0.14);
+      ctx.translate(-cx, -cy);
+      var x = 40, y = y0 + 5, w = 165, h = 240;
+      if (fx === 'premium') for (var d = 14; d > 0; d -= 3) { ctx.fillStyle = rgba(th.accent, 0.35); rr(ctx, x + d * 0.8, y + d * 0.3, w, h, 12); ctx.fill(); }
+      ctx.save(); if (fx !== 'matte') { ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = fx === 'vintage' ? 16 : 30; ctx.shadowOffsetY = 14; } ctx.fillStyle = th.bg2; rr(ctx, x, y, w, h, 12); ctx.fill(); ctx.restore();
+      ctx.save(); rr(ctx, x, y, w, h, 12); ctx.clip();
+      var cv = media.covers[book.id];
+      if (cv) drawCover(ctx, cv.img, cv.img.naturalWidth, cv.img.naturalHeight, x, y, w, h, 0.5, 0.5); else drawCoverPlaceholder(ctx, x, y, w, h, book, th);
+      var g = ctx.createLinearGradient(x, 0, x + 22, 0); g.addColorStop(0, 'rgba(0,0,0,.38)'); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(x, y, 22, h);
+      ctx.restore(); ctx.strokeStyle = 'rgba(255,255,255,.28)'; ctx.lineWidth = 2; rr(ctx, x, y, w, h, 12); ctx.stroke(); ctx.restore();
+    }
+    x0 = 240;
+  }
+  var tx = x0, W = (pct ? 928 - 112 - 24 : 1040) - x0, items = [], gp = 8;
+  var add = function (h, f) { items.push({ h: h, f: f }); };
+  if (sh.genre && book.genre) add(40, function (yy) { sf(ctx, 25, 800); var gw = Math.min(W, ctx.measureText(book.genre).width + 44); chip(ctx, tx, yy, gw, 40, th); text(ctx, book.genre, tx + gw / 2, yy + 21, { size: 25, weight: 800, color: ink, align: 'center', maxW: W - 30, min: 16 }); });
+  if (sh.author && book.author) add(58, function (yy) { text(ctx, S.labels.author, tx, yy + 9, { size: 19, weight: 700, color: rgba(th.text, 0.7), fam: SANS }); text(ctx, book.author, tx, yy + 38, { size: 36, weight: 800, color: th.text, maxW: W, min: 22 }); });
+  if (sh.publisher && book.publisher) add(54, function (yy) { text(ctx, S.labels.publisher, tx, yy + 9, { size: 19, weight: 700, color: rgba(th.text, 0.7), fam: SANS }); text(ctx, book.publisher, tx, yy + 36, { size: 32, weight: 700, color: th.text, maxW: W, min: 20 }); });
+  var oldS = money(book.oldP), newS = money(book.newP);
+  if (sh.price && (oldS || newS)) add(70, function (yy) {
+    var cy = yy + 35, px = tx;
+    if (oldS && newS) { sf(ctx, 30, 700); var ow = ctx.measureText(oldS).width; text(ctx, oldS, px, cy, { size: 30, weight: 700, color: rgba(th.text, 0.7) }); ctx.strokeStyle = rgba(th.text, 0.85); ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(px - 3, cy + 2); ctx.lineTo(px + ow + 3, cy - 3); ctx.stroke(); px += ow + 14; text(ctx, '→', px, cy - 2, { size: 36, weight: 700, color: th.accent }); px += 46; }
+    var shown = newS || oldS; sf(ctx, 48, 800); var cw = Math.max(150, ctx.measureText(shown).width + 44), pu = cl ? 1 : 1 + 0.03 * Math.sin(t * 4);
+    ctx.save(); ctx.translate(px + cw / 2, cy); ctx.scale(pu, pu); ctx.translate(-(px + cw / 2), -cy); chip(ctx, px, cy - 31, cw, 62, th); text(ctx, shown, px + cw / 2, cy + 2, { size: 48, weight: 800, color: ink, align: 'center' }); ctx.restore();
+  });
+  var tot = items.reduce(function (s, i) { return s + i.h; }, 0) + gp * Math.max(0, items.length - 1), yy = y0 + (H - tot) / 2;
+  items.forEach(function (it, k) { var p = li(0.25 + 0.15 * k, 0.6); if (p > 0) { ctx.save(); ctx.globalAlpha = p; ctx.translate((1 - p) * 40, 0); it.f(yy); ctx.restore(); } yy += it.h + gp; });
+  if (pct) {
+    var bp = Math.min(eob((lt - 0.9) / 0.6), 1) * exit;
+    if (bp > 0) {
+      var bs = bp * (cl ? 1 : 1 + 0.04 * Math.sin(t * 4 + 1)), pt = pct + '%';
+      ctx.save(); ctx.translate(928, y0 + H / 2); ctx.rotate(fx === 'vintage' ? -0.2 : -0.12); ctx.scale(bs, bs);
+      if (fx === 'premium') {
+        ctx.transform(Math.cos(0.4 * Math.sin(t * 1.4)), 0, Math.sin(t * 1.1) * 0.05, 1, 0, 0);
+        for (var e = 14; e > 0; e -= 2) { ctx.save(); ctx.translate(e * 0.5, e); burst(ctx, 112, 18, 0.9); ctx.fillStyle = e > 8 ? '#6B4A0E' : '#9A7216'; ctx.fill(); ctx.restore(); }
+        var bg = ctx.createRadialGradient(-30, -40, 10, 0, 0, 120); bg.addColorStop(0, '#FFF6CC'); bg.addColorStop(0.5, th.accent); bg.addColorStop(1, '#B98A22'); ctx.shadowColor = rgba(th.accent, 0.6); ctx.shadowBlur = 26; burst(ctx, 112, 18, 0.9); ctx.fillStyle = bg; ctx.fill(); ctx.shadowBlur = 0;
+      } else { burst(ctx, 112, 18, 0.9); ctx.fillStyle = th.accent; ctx.fill(); }
+      ctx.strokeStyle = rgba(ink, 0.5); ctx.lineWidth = fx === 'vintage' ? 4 : 3; ctx.beginPath(); ctx.arc(0, 0, 88, 0, 7); ctx.stroke();
+      if (fx === 'premium') for (var q = 5; q > 0; q--) text(ctx, pt, q * 0.6, -14 + q, { size: 88, weight: 800, color: 'rgba(90,60,5,.45)', align: 'center', maxW: 150 });
+      text(ctx, pt, 0, -14, { size: 88, weight: 800, color: ink, align: 'center', maxW: 150 });
+      text(ctx, S.labels.off, 0, 52, { size: 28, weight: 800, color: ink, align: 'center', maxW: 130, min: 14, fam: SANS });
+      ctx.restore();
+    }
+  }
+}
+
+function drawCoverPlaceholder(ctx, x, y, w, h, book, th) {
+  var g = ctx.createLinearGradient(x, y, x + w, y + h); g.addColorStop(0, th.accent); g.addColorStop(1, rgba(th.accent, 0.7));
+  ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+  var on = onColor(th.accent);
+  ctx.fillStyle = rgba(on, 0.14); ctx.beginPath(); ctx.arc(x + w * 0.85, y + h * 0.18, w * 0.42, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + w * 0.1, y + h * 0.95, w * 0.5, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = rgba(on, 0.5); ctx.lineWidth = 3; ctx.strokeRect(x + 14, y + 14, w - 28, h - 28);
+  sf(ctx, 30, 800); var lines = wrap(ctx, book.title || 'புத்தகம்', w - 56).slice(0, 5), lh = 38;
+  lines.forEach(function (ln, i) { text(ctx, ln, x + w / 2, y + h / 2 - (lines.length * lh) / 2 + lh * i + lh / 2, { size: 30, weight: 800, color: on, align: 'center' }); });
+}
+
+var qrCache = {};
+function qrMatrix(s) {
+  if (!window.qrcode) return null;
+  if (qrCache[s]) return qrCache[s];
+  try {
+    var q = window.qrcode(0, 'M'); q.addData(s); q.make();
+    var n = q.getModuleCount(), m = [];
+    for (var r = 0; r < n; r++) { var row = []; for (var c = 0; c < n; c++) row.push(q.isDark(r, c)); m.push(row); }
+    return (qrCache[s] = m);
+  } catch (e) { return null; }
+}
+
+
+
+function contactRows() { var S = state; return [['wa', S.labels.wa, S.wa], ['web', S.labels.web, S.web], ['ig', S.labels.ig, S.ig]].filter(function (r) { return r[2]; }); }
+function drawContact(ctx, t, lt, th, ink, exit, a, R, rows, qrText, book, pr) {
+  var S = state, sh = S.show, fx = th.fx, cl = calm(th), x = 40, w = 1000, y = R[0], h = R[1], cy = y + h / 2;
+  var oldS = money(book.oldP), newS = money(book.newP), pct = sh.discount ? pctOf(book) : 0, showP = sh.price && (oldS || newS), rowsOn = rows.length || qrText;
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(0, (1 - a) * 70); panel(ctx, x, y, w, h, 30, th, t);
+  if (pr) {
+    var px0 = rowsOn ? x + 26 : x + 120, px1 = rowsOn ? x + 470 : x + w - 120, rad = Math.min(76, h / 2 - 8), pp = Math.min(eo3((lt - 0.5) / 0.6), exit), pxs = px0 + (pct ? 2 * rad + 20 : 0), pw = px1 - pxs;
+    if (pct) {
+      var bp = Math.min(eob((lt - 0.9) / 0.6), 1) * exit;
+      if (bp > 0) {
+        var bs = bp * (cl ? 1 : 1 + 0.04 * Math.sin(t * 4 + 1)) * rad / 112, pt = pct + '%';
+        ctx.save(); ctx.translate(px0 + rad, cy); ctx.rotate(fx === 'vintage' ? -0.2 : -0.12); ctx.scale(bs, bs);
+        if (fx === 'premium') {
+          ctx.transform(Math.cos(0.4 * Math.sin(t * 1.4)), 0, Math.sin(t * 1.1) * 0.05, 1, 0, 0);
+          for (var e = 14; e > 0; e -= 2) { ctx.save(); ctx.translate(e * 0.5, e); burst(ctx, 112, 18, 0.9); ctx.fillStyle = e > 8 ? '#6B4A0E' : '#9A7216'; ctx.fill(); ctx.restore(); }
+          var bg = ctx.createRadialGradient(-30, -40, 10, 0, 0, 120); bg.addColorStop(0, '#FFF6CC'); bg.addColorStop(0.5, th.accent); bg.addColorStop(1, '#B98A22'); ctx.shadowColor = rgba(th.accent, 0.6); ctx.shadowBlur = 26; burst(ctx, 112, 18, 0.9); ctx.fillStyle = bg; ctx.fill(); ctx.shadowBlur = 0;
+        } else { burst(ctx, 112, 18, 0.9); ctx.fillStyle = th.accent; ctx.fill(); }
+        ctx.strokeStyle = rgba(ink, 0.5); ctx.lineWidth = fx === 'vintage' ? 4 : 3; ctx.beginPath(); ctx.arc(0, 0, 88, 0, 7); ctx.stroke();
+        if (fx === 'premium') for (var q = 5; q > 0; q--) text(ctx, pt, q * 0.6, -14 + q, { size: 88, weight: 800, color: 'rgba(90,60,5,.45)', align: 'center', maxW: 150 });
+        text(ctx, pt, 0, -14, { size: 88, weight: 800, color: ink, align: 'center', maxW: 150 });
+        text(ctx, S.labels.off, 0, 52, { size: 28, weight: 800, color: ink, align: 'center', maxW: 130, min: 14, fam: SANS });
+        ctx.restore();
+      }
+    }
+    if (showP && pp > 0) {
+      ctx.save(); ctx.globalAlpha *= pp;
+      var two = oldS && newS, ny = cy + (two ? 22 : 0), shown = newS || oldS;
+      if (two) { sf(ctx, 30, 700); var ow = ctx.measureText(oldS).width; text(ctx, oldS, pxs, cy - 28, { size: 30, weight: 700, color: rgba(th.text, 0.7) }); ctx.strokeStyle = rgba(th.text, 0.85); ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(pxs - 3, cy - 26); ctx.lineTo(pxs + ow + 3, cy - 31); ctx.stroke(); }
+      sf(ctx, 50, 800); var cw = Math.min(pw, Math.max(150, ctx.measureText(shown).width + 44)), pu = cl ? 1 : 1 + 0.03 * Math.sin(t * 4);
+      ctx.translate(pxs + cw / 2, ny); ctx.scale(pu, pu); ctx.translate(-(pxs + cw / 2), -ny); chip(ctx, pxs, ny - 32, cw, 64, th); text(ctx, shown, pxs + cw / 2, ny + 2, { size: 50, weight: 800, color: ink, align: 'center', maxW: cw - 24, min: 24 });
+      ctx.restore();
+    }
+    if (rowsOn) { ctx.fillStyle = rgba(th.text, 0.25); ctx.fillRect(x + 492, y + 22, 2, h - 44); }
+  }
+  var rx = pr ? x + 520 : x + 40, qs = Math.min(h - 20, 130), qr = qrText ? x + w - qs - 16 : x + w - 16, rh = 38, sy = cy - rows.length * rh / 2 + rh / 2;
+  rows.forEach(function (r, i) { var yy = sy + i * rh; text(ctx, r[1], rx, yy, { size: 20, weight: 700, color: th.accent, maxW: 115, min: 13, fam: SANS }); text(ctx, r[2], rx + 125, yy, { size: 28, weight: 700, color: th.text, maxW: qr - 14 - (rx + 125), min: 16 }); });
+  if (qrText) {
+    var qy = cy - qs / 2; ctx.fillStyle = '#FFFFFF'; rr(ctx, qr, qy, qs, qs, 12); ctx.fill();
+    var m = qrMatrix(qrText), pad = 9;
+    if (m) { var ms = (qs - pad * 2) / m.length; ctx.fillStyle = '#111111'; for (var r2 = 0; r2 < m.length; r2++) for (var c = 0; c < m.length; c++) if (m[r2][c]) ctx.fillRect(qr + pad + c * ms, qy + pad + r2 * ms, ms + 0.6, ms + 0.6); }
+    else text(ctx, 'QR', qr + qs / 2, qy + qs / 2, { size: 36, weight: 800, color: '#111', align: 'center' });
+  }
+  ctx.restore();
+}
+function drawContactOld(ctx, t, th, a, R, rows, qrText) {
+  var x = 40, w = 1000, y = R[0], h = R[1];
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(0, (1 - a) * 70); panel(ctx, x, y, w, h, 30, th, t);
+  var rh = 40, sy = y + (h - rows.length * rh) / 2 + rh / 2 + 2;
+  rows.forEach(function (r, i) {
+    var yy = sy + i * rh;
+    text(ctx, r[1], 80, yy, { size: 20, weight: 700, color: th.accent, maxW: 150, min: 14, fam: SANS });
+    text(ctx, r[2], 245, yy, { size: 30, weight: 700, color: th.text, maxW: qrText ? 560 : 700, min: 18 });
+  });
+  if (qrText) {
+    var qs = h - 20, qx = x + w - qs - 14, qy = y + 10; ctx.fillStyle = '#FFFFFF'; rr(ctx, qx, qy, qs, qs, 12); ctx.fill();
+    var m = qrMatrix(qrText), pad = 9;
+    if (m) { var ms = (qs - pad * 2) / m.length; ctx.fillStyle = '#111111'; for (var r = 0; r < m.length; r++) for (var c = 0; c < m.length; c++) if (m[r][c]) ctx.fillRect(qx + pad + c * ms, qy + pad + r * ms, ms + 0.6, ms + 0.6); }
+    else text(ctx, 'QR', qx + qs / 2, qy + qs / 2, { size: 36, weight: 800, color: '#111', align: 'center' });
+  }
+  ctx.restore();
+}
+
+function drawCTA(ctx, t, th, ink, a, y) {
+  var s = state.cta; if (!s) return;
+  sf(ctx, 28, 800); var pw = Math.min(900, ctx.measureText(s).width + 90), pulse = calm(th) ? 1 : 1 + 0.03 * Math.sin(t * 5);
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(540, y + 24); ctx.scale(pulse, pulse);
+  chip(ctx, -pw / 2, -24, pw, 48, th); text(ctx, s, 0, 2, { size: 28, weight: 800, color: ink, align: 'center', maxW: pw - 50, min: 16 });
+  ctx.restore();
+}
+
+function drawDots(ctx, th, n, bi, lt, slot, a, y) {
+  var gap = 12, sw = [], tot = 0;
+  for (var i = 0; i < n; i++) { var w = i === bi ? 70 : 18; sw.push(w); tot += w; }
+  tot += gap * (n - 1); var x = 540 - tot / 2;
+  ctx.save(); ctx.globalAlpha = a;
+  for (var j = 0; j < n; j++) {
+    ctx.fillStyle = rgba(th.text, 0.28); rr(ctx, x, y - 6, sw[j], 12, 6); ctx.fill();
+    if (j <= bi) { var fw = j < bi ? sw[j] : Math.max(12, sw[j] * clamp(lt / slot)); ctx.fillStyle = th.accent; rr(ctx, x, y - 6, fw, 12, 6); ctx.fill(); }
+    x += sw[j] + gap;
+  }
+  ctx.restore();
+}
+
+function drawFrame(ctx, t, o) {
+  var th = curTheme(), ink = onColor(th.accent), S = state, sh = S.show;
+  ctx.save(); ctx.setTransform(o.w / VW, 0, 0, o.w / VW, 0, 0); ctx.clearRect(0, 0, VW, VH);
+  drawBg(ctx, t, th);
+  var n = S.books.length, slot = TOTAL / n, bi = Math.min(n - 1, Math.floor(t / slot)), lt = t - bi * slot, book = S.books[bi];
+  var exit = clamp((slot - lt) / 0.5), gi = function (s, d) { return eo3((t - s) / d); };
+  var G = 10, y = 150, b = 1792, Lh, Lf, Ld, Lc, Lcta, Lr, Lt, hh = (sh.logo && media.logo) ? 100 : 80;
+  var fp = festParts(), rows = sh.contact ? contactRows() : [], qt = S.qr || (digits(S.wa) ? 'https://wa.me/' + digits(S.wa) : ''), qrT = sh.contact && sh.qr && qt ? qt : '', pr = S.books.some(function (b) { return (sh.price && (money(b.oldP) || money(b.newP))) || (sh.discount && pctOf(b)); }), hasC = rows.length || qrT || pr;
+  if ((sh.logo && media.logo) || (sh.orgName && S.org)) { Lh = y; y += hh + G; }
+  if (fp.length) { Lf = y; y += 60 + G; }
+  if (sh.dots && n > 1) { Ld = b - 6; b -= 12 + G; }
+  if (hasC) { var ch = Math.max(rows.length * 38 + 20, qrT ? 140 : 0, pr ? 160 : 0); Lc = [b - ch, ch]; b -= ch + G; }
+  if (sh.cta && S.cta) { Lcta = b - 48; b -= 48 + G; }
+  if (sh.cover || sh.back || sh.title || sh.author || sh.publisher || sh.genre) { Lr = [b - 336, 336]; b -= 336 + G; }
+  
+  if (Lh !== undefined) drawHead(ctx, t, th, gi(0, 0.7), Lh, hh);
+  if (Lf !== undefined) drawFest(ctx, t, th, gi(0.2, 0.7), Lf, fp);
+  drawSpeaker(ctx, t, th, ink, gi(0.3, 0.9), o, [y, b - y]);
+  if (Lt) drawTitle(ctx, t, th, eo3(lt / 0.8), exit, book, Lt);
+  if (Lr) drawInfo(ctx, t, lt, th, ink, exit, book, Lr);
+  if (Lcta !== undefined) drawCTA(ctx, t, th, ink, gi(0.9, 0.6), Lcta);
+  if (Lc) drawContact(ctx, t, lt, th, ink, exit, gi(0.6, 0.8), Lc, rows, qrT, book, pr);
+  if (Ld !== undefined) drawDots(ctx, th, n, bi, lt, slot, gi(0.8, 0.6), Ld);
+  ctx.restore();
+}
+
+/* ---------- fonts ---------- */
+function loadFonts() {
+  var jobs = [];
+  [state.font, 'Noto Sans Tamil'].forEach(function (f) {
+    [500, 700, 800].forEach(function (w) { jobs.push(document.fonts.load(w + ' 40px "' + f + '"', 'தமிழ் புத்தகம் ABC ₹ 123')); });
+  });
+  return Promise.all(jobs).catch(function () {}).then(function () { dirty = true; });
+}
+
+/* ---------- preview loop ---------- */
+var cv = $('#cv'), pctx = cv.getContext('2d');
+var tNow = 3.2, playing = false, last = 0, dirty = true;
+function fmt(s) { s = Math.floor(s); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+function syncPlayer() {
+  $('#seek').value = tNow; $('#tl').textContent = fmt(tNow) + ' / ' + fmt(TOTAL);
+  $('#play').textContent = playing ? 'நிறுத்து' : 'இயக்கு';
+  $('#play').setAttribute('aria-label', playing ? 'நிறுத்து' : 'இயக்கு');
+}
+function applyDur() {
+  TOTAL = clamp(+state.dur || 90, 10, 300); state.dur = TOTAL; $('#seek').max = TOTAL;
+  if (tNow >= TOTAL) { tNow = 0; var sv0 = speakerVideo(); if (sv0) { try { sv0.currentTime = 0; } catch (e) {} } }
+  renderBooks(); syncPlayer(); dirty = true;
+}
+function speakerVideo() { return media.speaker && media.speaker.kind === 'video' ? media.speaker.el : null; }
+function setPlaying(v) {
+  playing = v; var sv = speakerVideo();
+  if (sv) { if (v) { var d = sv.duration || 1; try { sv.currentTime = tNow % d; } catch (e) {} sv.play().catch(function () {}); } else sv.pause(); }
+  syncPlayer();
+}
+function tick(ts) {
+  if (playing) { var dt = Math.min(0.1, (ts - last) / 1000); tNow += dt; if (tNow >= TOTAL) { tNow = 0; var sv = speakerVideo(); if (sv) { try { sv.currentTime = 0; } catch (e) {} } } syncPlayer(); }
+  last = ts;
+  if ((playing || dirty) && !exporting) { dirty = false; drawFrame(pctx, tNow, { w: cv.width, h: cv.height, preview: true }); }
+  requestAnimationFrame(tick);
+}
+$('#play').addEventListener('click', function () { setPlaying(!playing); });
+$('#restart').addEventListener('click', function () { tNow = 0; var sv = speakerVideo(); if (sv) { try { sv.currentTime = 0; } catch (e) {} } dirty = true; syncPlayer(); });
+$('#seek').addEventListener('input', function (e) {
+  tNow = +e.target.value; var sv = speakerVideo();
+  if (sv) { var d = sv.duration || 1; try { sv.currentTime = tNow % d; } catch (er) {} }
+  dirty = true; $('#tl').textContent = fmt(tNow) + ' / ' + fmt(TOTAL);
+  if (sv) setTimeout(function () { dirty = true; }, 120);
+});
+$('#safeChk').addEventListener('change', function (e) { $('#safeT').hidden = $('#safeB').hidden = !e.target.checked; });
+
+/* ---------- forms ---------- */
+function fillForm() {
+  $$('[data-p]').forEach(function (el) {
+    var v = getPath(el.dataset.p);
+    if (el.type === 'checkbox') el.checked = !!v; else if (el.tagName === 'SELECT' && el.dataset.p === 'res') el.value = v; else if (el.dataset.p !== 'font') el.value = v == null ? '' : v;
+  });
+  var fs = $('#fontSel'); fs.innerHTML = FONTS.map(function (f) { return '<option value="' + esc(f[0]) + '">' + esc(f[1]) + '</option>'; }).join(''); fs.value = state.font;
+  renderThemes(); renderBooks(); renderStatus();
+}
+function renderThemes() {
+  $('#themes').innerHTML = THEMES.map(function (t) {
+    return '<button type="button" class="sw" data-act="theme" data-v="' + t.id + '" aria-pressed="' + (state.theme === t.id) + '"><i style="background:linear-gradient(160deg,' + t.bg1 + ',' + t.bg2 + ')"><b style="background:' + t.accent + '"></b></i><span>' + esc(t.name) + '</span></button>';
+  }).join('') + '<button type="button" class="sw" data-act="theme" data-v="custom" aria-pressed="' + (state.theme === 'custom') + '"><i style="background:linear-gradient(160deg,' + state.custom.bg1 + ',' + state.custom.bg2 + ')"><b style="background:' + state.custom.accent + '"></b></i><span>என் நிறங்கள்</span></button>';
+}
+function backThumb(id) { var c = media.backs[id]; return c ? 'background-image:url(' + c.url + ')' : ''; }
+function coverThumb(id) { var c = media.covers[id]; return c ? 'background-image:url(' + c.url + ')' : ''; }
+function renderBooks() {
+  var n = state.books.length, d = (TOTAL / n).toFixed(n === 4 || n === 6 || n === 3 || n === 2 || n === 1 || n === 5 ? 0 : 1);
+  $('#slotHint').textContent = 'ஒவ்வொரு புத்தகமும் ' + (+(TOTAL / n).toFixed(1)) + ' வினாடி காட்டப்படும் (மொத்தம் ' + TOTAL + ' வினாடி). அதிகபட்சம் 6 புத்தகங்கள்.';
+  $('#addBook').disabled = n >= 6;
+  $('#books').innerHTML = state.books.map(function (b, i) {
+    var f = function (k, label) { return '<label class="f"><span>' + label + '</span><input type="text" id="b-' + b.id + '-' + k + '" data-bid="' + b.id + '" data-bk="' + k + '" value="' + esc(b[k]) + '"></label>'; };
+    return '<div class="book">' +
+      '<div class="bh"><div><strong>புத்தகம் ' + (i + 1) + '</strong> <span class="dur">' + fmt(i * TOTAL / n) + ' – ' + fmt((i + 1) * TOTAL / n) + '</span></div>' +
+      '<div class="bt"><button class="btn small" type="button" data-act="up" data-id="' + b.id + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="மேலே நகர்த்து">↑</button>' +
+      '<button class="btn small" type="button" data-act="down" data-id="' + b.id + '"' + (i === n - 1 ? ' disabled' : '') + ' aria-label="கீழே நகர்த்து">↓</button>' +
+      '<button class="btn small warn" type="button" data-act="rmbook" data-id="' + b.id + '"' + (n <= 1 ? ' disabled' : '') + '>நீக்கு</button></div></div>' +
+      '<div class="up"><div class="thumb cv" id="th-' + b.id + '" style="' + coverThumb(b.id) + '"></div>' +
+      '<label class="btn small" for="cvf-' + b.id + '">முன் அட்டை</label><input type="file" id="cvf-' + b.id + '" data-file="cover" data-bid="' + b.id + '" accept="image/*" hidden>' +
+      '<button class="btn small warn" type="button" data-act="rmcover" data-id="' + b.id + '">நீக்கு</button></div>' +
+      '<div class="up"><div class="thumb cv" id="thb-' + b.id + '" style="' + backThumb(b.id) + '"></div><label class="btn small" for="bkf-' + b.id + '">பின் அட்டை</label><input type="file" id="bkf-' + b.id + '" data-file="back" data-bid="' + b.id + '" accept="image/*" hidden><button class="btn small warn" type="button" data-act="rmback" data-id="' + b.id + '">நீக்கு</button></div>' +
+      f('title', 'புத்தகத் தலைப்பு') +
+      '<div class="grid2">' + f('author', 'எழுத்தாளர்') + f('publisher', 'பதிப்பகம்') + f('genre', 'புத்தக வகை') + '</div>' +
+      '<div class="grid2">' + f('oldP', 'அசல் விலை (₹)') + f('newP', 'தள்ளுபடி விலை (₹)') + '</div></div>';
+  }).join('');
+}
+function renderStatus() {
+  $('#logoSt').textContent = media.logo ? media.logo.name : 'PNG லோகோ இல்லை — நிறுவனப் பெயர் எழுத்தாக வரும்';
+  $('#logoThumb').style.backgroundImage = media.logo ? 'url(' + media.logo.url + ')' : '';
+  var sp = media.speaker;
+  $('#spSt').textContent = sp ? (sp.kind === 'video' ? 'வீடியோ: ' : 'படம்: ') + sp.name : 'இன்னும் பதிவேற்றப்படவில்லை';
+  $('#spThumb').style.backgroundImage = sp && sp.kind === 'image' ? 'url(' + sp.url + ')' : '';
+  $('#musicSt').textContent = media.music ? media.music.name : 'இசை இல்லை';
+}
+function afterEdit() { dirty = true; scheduleSave(); }
+
+function onField(e) {
+  var el = e.target;
+  if (el.dataset && el.dataset.p) {
+    var v = el.type === 'checkbox' ? el.checked : (el.type === 'range' ? +el.value : el.value);
+    setPath(el.dataset.p, v);
+    if (el.dataset.p === 'dur' || el.dataset.p === 'fps') { state[el.dataset.p] = +el.value; if (el.dataset.p === 'dur') applyDur(); }
+    if (el.dataset.p.indexOf('custom.') === 0) { state.theme = 'custom'; renderThemes(); }
+    if (el.dataset.p === 'font') loadFonts();
+    afterEdit();
+  } else if (el.dataset && el.dataset.bk) {
+    var b = state.books.filter(function (x) { return x.id === el.dataset.bid; })[0];
+    if (b) { b[el.dataset.bk] = el.value; afterEdit(); }
+  }
+}
+document.addEventListener('input', onField);
+document.addEventListener('change', function (e) {
+  var el = e.target;
+  if (el.type === 'checkbox' || el.tagName === 'SELECT') onField(e);
+  if (el.type === 'file' && el.dataset.file && el.files && el.files[0]) handleFile(el, el.files[0]);
+});
+
+function handleFile(el, file) {
+  var kind = el.dataset.file;
+  if (kind === 'logo') imgFromFile(file).then(function (m) { media.logo = m; renderStatus(); dirty = true; }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); });
+  else if (kind === 'back') { var bid = el.dataset.bid; imgFromFile(file).then(function (m) { media.backs[bid] = m; var th2 = $('#thb-' + bid); if (th2) th2.style.backgroundImage = 'url(' + m.url + ')'; dirty = true; }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); }); }
+  else if (kind === 'cover') { var id = el.dataset.bid; imgFromFile(file).then(function (m) { media.covers[id] = m; var th = $('#th-' + id); if (th) th.style.backgroundImage = 'url(' + m.url + ')'; dirty = true; }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); }); }
+  else if (kind === 'speaker') {
+    setPlaying(false);
+    if (file.type.indexOf('video') === 0) videoFromFile(file).then(function (m) { m.kind = 'video'; m.file = file; media.speaker = m; renderStatus(); dirty = true; }).catch(function () { setMsg('இந்த வீடியோவை உலாவியால் இயக்க முடியவில்லை. MP4 (H.264) முயற்சிக்கவும்.', true); });
+    else imgFromFile(file).then(function (m) { m.kind = 'image'; media.speaker = m; renderStatus(); dirty = true; }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); });
+  }
+  else if (kind === 'music') { media.music = { file: file, name: file.name }; renderStatus(); }
+  el.value = '';
+}
+
+var resetArm = 0;
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('[data-act]'); if (!b) return;
+  var act = b.dataset.act, id = b.dataset.id, i;
+  if (act === 'theme') { state.theme = b.dataset.v; var tt = THEMES.filter(function (x) { return x.id === b.dataset.v; })[0]; if (tt && tt.font) { state.font = tt.font; $('#fontSel').value = tt.font; loadFonts(); } renderThemes(); afterEdit(); }
+  else if (act === 'rmlogo') { media.logo = null; renderStatus(); dirty = true; }
+  else if (act === 'rmspeaker') { setPlaying(false); media.speaker = null; renderStatus(); dirty = true; }
+  else if (act === 'rmmusic') { media.music = null; renderStatus(); }
+  else if (act === 'addbook') { if (state.books.length < 6) { state.books.push({ id: uid(), title: 'புதிய புத்தகத் தலைப்பு', author: '', publisher: state.org, genre: '', oldP: '', newP: '' }); renderBooks(); afterEdit(); } }
+  else if (act === 'rmbook') { if (state.books.length > 1) { state.books = state.books.filter(function (x) { return x.id !== id; }); delete media.covers[id]; renderBooks(); afterEdit(); } }
+  else if (act === 'rmback') { delete media.backs[id]; var thb = $('#thb-' + id); if (thb) thb.style.backgroundImage = ''; dirty = true; }
+  else if (act === 'rmcover') { delete media.covers[id]; var th = $('#th-' + id); if (th) th.style.backgroundImage = ''; dirty = true; }
+  else if (act === 'up' || act === 'down') {
+    i = state.books.map(function (x) { return x.id; }).indexOf(id); var j = act === 'up' ? i - 1 : i + 1;
+    if (i > -1 && j > -1 && j < state.books.length) { var tmp = state.books[i]; state.books[i] = state.books[j]; state.books[j] = tmp; renderBooks(); afterEdit(); }
+  }
+});
+$('#resetBtn').addEventListener('click', function (e) {
+  var btn = e.currentTarget;
+  if (!resetArm) { resetArm = 1; btn.textContent = 'உறுதி செய்ய மீண்டும் அழுத்தவும்'; setTimeout(function () { resetArm = 0; btn.textContent = 'எல்லாவற்றையும் இயல்புநிலைக்கு மாற்று'; }, 4000); return; }
+  resetArm = 0; btn.textContent = 'எல்லாவற்றையும் இயல்புநிலைக்கு மாற்று';
+  state = clone(DEFAULT); media.covers = {}; media.backs = {}; try { localStorage.removeItem(KEY); } catch (er) {}
+  fillForm(); loadFonts(); dirty = true;
+});
+
+/* ---------- export ---------- */
+var exporting = false, cancelFlag = false, outBlob = null, dl = null;
+function setMsg(s, err) { var m = $('#expMsg'); m.textContent = s; m.className = 'msg' + (err ? ' err' : ''); }
+var mc = new MessageChannel();
+function yieldNow() { return new Promise(function (r) { mc.port1.onmessage = function () { r(); }; mc.port2.postMessage(0); }); }
+function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+function seekTo(v, time) {
+  return new Promise(function (res) {
+    if (Math.abs(v.currentTime - time) < 0.002 && v.readyState >= 2) { res(); return; }
+    var done = false, fin = function () { if (done) return; done = true; v.removeEventListener('seeked', fin); res(); };
+    v.addEventListener('seeked', fin); try { v.currentTime = time; } catch (e) { fin(); }
+    setTimeout(fin, 700);
+  });
+}
+async function buildAudio(SR) {
+  var len = TOTAL * SR, L = null, R = null, any = false;
+  function add(buf, gain) {
+    var n = buf.length; if (!n) return;
+    var c0 = buf.getChannelData(0), c1 = buf.numberOfChannels > 1 ? buf.getChannelData(1) : c0;
+    if (!L) { L = new Float32Array(len); R = new Float32Array(len); }
+    for (var i = 0, j = 0; i < len; i++) { L[i] += c0[j] * gain; R[i] += c1[j] * gain; if (++j >= n) j = 0; }
+    any = true;
+  }
+  async function decode(file) { var ab = await file.arrayBuffer(); var oc = new OfflineAudioContext(2, SR, SR); return await oc.decodeAudioData(ab); }
+  if (media.speaker && media.speaker.kind === 'video') { try { add(await decode(media.speaker.file), 1); } catch (e) {} }
+  if (media.music && state.musicVol > 0) { try { add(await decode(media.music.file), state.musicVol); } catch (e) {} }
+  if (!any) return null;
+  var fade = SR, i2;
+  for (i2 = 0; i2 < len; i2++) {
+    var g = i2 > len - fade ? (len - i2) / fade : 1;
+    L[i2] = Math.max(-1, Math.min(1, L[i2] * g)); R[i2] = Math.max(-1, Math.min(1, R[i2] * g));
+  }
+  return { L: L, R: R };
+}
+function showResult(blob) {
+  outBlob = blob; var url = URL.createObjectURL(blob), v = $('#outVid');
+  v.src = url; $('#result').hidden = false; $('#sizeTxt').textContent = (blob.size / 1048576).toFixed(1) + ' MB · ' + TOTAL + ' வினாடி · MP4';
+}
+async function doExport() {
+  if (exporting) return;
+  if (!('VideoEncoder' in window) || !window.Mp4Muxer) { setMsg('இந்த உலாவியில் MP4 ஏற்றுமதி இயலாது. கணினியில் Chrome அல்லது Edge பயன்படுத்துங்கள்.', true); return; }
+  exporting = true; cancelFlag = false; setPlaying(false);
+  $('#exportBtn').disabled = true; $('#cancelBtn').hidden = false; $('#result').hidden = true; $('#prog').style.width = '0%';
+  var venc = null, aenc = null, note = '';
+  try {
+    setMsg('எழுத்துருக்களை ஏற்றுகிறேன்…'); await loadFonts();
+    var W = state.res === '1080' ? 1080 : 720, H = W === 1080 ? 1920 : 1280, fps = clamp(+state.fps || 24, 15, 30), total = Math.round(TOTAL * fps), SR = 44100;
+    var vcfg = null, codecs = ['avc1.640029', 'avc1.4D0029', 'avc1.42E029'], hws = ['prefer-hardware', 'no-preference'];
+    for (var ci = 0; ci < codecs.length && !vcfg; ci++) {
+      for (var hi = 0; hi < hws.length && !vcfg; hi++) {
+        var cfg = { codec: codecs[ci], width: W, height: H, bitrate: W === 1080 ? 5000000 : 2500000, framerate: fps, hardwareAcceleration: hws[hi] };
+        try { var r = await VideoEncoder.isConfigSupported(cfg); if (r.supported) vcfg = cfg; } catch (e) {}
+      }
+    }
+    if (!vcfg) throw new Error('இந்தச் சாதனத்தில் H.264 என்கோடர் கிடைக்கவில்லை.');
+    var mix = null, acfg = null;
+    if ('AudioEncoder' in window) {
+      setMsg('ஒலியைத் தயாரிக்கிறேன்…'); mix = await buildAudio(SR);
+      if (mix) {
+        var ac = { codec: 'mp4a.40.2', sampleRate: SR, numberOfChannels: 2, bitrate: 128000 };
+        try { var ar = await AudioEncoder.isConfigSupported(ac); if (ar.supported) acfg = ac; } catch (e) {}
+        if (!acfg) { mix = null; note = ' (இந்த உலாவியில் AAC ஒலி என்கோடர் இல்லாததால் ஒலி சேர்க்கப்படவில்லை)'; }
+      }
+    } else if (media.music || (media.speaker && media.speaker.kind === 'video')) note = ' (இந்த உலாவியில் ஒலி என்கோடிங் இல்லாததால் ஒலி சேர்க்கப்படவில்லை)';
+    var muxOpts = { target: new Mp4Muxer.ArrayBufferTarget(), video: { codec: 'avc', width: W, height: H, frameRate: fps }, fastStart: 'in-memory', firstTimestampBehavior: 'offset' };
+    if (acfg) muxOpts.audio = { codec: 'aac', numberOfChannels: 2, sampleRate: SR };
+    var muxer = new Mp4Muxer.Muxer(muxOpts), encErr = null;
+    venc = new VideoEncoder({ output: function (c, m) { muxer.addVideoChunk(c, m); }, error: function (e) { encErr = e; } }); venc.configure(vcfg);
+    if (acfg) { aenc = new AudioEncoder({ output: function (c, m) { muxer.addAudioChunk(c, m); }, error: function (e) { encErr = e; } }); aenc.configure(acfg); }
+    var ex = document.createElement('canvas'); ex.width = W; ex.height = H; var ectx = ex.getContext('2d', { alpha: false });
+    var sv = speakerVideo(), pend = Promise.resolve(); if (sv) { sv.pause(); pend = seekTo(sv, 0); }
+    var audioPos = 0, CH = 4096, t0 = performance.now();
+    var pushAudio = function () {
+      var n = Math.min(CH, mix.L.length - audioPos), data = new Float32Array(n * 2);
+      data.set(mix.L.subarray(audioPos, audioPos + n), 0); data.set(mix.R.subarray(audioPos, audioPos + n), n);
+      var ad = new AudioData({ format: 'f32-planar', sampleRate: SR, numberOfFrames: n, numberOfChannels: 2, timestamp: Math.round(audioPos / SR * 1e6), data: data });
+      aenc.encode(ad); ad.close(); audioPos += n;
+    };
+    for (var i = 0; i < total; i++) {
+      if (cancelFlag) throw new Error('cancel');
+      if (encErr) throw encErr;
+      var t = i / fps;
+      if (sv) await pend;
+      drawFrame(ectx, t, { w: W, h: H, preview: false });
+      var frame = new VideoFrame(ex, { timestamp: Math.round(i * 1e6 / fps), duration: Math.round(1e6 / fps) });
+      if (sv && i + 1 < total) pend = seekTo(sv, ((i + 1) / fps) % (sv.duration || 1));
+      venc.encode(frame, { keyFrame: i % (fps * 2) === 0 }); frame.close();
+      while (aenc && audioPos < mix.L.length && audioPos / SR <= t + 0.3) pushAudio();
+      while (venc.encodeQueueSize > 8) await yieldNow();
+      if (i % 12 === 0) {
+        var pc = (i / total * 100), el = (performance.now() - t0) / 1000, left = i > 20 ? el / i * (total - i) : 0;
+        $('#prog').style.width = pc.toFixed(1) + '%';
+        setMsg('பிரேம் ' + i + ' / ' + total + ' (' + pc.toFixed(0) + '%)' + (left ? ' · மீதம் சுமார் ' + (left > 90 ? Math.ceil(left / 60) + ' நிமிடம்' : Math.ceil(left) + ' வினாடி') : ''));
+        await yieldNow();
+      }
+    }
+    setMsg('கோப்பை முடிக்கிறேன்…');
+    await venc.flush();
+    if (aenc) { while (audioPos < mix.L.length) pushAudio(); await aenc.flush(); }
+    muxer.finalize();
+    var blob = new Blob([muxer.target.buffer], { type: 'video/mp4' });
+    $('#prog').style.width = '100%';
+    showResult(blob);
+    setMsg('முடிந்தது. கீழே பார்த்து சேமிக்கலாம்.' + note);
+  } catch (err) {
+    if (err && err.message === 'cancel') setMsg('ஏற்றுமதி நிறுத்தப்பட்டது.');
+    else setMsg('ஏற்றுமதி தோல்வி: ' + (err && err.message ? err.message : err), true);
+    $('#prog').style.width = '0%';
+  } finally {
+    try { if (venc && venc.state !== 'closed') venc.close(); } catch (e) {}
+    try { if (aenc && aenc.state !== 'closed') aenc.close(); } catch (e) {}
+    exporting = false; $('#exportBtn').disabled = false; $('#cancelBtn').hidden = true; dirty = true;
+    var sv2 = speakerVideo(); if (sv2) { try { sv2.currentTime = tNow % (sv2.duration || 1); } catch (e) {} }
+  }
+}
+$('#exportBtn').addEventListener('click', doExport);
+$('#cancelBtn').addEventListener('click', function () { cancelFlag = true; });
+$('#saveBtn').addEventListener('click', async function () {
+  if (!outBlob) return;
+  if (!dl) { try { var nm = 'book-promo-' + TOTAL + 's.mp4', f = new File([outBlob], nm, { type: 'video/mp4' }); if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f] }); setMsg('சேமிக்கப்பட்டது.'); return; } } catch (e) { if (e && e.name === 'AbortError') return; } var a = document.createElement('a'); a.href = URL.createObjectURL(outBlob); a.download = 'book-promo-' + TOTAL + 's.mp4'; document.body.appendChild(a); a.click(); a.remove(); setMsg('பதிவிறக்கம் தொடங்கியது.'); return; }
+  try { await dl.save({ filename: 'book-promo-' + TOTAL + 's.mp4', data: outBlob }); setMsg('சேமிக்கப்பட்டது.'); }
+  catch (e) {
+    var c = e && e.code;
+    if (c === 'declined') setMsg('சேமிப்பு ரத்து செய்யப்பட்டது. மீண்டும் "MP4 சேமி" அழுத்தலாம்.');
+    else if (c === 'rate_limited') setMsg('சற்று காத்திருந்து மீண்டும் முயற்சிக்கவும்.', true);
+    else setMsg('சேமிக்க முடியவில்லை. வீடியோவின் மெனுவில் (⋮) "பதிவிறக்கு" பயன்படுத்தவும்.', true);
+  }
+});
+(async function () { try { dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { dl = null; } if (!dl) $('#saveBtn').title = 'நேரடிச் சேமிப்பு இல்லை'; })();
+
+/* ---------- follow the app theme ---------- */
+var APP2BOOK = { royal: 'royal', night: 'hibiscus', sun: 'turmeric', ink: 'ink', emerald: 'emerald' }, firstTheme = true;
+window.onAppTheme = function (t) {
+  if (firstTheme) { firstTheme = false; var sv = null; try { sv = localStorage.getItem(KEY); } catch (e) {} if (sv) return; }
+  var id = APP2BOOK[t.id], tt = THEMES.filter(function (x) { return x.id === id; })[0];
+  if (!tt) return; state.theme = id; if (tt.font) { state.font = tt.font; $('#fontSel').value = tt.font; loadFonts(); }
+  renderThemes(); afterEdit();
+};
+/* ---------- boot ---------- */
+fillForm(); $('#seek').max = TOTAL; syncPlayer();
+loadFonts();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { dirty = true; });
+requestAnimationFrame(tick);
+})();
+</script>
+
+<script src="theme.js"></script>
+<script>AppTheme.mount("#appThemes")</script>
+</body></html>
