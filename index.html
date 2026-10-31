@@ -213,6 +213,7 @@ function readState(){
     if(!map[id]){map[id]={id:id};books.push(map[id])}
     map[id][el.dataset.bk]=el.value;
   });
+  if(!books.length){try{var ss=JSON.parse(localStorage.getItem('puthaga-video-studio-v2')||'null');if(ss&&ss.books&&ss.books.length)return ss}catch(e){}}
   var g=function(s){var e=$(s);return e?e.value:''};
   return {org:g('#f-org'),labels:{author:g('#l-author')||'எழுத்தாளர்',publisher:g('#l-publisher')||'பதிப்பகம்',off:g('#l-off')||'தள்ளுபடி'},books:books};
 }
@@ -492,7 +493,7 @@ if(P){try{P.playAt(i);return}catch(e){}}
 location.href='book.html#play='+i;
 }
 $('#vid').onclick=function(){play(shown)};
-if(P){document.body.classList.add('emb');document.querySelector('.hint').textContent='பெரிய புத்தகத்தைத் தொட்டால் அதன் வீடியோ ஓடும்'}
+if(P){document.body.classList.add('emb');document.querySelector('.hint').textContent='பெரிய புத்தகத்தைத் தொட்டால் அதன் வீடியோ ஓடும் · v4'}
 
 /* ---------- studio-ல் கொடுத்த அட்டை / லோகோவை தானாக நினைவில் வைக்கும் (தனியாக எதையும் கொடுக்க வேண்டாம்) ---------- */
 var done={};
