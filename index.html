@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#d71920">
 <title>NEWS STUDIO</title>
+<script>(function(){try{var V='shelf-3';if(localStorage.getItem('shelf_build')!==V){localStorage.setItem('shelf_build',V);var j=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)j.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));if(window.caches)j.push(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}));Promise.all(j).then(function(){location.reload()})}}catch(e){}})();</script>
 <style>
 :root{--red:#d71920;--dark:#101010;--gold:#e0a823}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
@@ -193,6 +194,11 @@ html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil
 #bkBar.on{display:flex}
 #bkBar button{pointer-events:auto;height:42px;padding:0 18px;border-radius:99px;border:2px solid #e3b04b;background:#190d06;color:#e3b04b;font:800 14px inherit;font-family:inherit;cursor:pointer}
 #bkBar[data-mode=edit] #bkAgain{display:none}
+#vidPop{display:none;position:absolute;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:12;height:46px;padding:0 24px;border-radius:99px;border:2px solid #e3b04b;background:linear-gradient(#FFF1B8,#e3b04b 55%,#b98a22);color:#2a1709;font:800 16px inherit;font-family:inherit;box-shadow:0 8px 22px rgba(0,0,0,.55);cursor:pointer;white-space:nowrap}
+#vidPop.on{display:block;animation:vpIn .4s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes vpIn{from{opacity:0;transform:translateX(-50%) translateY(24px)}to{opacity:1;transform:translateX(-50%)}}
+#bk.sheet{animation:sheetUp .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
 </style></head>
 <body><script type="text/plain" id="linkSrc">/* book.html உள்ளே தானாக ஏற்றப்படும் இணைப்பு */
 (function(){
@@ -267,6 +273,10 @@ body{min-height:100vh;color:var(--ink);font:500 15px/1.55 "Noto Sans Tamil",sans
 background:radial-gradient(ellipse 80% 45% at 50% 30%,rgba(255,196,110,.30),transparent 70%),repeating-linear-gradient(90deg,rgba(0,0,0,.14) 0 2px,transparent 2px 52px),linear-gradient(#3B2314,#190D06);
 padding:env(safe-area-inset-top,0px) 0 calc(env(safe-area-inset-bottom,0px) + 24px)}
 main{max-width:640px;margin:0 auto;padding:14px 14px 0;position:relative}
+body.emb{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 96px)}
+body.emb h1{font-size:22px;margin:0 0 2px}body.emb .hint{font-size:12px;margin-bottom:8px}body.emb #vid{display:none}
+body.emb .info{min-height:0;padding:8px 12px;margin-bottom:4px}body.emb .lg{width:52px;height:52px;font-size:24px}body.emb .pr .now{font-size:20px}body.emb .bt{margin-top:6px;min-height:50px}body.emb .ctl{margin:4px 0}body.emb .arrow{display:none}body.emb .dots button{height:10px}
+@media (max-height:640px){body.emb .tx small{display:none}body.emb .info{row-gap:0}body.emb .pr{padding-top:3px;margin-top:2px}body.emb h1{display:none}}
 h1{font:800 clamp(24px,6vw,34px)/1.25 "Noto Serif Tamil",serif;margin:6px 0 2px;text-align:center;color:var(--gold);text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .hint{margin:0 0 10px;text-align:center;color:var(--mut);font-size:13px}
 .dust{position:fixed;inset:0;pointer-events:none;z-index:0}
@@ -336,7 +346,7 @@ summary{cursor:pointer;padding:12px 16px;font-weight:800;color:var(--gold)}
 <body>
 <div class="dust" id="dust" aria-hidden="true"></div>
 <main>
-<h1 id="ttl">புத்தக நூலகம்</h1>
+<h1 id="ttl">புத்தக அலமாரி</h1>
 <p class="hint">பக்கவாட்டில் தள்ளுங்கள் · பெரிய புத்தகத்தைத் தொட்டால் அதன் வீடியோ ஓடும்</p>
 
 <section class="info" id="info" aria-live="polite">
@@ -361,23 +371,8 @@ summary{cursor:pointer;padding:12px 16px;font-weight:800;color:var(--gold)}
 
 <button class="vbtn" id="vid" type="button"><span class="tri"></span><span id="vtx">இந்த புத்தகத்தின் வீடியோ ஓடு</span></button>
 
-<details>
-<summary>அமைப்புகள் (அலமாரி தலைப்பு, லோகோ, அட்டை)</summary>
-<div class="cfg">
-<p class="note">புத்தகத் தலைப்பு, எழுத்தாளர், பதிப்பகம், வகை, விலை ஆகியவை “புத்தக வீடியோ ஸ்டுடியோ” (book.html) → “புத்தகங்கள்” பகுதியில் நீங்கள் கொடுப்பதிலிருந்தே தானாக வரும். வீடியோ, அட்டை, லோகோ ஆகியவை ஸ்டுடியோவில் ஏற்கனவே சேர்த்தவையே பயன்படும். நூலகம் ஸ்டுடியோவுக்குள் திறந்தால் இங்கே எதுவும் சேர்க்க வேண்டாம்; தனிப் பக்கமாக திறந்தால் மட்டும் அட்டை / லோகோ சேர்க்கலாம்.</p>
-<label class="f"><span>அலமாரி தலைப்பு</span><input type="text" id="cTitle" placeholder="புத்தக நூலகம்"></label>
-<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-<label class="btn" for="cLogo">பதிப்பக லோகோ சேர்</label><input type="file" id="cLogo" accept="image/*" hidden>
-<button class="btn warn" type="button" id="rmLogo">லோகோ நீக்கு</button>
-<button class="btn" type="button" id="reload">ஸ்டுடியோ தகவலை மீண்டும் எடு</button>
-</div>
-<div id="cBooks" style="display:grid;gap:10px"></div>
-</div>
-</details>
 </main>
 
-<button class="closeShelf" id="cs" type="button" hidden aria-label="மூடு">✕</button>
-<button class="editShelf" id="es" type="button" hidden>✎ திருத்து</button>
 
 <script>
 (function(){
@@ -399,15 +394,15 @@ function jset(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){alert(
 var studio={},X={extra:{}},books=[],els=[],pos=0,shown=-1,drag=false,SP=120,P=null;
 try{if(window.parent&&window.parent!==window&&window.parent.__shelfAPI)P=window.parent.__shelfAPI}catch(e){P=null}
 function pm(){try{return P?P.media():null}catch(e){return null}}
-function coverOf(b){var c=ex(b.id).cover;if(c)return c;var m=pm();return m&&m.covers&&m.covers[b.id]?m.covers[b.id].url:''}
-function logoOf(){if(X.logo)return X.logo;var m=pm();return m&&m.logo?m.logo.url:''}
+function coverOf(b){var m=pm();if(m&&m.covers&&m.covers[b.id])return m.covers[b.id].url;return ex(b.id).cover||''}
+function logoOf(){var m=pm();if(m&&m.logo)return m.logo.url;return X.logo||''}
 
 function load(){
 studio=(P?P.state():jget(SK))||{};
 var l=studio.labels||{};
 $('#pubL').textContent=l.publisher||'பதிப்பகம்';
 $('#auL').textContent=l.author||'எழுத்தாளர்';
-books=(Array.isArray(studio.books)&&studio.books.length?studio.books:DEF).slice(0,5);
+books=(Array.isArray(studio.books)&&studio.books.length?studio.books:DEF).slice(0,6);
 X=jget(XK)||{};X.extra=X.extra||{};
 }
 function ex(id){return X.extra[id]||(X.extra[id]={})}
@@ -415,8 +410,6 @@ function pct(b){var o=parseInt(digits(b.oldP),10),n=parseInt(digits(b.newP),10);
 
 /* ---------- build shelf ---------- */
 function build(){
-$('#ttl').textContent=X.title||'புத்தக நூலகம்';
-$('#cTitle').value=X.title||'';
 var row=$('#row');row.innerHTML='';els=[];
 books.forEach(function(b,i){
 var d=document.createElement('div');d.className='bk';d.dataset.i=i;
@@ -426,10 +419,10 @@ row.appendChild(d);els.push(d);
 });
 $('#dots').innerHTML=books.map(function(b,i){return '<button type="button" data-i="'+i+'" aria-label="புத்தகம் '+(i+1)+'"></button>'}).join('');
 pos=clamp(Math.round(pos),0,books.length-1);shown=-1;
-buildCfg();layout();
+layout();cacheMedia();
 }
 function size(){
-var sw=$('#stage').clientWidth||360,bw=clamp(sw*.5,130,210);
+var sw=$('#stage').clientWidth||360,emb=document.body.classList.contains('emb'),bw=emb?clamp(sw*.42,118,165):clamp(sw*.5,130,210);
 SP=clamp(sw*.34,84,170);
 var st=$('#stage').style;st.setProperty('--bw',bw+'px');st.setProperty('--bh',(bw*1.48)+'px');
 }
@@ -488,7 +481,6 @@ $('#prev').onclick=function(){go(Math.round(pos)-1)};
 $('#next').onclick=function(){go(Math.round(pos)+1)};
 $('#dots').addEventListener('click',function(e){var b=e.target.closest('button');if(b)go(+b.dataset.i)});
 document.addEventListener('keydown',function(e){
-if(e.key==='Escape'&&P){closeShelf();return}
 if(/INPUT|TEXTAREA/.test(document.activeElement.tagName))return;
 if(e.key==='ArrowLeft')go(Math.round(pos)-1);if(e.key==='ArrowRight')go(Math.round(pos)+1);
 });
@@ -499,40 +491,17 @@ function play(i){
 if(P){try{P.playAt(i);return}catch(e){}}
 location.href='book.html#play='+i;
 }
-function closeShelf(){try{P.close()}catch(e){}}
 $('#vid').onclick=function(){play(shown)};
-if(P){var cs=$('#cs');cs.hidden=false;cs.onclick=closeShelf;var es=$('#es');es.hidden=false;es.onclick=function(){try{P.edit()}catch(e){}}}
+if(P){document.body.classList.add('emb');document.querySelector('.hint').textContent='பெரிய புத்தகத்தைத் தொட்டால் அதன் வீடியோ ஓடும்'}
 
-/* ---------- settings ---------- */
-function shrink(file,max,type,cb){
-var u=URL.createObjectURL(file),im=new Image();
-im.onload=function(){var s=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');
-c.width=Math.max(1,Math.round(im.width*s));c.height=Math.max(1,Math.round(im.height*s));
-c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);cb(c.toDataURL(type,.82))};
-im.onerror=function(){alert('படத்தைப் படிக்க முடியவில்லை.')};im.src=u;
+/* ---------- studio-ல் கொடுத்த அட்டை / லோகோவை தானாக நினைவில் வைக்கும் (தனியாக எதையும் கொடுக்க வேண்டாம்) ---------- */
+var done={};
+function snap(url,max,type,cb){var im=new Image();im.onload=function(){var k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));try{c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL(type,.8))}catch(e){}};im.src=url}
+function cacheMedia(){
+var m=pm();if(!m)return;
+books.forEach(function(b){var c=m.covers&&m.covers[b.id];if(c&&c.url&&!done[c.url]){done[c.url]=1;snap(c.url,420,'image/jpeg',function(d){ex(b.id).cover=d;jset(XK,X)})}});
+if(m.logo&&m.logo.url&&!done[m.logo.url]){done[m.logo.url]=1;snap(m.logo.url,300,'image/png',function(d){X.logo=d;jset(XK,X)})}
 }
-function buildCfg(){
-$('#cBooks').innerHTML=books.map(function(b,i){
-var e=ex(b.id),cu=coverOf(b);
-return '<div class="brow"><div class="th" style="'+(cu?'background-image:url('+cu+')':'')+'"></div><strong>'+(i+1)+'. '+esc(b.title)+'</strong>'+
-'<div style="display:grid;gap:6px"><div style="display:flex;gap:8px;flex-wrap:wrap"><label class="btn" for="cv'+i+'">அட்டைப் படம்</label><input type="file" id="cv'+i+'" data-cv="'+i+'" accept="image/*" hidden><button class="btn warn" type="button" data-rc="'+i+'">நீக்கு</button></div>'+
-'</div></div>';
-}).join('');
-}
-$('#cBooks').addEventListener('change',function(e){
-var i=e.target.dataset.cv;if(i==null||!e.target.files[0])return;
-shrink(e.target.files[0],420,'image/jpeg',function(u){ex(books[i].id).cover=u;jset(XK,X);build()});
-});
-$('#cBooks').addEventListener('click',function(e){
-var i=e.target.dataset.rc;if(i==null)return;delete ex(books[i].id).cover;jset(XK,X);build();
-});
-$('#cTitle').addEventListener('input',function(e){X.title=e.target.value;$('#ttl').textContent=X.title||'புத்தக நூலகம்';jset(XK,X)});
-$('#cLogo').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;shrink(f,300,'image/png',function(u){X.logo=u;jset(XK,X);shown=-1;layout()});e.target.value=''});
-$('#rmLogo').onclick=function(){delete X.logo;jset(XK,X);shown=-1;layout()};
-$('#reload').onclick=function(){load();build()};
-window.addEventListener('storage',function(e){if(e.key===SK){load();build()}});
-document.addEventListener('visibilitychange',function(){if(!document.hidden){load();build()}});
-
 /* ---------- dust motes ---------- */
 (function(){var d=$('#dust'),h='';for(var i=0;i<14;i++)h+='<i style="left:'+(Math.random()*100)+'%;top:'+(60+Math.random()*50)+'%;animation-duration:'+(12+Math.random()*14)+'s;animation-delay:-'+(Math.random()*14)+'s"></i>';d.innerHTML=h})();
 
@@ -583,7 +552,7 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);
   <div id="load">ஏற்றுகிறது…</div>
   <div id="zBar"><button type="button" id="zIn" title="பெரிதாக்கு">+</button><div id="zLvl">1×</div><button type="button" id="zOut" title="சிறிதாக்கு">−</button></div>
 </div>
-<div id="tv"></div><div id="bk"></div><div id="lib"></div><div id="bkBar"><button type="button" id="bkBack">← அலமாரி</button><button type="button" id="bkAgain">↻ மீண்டும்</button></div><div id="sec"></div><div id="pill"><span id="pgn">0 / 0</span></div><button id="fab" title="PDF மாற்று">PDF</button></div><div id="toast"></div>
+<div id="tv"></div><div id="bk"></div><div id="lib"></div><button type="button" id="vidPop">🎬 புத்தக வீடியோ</button><div id="bkBar"><button type="button" id="bkBack">← அலமாரி</button><button type="button" id="bkAgain">↻ மீண்டும்</button></div><div id="sec"></div><div id="pill"><span id="pgn">0 / 0</span></div><button id="fab" title="PDF மாற்று">PDF</button></div><div id="toast"></div>
 <input type="file" id="file" accept="application/pdf,.pdf" hidden>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -721,7 +690,7 @@ function show(v){
   view=v;if(v!=='books')bkMode='shelf';const isSec=MORE_TABS.some(t=>t[0]===v);
   const isTv=v==='tv', isPaper=v==='paper';
   $('#tv').classList.toggle('on',isTv);
-  $('#bk').classList.toggle('on',v==='books');$('#lib').classList.toggle('on',v==='books'&&bkMode==='shelf');{const bb=$('#bkBar');bb.classList.toggle('on',v==='books'&&bkMode!=='shelf');bb.dataset.mode=bkMode}$('#sec').classList.toggle('on',isSec);
+  $('#bk').classList.toggle('on',v==='books');$('#lib').classList.toggle('on',v==='books'&&bkMode==='shelf');{const bb=$('#bkBar');bb.classList.toggle('on',v==='books'&&bkMode!=='shelf');bb.dataset.mode=bkMode;$('#bkBack').textContent=bkMode==='edit'?'✕ மூடு':'← அலமாரி';$('#vidPop').classList.toggle('on',v==='books'&&bkMode==='shelf');$('#bk').classList.toggle('sheet',v==='books'&&bkMode==='edit')}$('#sec').classList.toggle('on',isSec);
   const mb=$('#modeBtn'), sb=$('#slotBtn');
   if(mb){
     /* Button 1 = switch target (other mode) */
@@ -790,6 +759,7 @@ function openLib(){
   });
 }
 $('#bkBack').onclick=toShelf;
+$('#vidPop').onclick=()=>window.__shelfAPI.edit();
 $('#bkAgain').onclick=()=>{const a=bkApi();if(a)a.playSolo(lastBook)};
 function closeBkMenu(){bkOpen=false;$('#bkDrop').classList.remove('on');const a=$('#bkMain .arr');if(a)a.textContent='▼';const sb=$('#shelfBtn');if(sb)sb.classList.remove('on')}
 function openBkMenu(){bkOpen=true;$('#bkDrop').classList.add('on');const a=$('#bkMain .arr');if(a)a.textContent='▲';const sb=$('#shelfBtn');if(sb)sb.classList.add('on')}
