@@ -68,6 +68,8 @@ summary{cursor:pointer;padding:12px 16px;font-weight:800;color:var(--gold)}
 .btn.warn{border-color:#d9776a;color:#ffb3a8}
 .note{color:var(--mut);font-size:12.5px;margin:0}
 .closeShelf{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;z-index:60;width:44px;height:44px;border-radius:50%;border:2px solid var(--gold);background:var(--deep);color:var(--gold);font-size:20px;cursor:pointer}
+.editShelf{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;gap:6px;margin:0 auto 12px;height:42px;padding:0 20px;border-radius:99px;border:2px solid var(--gold);background:var(--deep);color:var(--gold);font:800 14px "Noto Sans Tamil",sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.45)}
+.editShelf:active{transform:scale(.97)}
 #md{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.86);display:grid;place-items:center;padding:14px}
 #md[hidden]{display:none}
 .mbox{width:min(100%,720px);position:relative}
@@ -83,6 +85,7 @@ summary{cursor:pointer;padding:12px 16px;font-weight:800;color:var(--gold)}
 <main>
 <h1 id="ttl">புத்தக நூலகம்</h1>
 <p class="hint">பக்கவாட்டில் தள்ளுங்கள் · பெரிய புத்தகத்தைத் தொட்டால் அதன் வீடியோ ஓடும்</p>
+<button class="editShelf" id="es" type="button" aria-label="புத்தகங்களைத் திருத்து">✎ புத்தகங்களைத் திருத்து</button>
 
 <section class="info" id="info" aria-live="polite">
 <div class="lg" id="lg"></div>
@@ -245,6 +248,12 @@ location.href='book.html#play='+i;
 }
 function closeShelf(){try{P.close()}catch(e){}}
 $('#vid').onclick=function(){play(shown)};
+/* edit: ஸ்டுடியோவில் (book.html) புத்தகத் தகவலைத் திருத்தலாம் */
+$('#es').onclick=function(){
+if(P&&P.edit){try{P.edit();return}catch(e){}}
+if(P&&P.close){closeShelf();return}
+location.href='book.html';
+};
 if(P){var cs=$('#cs');cs.hidden=false;cs.onclick=closeShelf}
 
 /* ---------- settings ---------- */
