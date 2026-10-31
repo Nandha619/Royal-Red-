@@ -57,10 +57,10 @@ html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil
 .big{border:0;border-radius:14px;padding:14px 26px;font:inherit;font-size:17px;font-weight:800;color:#fff;background:linear-gradient(90deg,var(--deep,#b30f16),var(--red));box-shadow:0 6px 18px rgba(215,25,32,.45);cursor:pointer;animation:pulse 1.8s infinite}
 @keyframes pulse{50%{transform:scale(1.05)}}
 #stage{position:absolute;inset:0;overflow:hidden;touch-action:none;background:radial-gradient(circle at 50% 40%,#3a3a3a,#161616)}
-#tv,#sec,#bk{position:absolute;inset:0;z-index:8;display:none;background:#111}
-#tv.on,#bk.on{display:block;animation:fade .3s}#sec.on{display:block;animation:fade .3s;overflow:auto;padding:16px;background:var(--bg,#fffdf0);color:var(--fg,#101010)}
+#tv,#sec,#bk,#lib{position:absolute;inset:0;z-index:8;display:none;background:#111}
+#tv.on,#bk.on,#lib.on{display:block;animation:fade .3s}#sec.on{display:block;animation:fade .3s;overflow:auto;padding:16px;background:var(--bg,#fffdf0);color:var(--fg,#101010)}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}}
-#tv iframe,#bk iframe{width:100%;height:100%;border:0;background:var(--bg,#fffdf0)}
+#tv iframe,#bk iframe,#lib iframe{width:100%;height:100%;border:0;background:var(--bg,#fffdf0)}
 #sec h2{font-size:22px;color:var(--red);padding-bottom:8px;margin-bottom:12px;border-bottom:3px solid var(--red)}
 #sec .body{min-height:55vh;white-space:pre-wrap;outline:0;border:2px dashed var(--line,#e5d79a);border-radius:12px;padding:12px;font-size:16px;line-height:1.7}
 #sec .body:empty:before{content:attr(data-ph);color:#999}
@@ -228,7 +228,7 @@ html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil
   <div id="load">ஏற்றுகிறது…</div>
   <div id="zBar"><button type="button" id="zIn" title="பெரிதாக்கு">+</button><div id="zLvl">1×</div><button type="button" id="zOut" title="சிறிதாக்கு">−</button></div>
 </div>
-<div id="tv"></div><div id="bk"></div><div id="sec"></div><div id="pill"><span id="pgn">0 / 0</span></div><button id="fab" title="PDF மாற்று">PDF</button></div><div id="toast"></div>
+<div id="tv"></div><div id="bk"></div><div id="lib"></div><div id="sec"></div><div id="pill"><span id="pgn">0 / 0</span></div><button id="fab" title="PDF மாற்று">PDF</button></div><div id="toast"></div>
 <input type="file" id="file" accept="application/pdf,.pdf" hidden>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -358,15 +358,15 @@ const MORE_TABS=[['article','Article'],['shopping','Shopping'],['sub','Sub Headi
 const ICO_TV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="3.5" width="19" height="13.5" rx="2.2"/><rect x="4.2" y="5.2" width="15.6" height="9.2" rx="1" fill="currentColor" opacity=".18"/><path d="M8 20.5h8"/><path d="M12 17v3.5"/><circle cx="17.2" cy="7.2" r=".9" fill="currentColor" stroke="none"/></svg>';
 /* folded newspaper icon */
 const ICO_PAPER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5v12.2c0 .7.6 1.3 1.3 1.3h12.4"/><path d="M6.2 4.2h12.5c.8 0 1.4.6 1.4 1.4v12.6c0 .5-.4.9-.9.9H8.2"/><path d="M6.2 4.2v14"/><path d="M9.5 8h7.2M9.5 11h7.2M9.5 14h4.5"/><path d="M3 9.5h3.2"/></svg>';
-let names={},view='paper',ifr=null,bifr=null,bkOpen=false;try{names=JSON.parse(ls.get('np_tabs')||'{}')}catch(e){}
+let names={},view='paper',prevView='paper',ifr=null,bifr=null,lifr=null,bkOpen=false;try{names=JSON.parse(ls.get('np_tabs')||'{}')}catch(e){}
 /* icons now inside switch – no longer needed */
 // $('#tvIcon').innerHTML=ICO_TV;
 // $('#paperIcon').innerHTML=ICO_PAPER;
 function show(v){
-  view=v;const isSec=MORE_TABS.some(t=>t[0]===v);
+  if(v!==view&&view!=='lib')prevView=view;view=v;const isSec=MORE_TABS.some(t=>t[0]===v);
   const isTv=v==='tv', isPaper=v==='paper';
   $('#tv').classList.toggle('on',isTv);
-  $('#bk').classList.toggle('on',v==='books');$('#sec').classList.toggle('on',isSec);
+  $('#bk').classList.toggle('on',v==='books');$('#lib').classList.toggle('on',v==='lib');$('#sec').classList.toggle('on',isSec);
   const mb=$('#modeBtn'), sb=$('#slotBtn');
   if(mb){
     /* Button 1 = switch target (other mode) */
@@ -395,7 +395,8 @@ function show(v){
     }
   }
   if(isTv&&!ifr){ifr=document.createElement('iframe');ifr.allow='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';ifr.src='news.html';$('#tv').appendChild(ifr)}
-  if(v==='books'&&!bifr){bifr=document.createElement('iframe');bifr.allow='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';bifr.src='book.html';$('#bk').appendChild(bifr)}
+  if(v==='books')ensureBk();
+  if(v==='lib')openLib();
   if(isSec)renderSec(v);
   /* highlight dropdown items */
   document.querySelectorAll('#bkDrop button').forEach(b=>b.classList.toggle('on',b.dataset.id===v));
@@ -404,12 +405,38 @@ function show(v){
 function renderSec(id){const sc=$('#sec');sc.innerHTML='<h2></h2><div class="body" contenteditable="true" data-ph="இங்கே தொட்டு உள்ளடக்கத்தை எழுதவும் / ஒட்டவும்"></div>';
   const def=(MORE_TABS.find(t=>t[0]===id)||TABS0.find(t=>t[0]===id)||[id,id])[1];
   sc.querySelector('h2').textContent=names[id]||def;const b=sc.querySelector('.body');b.textContent=ls.get('np_s_'+id)||'';b.oninput=()=>ls.set('np_s_'+id,b.innerText)}
+/* ===== நூலக அலமாரி (bookshelf.html) ↔ Book Shelf (book.html) இணைப்பு ===== */
+function ensureBk(){
+  if(bifr&&bifr._ready)return Promise.resolve();
+  if(!bifr){
+    bifr=document.createElement('iframe');bifr.allow='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';
+    bifr._p=new Promise(res=>{bifr.addEventListener('load',()=>{
+      try{const w=bifr.contentWindow;w.__noShelfBtn=true;const s=w.document.createElement('script');s.src='book-shelf-link.js';s.onload=()=>{bifr._ready=true;res()};s.onerror=()=>{bifr._ready=true;res()};w.document.body.appendChild(s)}catch(e){bifr._ready=true;res()}
+    })});
+    bifr.src='book.html';$('#bk').appendChild(bifr);
+  }
+  return bifr._p;
+}
+function bkApi(){try{return bifr&&bifr.contentWindow.__shelfAPI||null}catch(e){return null}}
+window.__shelfAPI={
+  state(){const a=bkApi();return a?a.state():null},
+  media(){const a=bkApi();return a?a.media():null},
+  playAt(i){show('books');setTimeout(()=>{const a=bkApi();if(a)a.playAt(i)},200)},
+  close(){show(prevView||'paper')}
+};
+function openLib(){
+  ensureBk().then(()=>{
+    if(view!=='lib')return;
+    const box=$('#lib');box.innerHTML='';
+    lifr=document.createElement('iframe');lifr.allow='autoplay;fullscreen';lifr.src='bookshelf.html';box.appendChild(lifr);
+  });
+}
 function closeBkMenu(){bkOpen=false;$('#bkDrop').classList.remove('on');const a=$('#bkMain .arr');if(a)a.textContent='▼';const sb=$('#shelfBtn');if(sb)sb.classList.remove('on')}
 function openBkMenu(){bkOpen=true;$('#bkDrop').classList.add('on');const a=$('#bkMain .arr');if(a)a.textContent='▲';const sb=$('#shelfBtn');if(sb)sb.classList.add('on')}
 (function buildBkMenu(){
   const drop=$('#bkDrop');
   /* Book Shelf itself opens books studio */
-  const all=[['books','Book Shelf'],...MORE_TABS];
+  const all=[['books','Book Shelf'],['lib','📚 நூலக அலமாரி'],...MORE_TABS];
   all.forEach(([id,def])=>{
     const b=document.createElement('button');b.type='button';b.dataset.id=id;b.textContent=names[id]||def;
     let T,long=false;
