@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ta">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#B3121A">
+<title>செட்டிங்ஸ் · NEWS STUDIO</title>
+<link rel="stylesheet" href="settings.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+.st-page{min-height:100vh}
+.st-pane > .st-native{animation:stIn .25s ease}
+@keyframes stIn{from{opacity:0;transform:translateY(6px)}}
+.st-empty{color:var(--s-mut);font-size:14px;text-align:center;padding:6px 0}
+@media (prefers-reduced-motion:reduce){.st-pane > .st-native{animation:none}}
+</style>
+</head>
+<body class="st-page">
+
+<header class="st-top" id="top">
+  <div class="st-head">
+    <a class="st-back" id="back" href="index.html">← திரும்பு</a>
+    <h1>⚙ செட்டிங்ஸ்</h1>
+  </div>
+  <nav class="st-tabs" id="tabs" role="tablist" aria-label="செட்டிங் பகுதிகள்">
+    <button class="st-tab" role="tab" data-t="epaper" type="button">📰 E-Paper</button>
+    <button class="st-tab" role="tab" data-t="tv" type="button">📺 Mobile TV</button>
+    <button class="st-tab" role="tab" data-t="shelf" type="button">📚 Book Shelf</button>
+    <button class="st-tab" role="tab" data-t="theme" type="button">🎨 தோற்றம்</button>
+    <button class="st-tab" role="tab" data-t="sections" type="button">📝 பிற பகுதிகள்</button>
+  </nav>
+</header>
+
+<main class="st-body">
+
+  <!-- ===== E-Paper ===== -->
+  <section class="st-pane" id="p-epaper" role="tabpanel">
+    <div class="st-native">
+      <div class="sc">
+        <h2>📰 இன்றைய இதழ் (PDF)</h2>
+        <div class="st-kv"><span>தற்போதைய கோப்பு</span><b id="pdfName">—</b></div>
+        <div class="st-kv"><span>அளவு</span><b id="pdfSize">—</b></div>
+        <input type="file" id="pdfFile" accept="application/pdf,.pdf" hidden>
+        <div class="st-row">
+          <button type="button" id="pdfPick">PDF தேர்வு / மாற்று</button>
+          <button type="button" class="warn" id="pdfDel">PDF நீக்கு</button>
+        </div>
+        <p class="note">இங்கே சேர்க்கும் PDF, முதல் பக்கத்தில் E-Paper ஆக புரட்டிப் படிக்கத் தெரியும்.</p>
+      </div>
+      <div class="sc">
+        <h2>⬇ பதிவிறக்கம்</h2>
+        <label>கோப்புப் பெயரில் வரும் தேதி
+          <input type="date" id="dlDate">
+        </label>
+        <div class="st-row">
+          <button type="button" class="alt" id="dlToday">இன்றைய தேதி பயன்படுத்து</button>
+        </div>
+        <p class="note">காலியாக விட்டால் தினமும் இன்றைய தேதி தானாக வரும். கோப்புப் பெயர்: Theekkathir-DD-MM-YYYY.pdf</p>
+      </div>
+      <div class="sc">
+        <h2>🔊 புரட்டும் ஒலி</h2>
+        <label class="toggle"><span>பக்கம் புரட்டும்போது தாள் ஒலி</span><input type="checkbox" id="sndChk"></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Mobile TV (news.html?mode=settings) ===== -->
+  <section class="st-pane" id="p-tv" role="tabpanel"></section>
+
+  <!-- ===== Book Shelf (book.html?mode=settings) ===== -->
+  <section class="st-pane" id="p-shelf" role="tabpanel"></section>
+
+  <!-- ===== தோற்றம் ===== -->
+  <section class="st-pane" id="p-theme" role="tabpanel">
+    <div class="st-native">
+      <div class="sc">
+        <h2>🎨 ஆப் தோற்றம்</h2>
+        <div id="themes"></div>
+        <p class="note">ஒரு தேர்வு E-Paper, Mobile TV, Book Shelf மற்றும் அனைத்து செட்டிங் பக்கங்களுக்கும் ஒரே நிறத்தைத் தரும்.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== பிற பகுதிகள் ===== -->
+  <section class="st-pane" id="p-sections" role="tabpanel">
+    <div class="st-native" id="secList"></div>
+  </section>
+
+</main>
+<div class="st-toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="theme.js"></script>
+<script src="owner-gate.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  var ls = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
+  };
+  var toastT = 0;
+  function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 2400); }
+
+  /* ---------- தாவல்கள் ---------- */
+  var TABS = ['epaper', 'tv', 'shelf', 'theme', 'sections'];
+  var VIEW_OF = { epaper: 'paper', tv: 'tv', shelf: 'books', theme: 'paper', sections: 'paper' };
+  var SRC = { tv: 'news.html?mode=settings', shelf: 'book.html?mode=settings' };
+  var cur = '';
+  function fitFrames() {
+    var h = Math.max(240, innerHeight - $('#top').offsetHeight);
+    [].forEach.call(document.querySelectorAll('.st-pane > iframe'), function (f) { f.style.height = h + 'px'; });
+  }
+  function openTab(id, push) {
+    if (TABS.indexOf(id) < 0) id = 'epaper';
+    cur = id;
+    [].forEach.call(document.querySelectorAll('.st-tab'), function (b) { b.setAttribute('aria-selected', b.dataset.t === id ? 'true' : 'false'); });
+    TABS.forEach(function (t) { $('#p-' + t).classList.toggle('on', t === id); });
+    if (SRC[id] && !$('#p-' + id + ' > iframe')) {
+      var f = document.createElement('iframe');
+      f.title = id; f.src = SRC[id];
+      f.allow = 'camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';
+      $('#p-' + id).appendChild(f);
+    }
+    $('#back').href = 'index.html#' + VIEW_OF[id];
+    try { if (push !== false) history.replaceState(null, '', '#' + id); } catch (e) {}
+    fitFrames(); window.scrollTo(0, 0);
+    if (id === 'epaper') loadPdfInfo();
+  }
+  $('#tabs').addEventListener('click', function (e) { var b = e.target.closest('.st-tab'); if (b) openTab(b.dataset.t); });
+  addEventListener('resize', fitFrames);
+  addEventListener('hashchange', function () { openTab(location.hash.slice(1), false); });
+
+  /* ---------- E-Paper: PDF (IndexedDB 'epaper' — முதல் பக்கம் அதையே படிக்கும்) ---------- */
+  var idb = function () { return new Promise(function (res, rej) { var r = indexedDB.open('epaper', 1); r.onupgradeneeded = function () { r.result.createObjectStore('kv'); }; r.onsuccess = function () { res(r.result); }; r.onerror = function () { rej(r.error); }; }); };
+  function dbSet(k, v) { return idb().then(function (d) { return new Promise(function (res, rej) { var t = d.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = res; t.onerror = function () { rej(t.error); }; }); }); }
+  function dbGet(k) { return idb().then(function (d) { return new Promise(function (res) { var q = d.transaction('kv').objectStore('kv').get(k); q.onsuccess = function () { res(q.result); }; q.onerror = function () { res(null); }; }); }).catch(function () { return null; }); }
+  function dbDel(k) { return idb().then(function (d) { return new Promise(function (res) { var t = d.transaction('kv', 'readwrite'); t.objectStore('kv').delete(k); t.oncomplete = res; t.onerror = res; }); }).catch(function () {}); }
+  function loadPdfInfo() {
+    dbGet('pdf').then(function (d) {
+      if (d && d.buf) { $('#pdfName').textContent = d.name || 'PDF'; $('#pdfSize').textContent = (d.buf.byteLength / 1048576).toFixed(1) + ' MB'; }
+      else { $('#pdfName').textContent = 'இல்லை'; $('#pdfSize').textContent = '—'; }
+    });
+  }
+  $('#pdfPick').onclick = function () { $('#pdfFile').click(); };
+  $('#pdfFile').onchange = function (e) {
+    var f = e.target.files[0]; e.target.value = '';
+    if (!f) return;
+    if (!/pdf/i.test(f.type + f.name)) { toast('PDF கோப்பை மட்டும் தேர்வு செய்யவும்'); return; }
+    f.arrayBuffer().then(function (buf) { return dbSet('pdf', { name: f.name, buf: buf }).then(function () { return dbSet('pg', 0); }); })
+      .then(function () { loadPdfInfo(); toast('✔ PDF சேர்க்கப்பட்டது — முதல் பக்கத்தில் தெரியும்'); })
+      .catch(function () { toast('⚠ PDF சேமிக்க முடியவில்லை'); });
+  };
+  $('#pdfDel').onclick = function () {
+    dbDel('pdf').then(function () { return dbDel('pg'); }).then(function () { loadPdfInfo(); toast('PDF நீக்கப்பட்டது'); });
+  };
+
+  /* ---------- E-Paper: தேதி, ஒலி ---------- */
+  $('#dlDate').value = ls.get('np_dldate') || '';
+  $('#dlDate').onchange = function (e) { if (e.target.value) ls.set('np_dldate', e.target.value); else ls.del('np_dldate'); toast('✔ சேமிக்கப்பட்டது'); };
+  $('#dlToday').onclick = function () { $('#dlDate').value = ''; ls.del('np_dldate'); toast('✔ இனி இன்றைய தேதி பயன்படும்'); };
+  $('#sndChk').checked = ls.get('np_sound') !== '0';
+  $('#sndChk').onchange = function (e) { ls.set('np_sound', e.target.checked ? '1' : '0'); toast('✔ சேமிக்கப்பட்டது'); };
+
+  /* ---------- தோற்றம் ---------- */
+  if (window.AppTheme) AppTheme.mount('#themes');
+
+  /* ---------- பிற பகுதிகள் (முன்பு Shelf மெனுவில் இருந்தவை) ---------- */
+  var SECS = [['article', 'Article'], ['shopping', 'Shopping'], ['sub', 'Sub Heading Title']];
+  var names = {}; try { names = JSON.parse(ls.get('np_tabs') || '{}') || {}; } catch (e) { names = {}; }
+  (function buildSecs() {
+    var box = $('#secList');
+    SECS.forEach(function (s) {
+      var id = s[0], c = document.createElement('div'); c.className = 'sc';
+      var h = document.createElement('h2'); h.textContent = '📝 ' + (names[id] || s[1]);
+      var l1 = document.createElement('label'); l1.textContent = 'பகுதியின் பெயர்';
+      var nm = document.createElement('input'); nm.type = 'text'; nm.value = names[id] || ''; nm.placeholder = s[1]; l1.appendChild(nm);
+      var l2 = document.createElement('label'); l2.textContent = 'உள்ளடக்கம்';
+      var tx = document.createElement('textarea'); tx.className = 'big'; tx.value = ls.get('np_s_' + id) || ''; tx.placeholder = 'இங்கே எழுதவும் / ஒட்டவும்'; l2.appendChild(tx);
+      nm.oninput = function () { var v = nm.value.trim(); if (v) names[id] = v; else delete names[id]; ls.set('np_tabs', JSON.stringify(names)); h.textContent = '📝 ' + (names[id] || s[1]); };
+      tx.oninput = function () { ls.set('np_s_' + id, tx.value); };
+      c.appendChild(h); c.appendChild(l1); c.appendChild(l2); box.appendChild(c);
+    });
+  })();
+
+  openTab((location.hash || '').slice(1) || 'epaper', false);
+})();
+</script>
+</body>
+</html>

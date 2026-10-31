@@ -39,11 +39,22 @@ button:disabled{opacity:.5}
 #st{font-size:14px;color:var(--gold);min-height:22px}
 small{color:var(--mut)}
 details summary{cursor:pointer;font-weight:700}
+/* ---- முதல் பக்கம் (காட்சி மட்டும்): ?mode=view ---- */
+html.m-view,html.m-view body{height:100%;overflow:hidden;background:#000;padding:0;overscroll-behavior:none}
+html.m-view main{display:block;padding:0;max-width:none;margin:0;height:100%}
+html.m-view #mainPanel,html.m-view #cardPanel{display:none!important}
+html.m-view .stage{position:fixed;inset:0;background:#000;border:0;border-radius:0;padding:0;display:block;cursor:pointer}
+html.m-view canvas{position:absolute;inset:0;width:100%;height:100%;max-height:none;aspect-ratio:auto;object-fit:contain;border-radius:0;background:#000;pointer-events:none}
+#vInfo{display:none}
+html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);transform:translateX(-50%);z-index:5;background:rgba(0,0,0,.62);color:#fff;font:800 12px "Noto Sans Tamil",sans-serif;padding:3px 12px;border-radius:99px;pointer-events:none}
 </style>
+<script>(function(){var m=new URLSearchParams(location.search).get('mode')||'';document.documentElement.classList.add('m-'+(m||'full'));if(m==='settings'){var l=document.createElement('link');l.rel='stylesheet';l.href='settings.css';document.head.appendChild(l)}})();</script>
+<script src="media-store.js"></script>
 </head>
 <body>
 <main>
 <div class="stage"><canvas id="cv" width="1080" height="1920"></canvas></div>
+<div id="vInfo"></div>
 <div class="panel" id="mainPanel">
   <h2>தீக்கதிர் – செய்தி ஸ்டுடியோ</h2>
   <div id="appThemes"></div>
@@ -414,7 +425,11 @@ function CONTACT(t){
 
 /* ---------- loop ---------- */
 let startT=performance.now(),rec=false,playing=true;
-function loop(now){if(window._exp){requestAnimationFrame(loop);return}if(cardMode&&items[cur].card){STILL=true;try{draw(items[cur].card,4)}catch(e){console.error(e)}requestAnimationFrame(loop);return}STILL=false;let t=Math.max(0,(now-startT)/1000);const DD=durOf(items[cur]);t=rec?Math.min(t,DD):playing?t%DD:4;try{draw(items[cur],t)}catch(e){console.error(e)}requestAnimationFrame(loop)}
+const VIEW=document.documentElement.classList.contains("m-view");
+function loop(now){if(window._exp){requestAnimationFrame(loop);return}if(cardMode&&items[cur].card){STILL=true;try{draw(items[cur].card,4)}catch(e){console.error(e)}requestAnimationFrame(loop);return}STILL=false;let t=Math.max(0,(now-startT)/1000);const DD=durOf(items[cur]);
+/* காட்சிப் பக்கம்: ஒரு செய்தி முடிந்ததும் அடுத்த செய்திக்குத் தானாகச் செல்லும் */
+if(VIEW&&!rec&&items.length>1&&t>=DD){sel((cur+1)%items.length);requestAnimationFrame(loop);return}
+t=rec?Math.min(t,DD):playing?t%DD:4;try{draw(items[cur],t)}catch(e){console.error(e)}requestAnimationFrame(loop)}
 (async()=>{try{await document.fonts.load("800 40px 'Noto Sans Tamil'","தமிழ்");await document.fonts.load("700 40px 'Noto Sans Tamil'","தமிழ்")}catch(e){}requestAnimationFrame(loop)})();
 
 /* ---------- UI ---------- */
@@ -429,11 +444,16 @@ FL.forEach(([i,k])=>{$("#"+i).oninput=e=>{G[k]=e.target.value;save()}});
 $("#gSl").onchange=e=>{G.slide=clamp(+e.target.value||3,1,15);e.target.value=G.slide;save()};
 $("#gDur").onchange=e=>{G.dur=clamp(+e.target.value||12,6,90);e.target.value=G.dur;save()};
 $("#fLogo").onchange=e=>{const f=e.target.files[0];if(!f)return;const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,500/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.max(1,Math.round(im.width*s));c.height=Math.max(1,Math.round(im.height*s));c.getContext("2d").drawImage(im,0,0,c.width,c.height);let u=c.toDataURL("image/png");if(u.length>230000)u=c.toDataURL("image/webp",.9);setLogo(u);try{localStorage.setItem("tk_logo",u)}catch(x){}$("#st").textContent="✔ லோகோ சேமிக்கப்பட்டது."};im.src=fr.result};fr.readAsDataURL(f)};
-$("#fMedia").onchange=e=>{const k=cur;[...e.target.files].forEach(f=>{const u=URL.createObjectURL(f);media[k]=media[k]||[];if(f.type.startsWith("video")){const v=document.createElement("video");v.src=u;v.loop=true;v.muted=true;v.playsInline=true;v.preload="auto";v.onloadeddata=()=>media[k].push({type:"v",el:v,file:f})}else{const im=new Image();im.onload=()=>media[k].push({type:"i",el:im});im.src=u}});e.target.value=""};
-$("#bClr").onclick=()=>{(media[cur]||[]).forEach(m=>{if(m.type==="v")m.el.pause()});delete media[cur]};
+/* footage (வீடியோ / படம்) — செட்டிங் பக்கத்தில் சேர்த்தவை IndexedDB-ல் சேமிக்கப்பட்டு காட்சிப் பக்கத்திலும் தெரியும் */
+function addMedia(k,f,done){const u=URL.createObjectURL(f);media[k]=media[k]||[];if(f.type.startsWith("video")){const v=document.createElement("video");v.src=u;v.loop=true;v.muted=true;v.playsInline=true;v.preload="auto";v.onloadeddata=()=>{media[k].push({type:"v",el:v,file:f});done&&done()}}else{const im=new Image();im.onload=()=>{media[k].push({type:"i",el:im,file:f});done&&done()};im.src=u}}
+let pmT=0;
+function persistMedia(){clearTimeout(pmT);pmT=setTimeout(()=>{if(!window.MediaStore)return;const o={};Object.keys(media).forEach(k=>{const a=(media[k]||[]).map(m=>m.file).filter(Boolean);if(a.length)o[k]=a});MediaStore.put("tv:media",o)},350)}
+$("#fMedia").onchange=e=>{const k=cur;[...e.target.files].forEach(f=>addMedia(k,f,persistMedia));e.target.value=""};
+if(window.MediaStore)MediaStore.get("tv:media").then(o=>{if(!o)return;Object.keys(o).forEach(k=>(o[k]||[]).forEach(f=>addMedia(+k,f)))});
+$("#bClr").onclick=()=>{(media[cur]||[]).forEach(m=>{if(m.type==="v")m.el.pause()});delete media[cur];persistMedia()};
 $("#bPlay").onclick=()=>{playing=!playing;$("#bPlay").textContent=playing?"⏸ முன்னோட்டம்":"▶ முன்னோட்டம்";startT=performance.now()};
 $("#bAdd").onclick=()=>{if(items.length>=10){$("#st").textContent="அதிகபட்சம் 10 செய்திகள்.";return}items.push({...blank(),headline:"",loc:"",script:"",ticker:""});save();sel(items.length-1)};
-$("#bDel").onclick=()=>{if(items.length<2)return;items.splice(cur,1);const m={};Object.keys(media).forEach(k=>{k=+k;if(k<cur)m[k]=media[k];else if(k>cur)m[k-1]=media[k]});media=m;save();sel(Math.min(cur,items.length-1))};
+$("#bDel").onclick=()=>{if(items.length<2)return;items.splice(cur,1);const m={};Object.keys(media).forEach(k=>{k=+k;if(k<cur)m[k]=media[k];else if(k>cur)m[k-1]=media[k]});media=m;persistMedia();save();sel(Math.min(cur,items.length-1))};
 $("#bDate").onclick=()=>{items.forEach(x=>{x.date=today();x.dm=false});save();fill();$("#st").textContent="✔ அனைத்து செய்திகளுக்கும் இன்றைய தேதி அமைக்கப்பட்டது."};
 $("#bImp").onclick=()=>{const L=$("#bulk").value.split("\n").map(s=>s.trim()).filter(Boolean).slice(0,10);if(!L.length)return;items=L.map(l=>{const p=l.split("|").map(s=>s.trim());return{headline:p[0]||"",loc:p[1]||"",date:today(),script:(p[2]||"").split(";").map(s=>s.trim()).join("\n"),ticker:p[3]||plain(p[0]),breaking:true}});media={};save();sel(0);$("#st").textContent=items.length+" செய்திகள் ஏற்றப்பட்டன. ஒவ்வொன்றிற்கும் வீடியோ சேர்க்கலாம்."};
 
@@ -695,6 +715,14 @@ window.onAppTheme=function(t){
     r.style.setProperty("--gold",YEL);r.style.setProperty("--warm",YEL);r.style.setProperty("--yel",YEL);r.style.setProperty("--red",RED);
   }catch(err){console.warn("onAppTheme",err)}
 };
+</script>
+<script>
+/* காட்சிப் பக்கம் (?mode=view): தொட்டால் முந்தைய / அடுத்த செய்தி; எண் காட்டி */
+if(VIEW){
+  const st=document.querySelector(".stage"),vi=document.getElementById("vInfo");
+  st.addEventListener("click",e=>{if(items.length<2)return;const x=e.clientX/innerWidth;sel(x<.33?(cur-1+items.length)%items.length:(cur+1)%items.length)});
+  setInterval(()=>{vi.textContent=items.length>1?(cur+1)+" / "+items.length:""},400);
+}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.js"></script>
 <script src="theme.js"></script>

@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>(function(){var m=new URLSearchParams(location.search).get('mode')||'';document.documentElement.classList.add('m-'+(m||'full'));if(m==='settings'){var l=document.createElement('link');l.rel='stylesheet';l.href='settings.css';document.head.appendChild(l)}})();</script><script src="media-store.js"></script></head><body>
 <title>புத்தக வீடியோ ஸ்டுடியோ</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400..800&display=swap">
@@ -110,6 +110,12 @@ input[type=color] { width: 38px; height: 30px; border: 1px solid var(--line); bo
 .hint { color: var(--muted); font-size: 13px; margin: 0; }
 @media (prefers-reduced-motion: reduce) { .bar > div { transition: none; } }
 .side{gap:10px}.panels{gap:8px!important}details.pn>summary{padding:10px 14px!important;font-size:17px!important}details.pn>.body{gap:8px!important;padding:0 14px 12px!important}.card{padding:12px!important}header.top{margin-bottom:12px!important}.shell{gap:16px!important}.checks{gap:6px 12px!important}
+/* ---- முதல் பக்கம் (காட்சி மட்டும்): ?mode=view ---- */
+html.m-view header.top,html.m-view .side,html.m-view .row2,html.m-view .hint,html.m-view .player{display:none!important}
+html.m-view body{padding:58px 0 0!important}
+html.m-view .shell{grid-template-columns:minmax(0,1fr)!important;gap:0!important}
+html.m-view .stage{position:static!important}
+html.m-view .phone{width:min(100%,400px,calc((100vh - 76px)*9/16))!important}
 </style>
 
 <div class="wrap">
@@ -375,6 +381,30 @@ function videoFromFile(file) {
     v.onerror = function () { rej(new Error('video')); };
     v.src = u;
   });
+}
+
+/* ---------- media சேமிப்பு (செட்டிங் பக்கத்தில் சேர்த்தவை முதல் பக்கத்திலும் தெரிய) ---------- */
+function mkey(kind, id) { return 'bk:' + kind + (id ? ':' + id : ''); }
+function keep(kind, id, file) { if (window.MediaStore) MediaStore.put(mkey(kind, id), { file: file, name: file && file.name }); }
+function drop(kind, id) { if (window.MediaStore) MediaStore.del(mkey(kind, id)); }
+function restoreMedia() {
+  if (!window.MediaStore) return;
+  MediaStore.keys('bk:').then(function (keys) {
+    return Promise.all(keys.map(function (k) {
+      return MediaStore.get(k).then(function (rec) {
+        if (!rec || !rec.file) return;
+        var f = rec.file, p = k.split(':'), kind = p[1], id = p.slice(2).join(':');
+        if (kind === 'logo') return imgFromFile(f).then(function (m) { media.logo = m; });
+        if (kind === 'cover') return imgFromFile(f).then(function (m) { media.covers[id] = m; });
+        if (kind === 'back') return imgFromFile(f).then(function (m) { media.backs[id] = m; });
+        if (kind === 'speaker') {
+          if (f.type && f.type.indexOf('video') === 0) return videoFromFile(f).then(function (m) { m.kind = 'video'; m.file = f; media.speaker = m; });
+          return imgFromFile(f).then(function (m) { m.kind = 'image'; media.speaker = m; });
+        }
+        if (kind === 'music') media.music = { file: f, name: f.name };
+      }).catch(function () {});
+    }));
+  }).then(function () { renderBooks(); renderStatus(); dirty = true; try { if (window.parent !== window) window.parent.postMessage({ bkReady: 1 }, '*'); } catch (e) {} });
 }
 
 /* ---------- canvas drawing ---------- */
@@ -981,15 +1011,15 @@ document.addEventListener('change', function (e) {
 
 function handleFile(el, file) {
   var kind = el.dataset.file;
-  if (kind === 'logo') imgFromFile(file).then(function (m) { media.logo = m; renderStatus(); dirty = true; }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); });
-  else if (kind === 'back') { var bid = el.dataset.bid; imgFromFile(file).then(function (m) { media.backs[bid] = m; var th2 = $('#thb-' + bid); if (th2) th2.style.backgroundImage = 'url(' + m.url + ')'; dirty = true; }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); }); }
-  else if (kind === 'cover') { var id = el.dataset.bid; imgFromFile(file).then(function (m) { media.covers[id] = m; var th = $('#th-' + id); if (th) th.style.backgroundImage = 'url(' + m.url + ')'; dirty = true; }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); }); }
+  if (kind === 'logo') imgFromFile(file).then(function (m) { media.logo = m; renderStatus(); dirty = true; keep('logo', '', file); }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); });
+  else if (kind === 'back') { var bid = el.dataset.bid; imgFromFile(file).then(function (m) { media.backs[bid] = m; var th2 = $('#thb-' + bid); if (th2) th2.style.backgroundImage = 'url(' + m.url + ')'; dirty = true; keep('back', bid, file); }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); }); }
+  else if (kind === 'cover') { var id = el.dataset.bid; imgFromFile(file).then(function (m) { media.covers[id] = m; var th = $('#th-' + id); if (th) th.style.backgroundImage = 'url(' + m.url + ')'; dirty = true; keep('cover', id, file); }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); }); }
   else if (kind === 'speaker') {
     setPlaying(false);
-    if (file.type.indexOf('video') === 0) videoFromFile(file).then(function (m) { m.kind = 'video'; m.file = file; media.speaker = m; renderStatus(); dirty = true; }).catch(function () { setMsg('இந்த வீடியோவை உலாவியால் இயக்க முடியவில்லை. MP4 (H.264) முயற்சிக்கவும்.', true); });
-    else imgFromFile(file).then(function (m) { m.kind = 'image'; media.speaker = m; renderStatus(); dirty = true; }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); });
+    if (file.type.indexOf('video') === 0) videoFromFile(file).then(function (m) { m.kind = 'video'; m.file = file; media.speaker = m; renderStatus(); dirty = true; keep('speaker', '', file); }).catch(function () { setMsg('இந்த வீடியோவை உலாவியால் இயக்க முடியவில்லை. MP4 (H.264) முயற்சிக்கவும்.', true); });
+    else imgFromFile(file).then(function (m) { m.kind = 'image'; media.speaker = m; renderStatus(); dirty = true; keep('speaker', '', file); }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); });
   }
-  else if (kind === 'music') { media.music = { file: file, name: file.name }; renderStatus(); }
+  else if (kind === 'music') { media.music = { file: file, name: file.name }; renderStatus(); keep('music', '', file); }
   el.value = '';
 }
 
@@ -998,13 +1028,13 @@ document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'); if (!b) return;
   var act = b.dataset.act, id = b.dataset.id, i;
   if (act === 'theme') { state.theme = b.dataset.v; var tt = THEMES.filter(function (x) { return x.id === b.dataset.v; })[0]; if (tt && tt.font) { state.font = tt.font; $('#fontSel').value = tt.font; loadFonts(); } renderThemes(); afterEdit(); }
-  else if (act === 'rmlogo') { media.logo = null; renderStatus(); dirty = true; }
-  else if (act === 'rmspeaker') { setPlaying(false); media.speaker = null; renderStatus(); dirty = true; }
-  else if (act === 'rmmusic') { media.music = null; renderStatus(); }
+  else if (act === 'rmlogo') { media.logo = null; renderStatus(); dirty = true; drop('logo', ''); }
+  else if (act === 'rmspeaker') { setPlaying(false); media.speaker = null; renderStatus(); dirty = true; drop('speaker', ''); }
+  else if (act === 'rmmusic') { media.music = null; renderStatus(); drop('music', ''); }
   else if (act === 'addbook') { if (state.books.length < 6) { state.books.push({ id: uid(), title: 'புதிய புத்தகத் தலைப்பு', author: '', publisher: state.org, genre: '', oldP: '', newP: '' }); renderBooks(); afterEdit(); } }
-  else if (act === 'rmbook') { if (state.books.length > 1) { state.books = state.books.filter(function (x) { return x.id !== id; }); delete media.covers[id]; renderBooks(); afterEdit(); } }
-  else if (act === 'rmback') { delete media.backs[id]; var thb = $('#thb-' + id); if (thb) thb.style.backgroundImage = ''; dirty = true; }
-  else if (act === 'rmcover') { delete media.covers[id]; var th = $('#th-' + id); if (th) th.style.backgroundImage = ''; dirty = true; }
+  else if (act === 'rmbook') { if (state.books.length > 1) { state.books = state.books.filter(function (x) { return x.id !== id; }); delete media.covers[id]; delete media.backs[id]; drop('cover', id); drop('back', id); renderBooks(); afterEdit(); } }
+  else if (act === 'rmback') { delete media.backs[id]; var thb = $('#thb-' + id); if (thb) thb.style.backgroundImage = ''; dirty = true; drop('back', id); }
+  else if (act === 'rmcover') { delete media.covers[id]; var th = $('#th-' + id); if (th) th.style.backgroundImage = ''; dirty = true; drop('cover', id); }
   else if (act === 'up' || act === 'down') {
     i = state.books.map(function (x) { return x.id; }).indexOf(id); var j = act === 'up' ? i - 1 : i + 1;
     if (i > -1 && j > -1 && j < state.books.length) { var tmp = state.books[i]; state.books[i] = state.books[j]; state.books[j] = tmp; renderBooks(); afterEdit(); }
@@ -1014,7 +1044,7 @@ $('#resetBtn').addEventListener('click', function (e) {
   var btn = e.currentTarget;
   if (!resetArm) { resetArm = 1; btn.textContent = 'உறுதி செய்ய மீண்டும் அழுத்தவும்'; setTimeout(function () { resetArm = 0; btn.textContent = 'எல்லாவற்றையும் இயல்புநிலைக்கு மாற்று'; }, 4000); return; }
   resetArm = 0; btn.textContent = 'எல்லாவற்றையும் இயல்புநிலைக்கு மாற்று';
-  state = clone(DEFAULT); media.covers = {}; media.backs = {}; try { localStorage.removeItem(KEY); } catch (er) {}
+  state = clone(DEFAULT); media.covers = {}; media.backs = {}; if (window.MediaStore) MediaStore.delPrefix('bk:cover:'), MediaStore.delPrefix('bk:back:'); try { localStorage.removeItem(KEY); } catch (er) {}
   fillForm(); loadFonts(); dirty = true;
 });
 
@@ -1158,6 +1188,7 @@ window.onAppTheme = function (t) {
 };
 /* ---------- boot ---------- */
 fillForm(); $('#seek').max = TOTAL; syncPlayer();
+restoreMedia();
 loadFonts();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { dirty = true; });
 requestAnimationFrame(tick);

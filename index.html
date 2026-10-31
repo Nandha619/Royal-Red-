@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#d71920">
 <title>NEWS STUDIO</title>
-<script>(function(){try{var V='shelf-3';if(localStorage.getItem('shelf_build')!==V){localStorage.setItem('shelf_build',V);var j=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)j.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));if(window.caches)j.push(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}));Promise.all(j).then(function(){location.reload()})}}catch(e){}})();</script>
+<script>(function(){try{var V='shelf-5';if(localStorage.getItem('shelf_build')!==V){localStorage.setItem('shelf_build',V);var j=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)j.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));if(window.caches)j.push(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}));Promise.all(j).then(function(){location.reload()})}}catch(e){}})();</script>
 <style>
 :root{--red:#d71920;--dark:#101010;--gold:#e0a823}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
@@ -199,6 +199,15 @@ html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil
 @keyframes vpIn{from{opacity:0;transform:translateX(-50%) translateY(24px)}to{opacity:1;transform:translateX(-50%)}}
 #bk.sheet{animation:sheetUp .35s cubic-bezier(.2,.8,.2,1)}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
+
+/* ===== APP INTERFACE: காட்சி மட்டும் — E-Paper | Mobile TV | Book Shelf | Download | செட்டிங்ஸ் ===== */
+.tb{flex:1;min-width:0;height:48px;border:0;border-radius:11px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:inherit;font-size:10px;font-weight:800;color:#fff;background:transparent;transition:background .25s,transform .2s,opacity .25s;padding:4px 2px;line-height:1.15;text-decoration:none;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.tb .ico{font-size:20px;line-height:1}
+.tb:active{transform:scale(.96)}
+.tb.on{background:rgba(255,255,255,.95);color:var(--red)}
+.tb.empty{opacity:.35;pointer-events:none}
+.tb.sep{flex:0 0 1px;width:1px;min-width:0;height:28px;align-self:center;padding:0;background:rgba(255,255,255,.35);border-radius:0}
+@media (max-width:480px){.tb{height:46px;font-size:9px}.tb .ico{font-size:18px}}
 </style></head>
 <body><script type="text/plain" id="linkSrc">/* book.html உள்ளே தானாக ஏற்றப்படும் இணைப்பு */
 (function(){
@@ -350,7 +359,7 @@ summary{cursor:pointer;padding:12px 16px;font-weight:800;color:var(--gold)}
 <main>
 <h1 id="ttl">புத்தக அலமாரி</h1>
 <p class="hint">பக்கவாட்டில் தள்ளுங்கள் · பெரிய புத்தகத்தைத் தொட்டால் அதன் வீடியோ ஓடும்</p>
-<button class="editShelf" id="es" type="button" aria-label="புத்தகங்களைத் திருத்து">✎ புத்தகங்களைத் திருத்து</button>
+<button class="editShelf" id="es" type="button" aria-label="செட்டிங்ஸில் புத்தகங்களைத் திருத்து">⚙ செட்டிங்ஸில் திருத்து</button>
 
 <section class="info" id="info" aria-live="polite">
 <div class="lg" id="lg"></div>
@@ -498,7 +507,7 @@ $('#vid').onclick=function(){play(shown)};
 /* ---------- edit: புத்தகத் தலைப்பு / எழுத்தாளர் / பதிப்பகம் / வகை / விலை / அட்டை திருத்த ஸ்டுடியோவைத் திறக்கும் ---------- */
 function editBooks(){
 if(P&&P.edit){try{P.edit();return}catch(e){}}
-location.href='book.html';
+location.href='settings.html#shelf';
 }
 $('#es').onclick=editBooks;
 if(P){document.body.classList.add('emb');document.querySelector('.hint').textContent='பெரிய புத்தகத்தைத் தொட்டால் அதன் வீடியோ ஓடும் · v4'}
@@ -526,43 +535,23 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);
 <div id="app">
 <nav id="bar">
   <div class="top-switch-wrap">
-    <button class="mode-btn" id="modeBtn" data-mode="paper" type="button" aria-label="Switch mode">
-      <span class="ico" id="modeIco">📺</span>
-      <span class="lbl" id="modeLbl">Mobile TV</span>
-    </button>
-    <button class="shelf-btn" id="shelfBtn" type="button" aria-label="Book Shelf">
-      <span class="ico">📚</span>
-      <span class="lbl">Shelf</span>
-    </button>
-    <button class="slot-btn" id="slotBtn" type="button" aria-label="Download">
-      <span class="ico" id="slotIco">⬇</span>
-      <span class="lbl" id="slotLbl">Download</span>
-    </button>
+    <button class="tb on" type="button" data-v="paper" aria-label="E-Paper"><span class="ico">📰</span><span>E-Paper</span></button>
+    <button class="tb" type="button" data-v="tv" aria-label="Mobile TV"><span class="ico">📺</span><span>Mobile TV</span></button>
+    <button class="tb" type="button" data-v="books" aria-label="Book Shelf"><span class="ico">📚</span><span>Book Shelf</span></button>
+    <i class="tb sep" aria-hidden="true"></i>
+    <button class="tb" type="button" id="dlBtn" aria-label="Download"><span class="ico">⬇</span><span>Download</span></button>
+    <a class="tb" id="setBtn" href="settings.html#epaper" aria-label="செட்டிங்ஸ்"><span class="ico">⚙</span><span>செட்டிங்ஸ்</span></a>
   </div>
-  <div id="subs" style="display:none">
-    <div id="bkMenu">
-      <button type="button" id="bkMain" aria-label="Book Shelf" style="display:none">
-        <span>Book Shelf</span>
-        <span class="arr">▼</span>
-      </button>
-    </div>
-  </div>
-  <div id="bkDrop"></div>
-  <div id="dlWrap" style="display:none">
-    <span id="dlDate" title="தேதி தேர்வு"></span>
-  </div>
-  <input type="date" id="datePick" hidden>
 </nav>
 <div id="main"><div id="stage">
   <div id="book"><div class="pg" id="pn_"></div><div class="pg" id="pc_"></div><div class="pg" id="pp_"></div></div>
   <div id="shade"></div>
-  <div id="empty"><div class="sheet"></div><h2>NEWS STUDIO</h2><p>PDF-ஐ தேர்வு செய்தால் உண்மையான செய்தித்தாள் போல ஸ்வைப் செய்து புரட்டிப் படிக்கலாம்.</p><button class="big" id="pick">PDF தேர்வு செய்</button></div>
+  <div id="empty"><div class="sheet"></div><h2>NEWS STUDIO</h2><p>செட்டிங்ஸ் → E-Paper பகுதியில் PDF-ஐச் சேர்த்தால், உண்மையான செய்தித்தாள் போல ஸ்வைப் செய்து புரட்டிப் படிக்கலாம்.</p><button class="big" id="pick">⚙ செட்டிங்ஸில் PDF சேர்</button></div>
   <div id="hint"><span><i>◀</i> ஸ்வைப் / கீழிருந்து இழுத்து மடித்துப் புரட்டவும் <i style="animation-direction:reverse">▶</i> &nbsp;|&nbsp; இருமுறை தட்டி / + − பெரிதாக்க</span></div>
   <div id="load">ஏற்றுகிறது…</div>
   <div id="zBar"><button type="button" id="zIn" title="பெரிதாக்கு">+</button><div id="zLvl">1×</div><button type="button" id="zOut" title="சிறிதாக்கு">−</button></div>
 </div>
-<div id="tv"></div><div id="bk"></div><div id="lib"></div><button type="button" id="vidPop">🎬 புத்தக வீடியோ</button><div id="bkBar"><button type="button" id="bkBack">← அலமாரி</button><button type="button" id="bkAgain">↻ மீண்டும்</button></div><div id="sec"></div><div id="pill"><span id="pgn">0 / 0</span></div><button id="fab" title="PDF மாற்று">PDF</button></div><div id="toast"></div>
-<input type="file" id="file" accept="application/pdf,.pdf" hidden>
+<div id="tv"></div><div id="bk"></div><div id="lib"></div><div id="bkBar"><button type="button" id="bkBack">← அலமாரி</button><button type="button" id="bkAgain">↻ மீண்டும்</button></div><div id="pill"><span id="pgn">0 / 0</span></div></div><div id="toast"></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
@@ -659,6 +648,7 @@ const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.remove('on');voi
 /* realistic paper-flip rustle via WebAudio */
 let ac=null;
 function flip(){
+  if(ls.get('np_sound')==='0')return;
   try{
     ac=ac||new(window.AudioContext||window.webkitAudioContext)();
     if(ac.state==='suspended')ac.resume();
@@ -675,79 +665,43 @@ function flip(){
     src.connect(hp);hp.connect(bp);bp.connect(g);g.connect(ac.destination);src.start()
   }catch(e){}
 }
-let selDate=today();
-function setDlDate(s){selDate=s;$('#dlDate').textContent=s;const p=$('#datePick');if(p){const m=s.match(/^(\d{2})-(\d{2})-(\d{4})$/);if(m)p.value=m[3]+'-'+m[2]+'-'+m[1]}}
-setDlDate(today());
-['#pick','#fab'].forEach(s=>$(s).onclick=()=>$('#file').click());
-$('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(f)openBuf(await f.arrayBuffer(),f.name,0,true)};
-stage.addEventListener('dragover',e=>e.preventDefault());
-stage.addEventListener('drop',async e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f&&/pdf/i.test(f.type+f.name))openBuf(await f.arrayBuffer(),f.name,0,true)});
+const dlDateStr=()=>{const v=ls.get('np_dldate');if(v&&/^\d{4}-\d{2}-\d{2}$/.test(v)){const[y,m,d]=v.split('-');return d+'-'+m+'-'+y}return today()};
+$('#pick').onclick=()=>{location.href='settings.html#epaper'};
 $('#pill').onclick=()=>{const v=prompt('பக்க எண் (1-'+N+')',cur+1);if(v&&!isNaN(v)){z=1;px=py=0;applyZ();jump(+v-1)}};
 $('#zIn').onclick=()=>zoomBtn(1);$('#zOut').onclick=()=>zoomBtn(-1);
-/* ---------- top bar: Mobile TV | E-Paper | Book Shelf▼ | Download ---------- */
-const TABS0=[['books','Book Shelf'],['article','Article'],['shopping','Shopping'],['sub','Sub Heading Title']];
-const MORE_TABS=[['article','Article'],['shopping','Shopping'],['sub','Sub Heading Title']];
-/* realistic TV icon */
-const ICO_TV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="3.5" width="19" height="13.5" rx="2.2"/><rect x="4.2" y="5.2" width="15.6" height="9.2" rx="1" fill="currentColor" opacity=".18"/><path d="M8 20.5h8"/><path d="M12 17v3.5"/><circle cx="17.2" cy="7.2" r=".9" fill="currentColor" stroke="none"/></svg>';
-/* folded newspaper icon */
-const ICO_PAPER='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5v12.2c0 .7.6 1.3 1.3 1.3h12.4"/><path d="M6.2 4.2h12.5c.8 0 1.4.6 1.4 1.4v12.6c0 .5-.4.9-.9.9H8.2"/><path d="M6.2 4.2v14"/><path d="M9.5 8h7.2M9.5 11h7.2M9.5 14h4.5"/><path d="M3 9.5h3.2"/></svg>';
-let names={},view='paper',bkMode='shelf',lastBook=0,ifr=null,bifr=null,lifr=null,bkOpen=false;try{names=JSON.parse(ls.get('np_tabs')||'{}')}catch(e){}
-/* icons now inside switch – no longer needed */
-// $('#tvIcon').innerHTML=ICO_TV;
-// $('#paperIcon').innerHTML=ICO_PAPER;
+/* ---------- app interface: காட்சிகள் மட்டும் — E-Paper | Mobile TV | Book Shelf ----------
+   எல்லா மாற்றங்களும் (PDF, செய்தி, புத்தகம், தோற்றம்…) settings.html பக்கத்தில் செய்யப்படும். */
+const VIEWS=['paper','tv','books'],SET_TAB={paper:'epaper',tv:'tv',books:'shelf'};
+let view='paper',bkMode='shelf',lastBook=0,ifr=null,bifr=null,lifr=null;
+const FRAME_ALLOW='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';
 function show(v){
-  view=v;if(v!=='books')bkMode='shelf';const isSec=MORE_TABS.some(t=>t[0]===v);
-  const isTv=v==='tv', isPaper=v==='paper';
-  $('#tv').classList.toggle('on',isTv);
-  $('#bk').classList.toggle('on',v==='books');$('#lib').classList.toggle('on',v==='books'&&bkMode==='shelf');{const bb=$('#bkBar');bb.classList.toggle('on',v==='books'&&bkMode!=='shelf');bb.dataset.mode=bkMode;$('#bkBack').textContent=bkMode==='edit'?'✕ மூடு':'← அலமாரி';$('#vidPop').classList.toggle('on',v==='books'&&bkMode==='shelf');$('#bk').classList.toggle('sheet',v==='books'&&bkMode==='edit')}$('#sec').classList.toggle('on',isSec);
-  const mb=$('#modeBtn'), sb=$('#slotBtn');
-  if(mb){
-    /* Button 1 = switch target (other mode) */
-    if(isTv){
-      mb.dataset.mode='tv';
-      $('#modeIco').textContent='🗞️';
-      $('#modeLbl').textContent='E-Paper';
-    } else if(isPaper){
-      mb.dataset.mode='paper';
-      $('#modeIco').textContent='📺';
-      $('#modeLbl').textContent='Mobile TV';
-    }
-  }
-  /* Button 3 = Download on E-Paper, empty placeholder on Mobile TV */
-  if(sb){
-    if(isPaper){
-      sb.classList.remove('empty');
-      sb.setAttribute('aria-label','Download');
-      $('#slotIco').textContent='⬇';
-      $('#slotLbl').textContent='Download';
-    } else {
-      sb.classList.add('empty');
-      sb.setAttribute('aria-label','Soon');
-      $('#slotIco').textContent='○';
-      $('#slotLbl').textContent='Soon';
-    }
-  }
-  if(isTv&&!ifr){ifr=document.createElement('iframe');ifr.allow='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';ifr.src='news.html';$('#tv').appendChild(ifr)}
-  if(v==='books')ensureBk();
+  if(!VIEWS.includes(v))v='paper';
+  view=v;if(v!=='books')bkMode='shelf';
+  $('#tv').classList.toggle('on',v==='tv');
+  $('#bk').classList.toggle('on',v==='books');
+  $('#lib').classList.toggle('on',v==='books'&&bkMode==='shelf');
+  $('#bkBar').classList.toggle('on',v==='books'&&bkMode==='play');
+  document.querySelectorAll('.tb[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  $('#dlBtn').classList.toggle('empty',v!=='paper');
+  $('#setBtn').href='settings.html#'+SET_TAB[v];
+  /* Mobile TV: இந்தக் காட்சிக்கு வரும்போது மட்டும் இயங்கும் (பேட்டரி சேமிப்பு) */
+  if(v==='tv'&&!ifr){ifr=document.createElement('iframe');ifr.allow=FRAME_ALLOW;ifr.src='news.html?mode=view';$('#tv').appendChild(ifr)}
+  if(v!=='tv'&&ifr){ifr.remove();ifr=null}
+  if(v==='books'){ensureBk();if(bkMode==='shelf'){const a=bkApi();if(a)a.setMode('')}}
+  else{const a=bkApi();if(a)a.setMode('')}
   if(v==='books'&&bkMode==='shelf')openLib();
-  if(isSec)renderSec(v);
-  /* highlight dropdown items */
-  document.querySelectorAll('#bkDrop button').forEach(b=>b.classList.toggle('on',b.dataset.id===v));
-  if(v!=='books'&&!isSec)closeBkMenu();
+  try{history.replaceState(null,'','#'+v)}catch(e){}
 }
-function renderSec(id){const sc=$('#sec');sc.innerHTML='<h2></h2><div class="body" contenteditable="true" data-ph="இங்கே தொட்டு உள்ளடக்கத்தை எழுதவும் / ஒட்டவும்"></div>';
-  const def=(MORE_TABS.find(t=>t[0]===id)||TABS0.find(t=>t[0]===id)||[id,id])[1];
-  sc.querySelector('h2').textContent=names[id]||def;const b=sc.querySelector('.body');b.textContent=ls.get('np_s_'+id)||'';b.oninput=()=>ls.set('np_s_'+id,b.innerText)}
 /* ===== Book Shelf: முதலில் புத்தக அலமாரி; தொட்ட புத்தகத்தின் வீடியோ மட்டும் ஓடும் ===== */
 const rawSrc=id=>document.getElementById(id).textContent.replace(/<\\\/script/g,'</script');
 function ensureBk(){
   if(!bifr){
-    bifr=document.createElement('iframe');bifr.allow='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';
+    bifr=document.createElement('iframe');bifr.allow=FRAME_ALLOW;
     bifr._p=new Promise(res=>{bifr.addEventListener('load',()=>{
       try{const w=bifr.contentWindow;const s=w.document.createElement('script');s.textContent=rawSrc('linkSrc');w.document.body.appendChild(s)}catch(e){console.warn('shelf link',e)}
       res();
     })});
-    bifr.src='book.html';$('#bk').appendChild(bifr);
+    bifr.src='book.html?mode=view';$('#bk').appendChild(bifr);
   }
   return bifr._p;
 }
@@ -756,7 +710,7 @@ window.__shelfAPI={
   state(){const a=bkApi();return a?a.state():null},
   media(){const a=bkApi();return a?a.media():null},
   playAt(i){bkMode='play';lastBook=i;show('books');const a=bkApi();if(a)setTimeout(()=>a.playSolo(i),250)},
-  edit(){bkMode='edit';show('books');const a=bkApi();if(a)a.setMode('edit')},
+  edit(){location.href='settings.html#shelf'},
   close(){show('paper')}
 };
 function toShelf(){const a=bkApi();if(a)a.setMode('');bkMode='shelf';show('books')}
@@ -768,51 +722,20 @@ function openLib(){
   });
 }
 $('#bkBack').onclick=toShelf;
-$('#vidPop').onclick=()=>window.__shelfAPI.edit();
 $('#bkAgain').onclick=()=>{const a=bkApi();if(a)a.playSolo(lastBook)};
-function closeBkMenu(){bkOpen=false;$('#bkDrop').classList.remove('on');const a=$('#bkMain .arr');if(a)a.textContent='▼';const sb=$('#shelfBtn');if(sb)sb.classList.remove('on')}
-function openBkMenu(){bkOpen=true;$('#bkDrop').classList.add('on');const a=$('#bkMain .arr');if(a)a.textContent='▲';const sb=$('#shelfBtn');if(sb)sb.classList.add('on')}
-(function buildBkMenu(){
-  const drop=$('#bkDrop');
-  /* Book Shelf itself opens books studio */
-  const all=[['books','Book Shelf'],...MORE_TABS];
-  all.forEach(([id,def])=>{
-    const b=document.createElement('button');b.type='button';b.dataset.id=id;b.textContent=names[id]||def;
-    let T,long=false;
-    b.onpointerdown=()=>{long=false;T=setTimeout(()=>{long=true;const v=prompt('பட்டன் பெயர்',b.textContent);if(v&&v.trim()){names[id]=v.trim();ls.set('np_tabs',JSON.stringify(names));b.textContent=v.trim();if(view===id)renderSec(id)}},700)};
-    ['pointerup','pointerleave','pointercancel'].forEach(n=>b.addEventListener(n,()=>clearTimeout(T)));
-    b.onclick=()=>{if(long){long=false;return}show(view===id?'paper':id);closeBkMenu()};
-    drop.appendChild(b);
-  });
-})();
-$('#bkMain').onclick=e=>{e.stopPropagation();if(bkOpen){closeBkMenu();show(view==='books'?'paper':'books')}else openBkMenu()};
-document.addEventListener('click',e=>{if(bkOpen&&!e.target.closest('#bkDrop')&&!e.target.closest('#shelfBtn'))closeBkMenu()});
-/* Single toggle button + bookshelf */
-const modeBtn=$('#modeBtn'), shelfBtn=$('#shelfBtn');
-if(modeBtn){
-  modeBtn.addEventListener('click',()=>{
-    const next = modeBtn.dataset.mode==='tv' ? 'paper' : 'tv';
-    show(next);
-  });
-}
-if(shelfBtn){
-  shelfBtn.addEventListener('click',e=>{
-    e.stopPropagation();
-    const open = !$('#bkDrop').classList.contains('on');
-    if(open){openBkMenu();shelfBtn.classList.add('on')}
-    else{closeBkMenu();shelfBtn.classList.remove('on')}
-  });
-}
-show('paper');
-const slotBtn=$('#slotBtn');
-if(slotBtn){slotBtn.onclick=()=>{
-  if(slotBtn.classList.contains('empty'))return;
-  if(!curBuf){toast('முதலில் PDF-ஐ upload செய்யவும்');$('#file').click();return}
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([curBuf],{type:'application/pdf'}));a.download='Theekkathir-'+selDate+'.pdf';document.body.appendChild(a);a.click();
+document.querySelectorAll('.tb[data-v]').forEach(b=>b.addEventListener('click',()=>{bkMode='shelf';show(b.dataset.v)}));
+/* Download (செயல்) — E-Paper காட்சியில் மட்டும் */
+$('#dlBtn').onclick=()=>{
+  if(view!=='paper')return;
+  if(!curBuf){toast('முதலில் செட்டிங்ஸில் PDF-ஐச் சேர்க்கவும்');return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([curBuf],{type:'application/pdf'}));a.download='Theekkathir-'+dlDateStr()+'.pdf';document.body.appendChild(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast('PDF பதிவிறக்கம் ஆகிறது');
-}}
-$('#dlDate').onclick=()=>{$('#datePick').showPicker?$('#datePick').showPicker():$('#datePick').click()};
-$('#datePick').onchange=e=>{const v=e.target.value;if(!v)return;const[y,m,d]=v.split('-');setDlDate(d+'-'+m+'-'+y)};
+};
+/* செட்டிங்ஸில் இருந்து திரும்பும்போது (back / bfcache) புதிய தரவுடன் ஏற்று */
+addEventListener('pageshow',e=>{if(e.persisted)location.reload()});
+/* புத்தக ஸ்டுடியோ media ஏற்றி முடிந்ததும் அலமாரியைப் புதுப்பி */
+addEventListener('message',e=>{if(e.data&&e.data.bkReady&&lifr){try{lifr.contentWindow.__refresh()}catch(err){}}});
+show((location.hash||'').slice(1)||'paper');
 addEventListener('message',e=>{if(e.data&&e.data.goto==='paper')show('paper')});
 function hideHint(){$('#hint').classList.remove('on')}
 async function openBuf(buf,name,page,save){
@@ -822,7 +745,7 @@ async function openBuf(buf,name,page,save){
     pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     pdf=await pdfjsLib.getDocument({data:new Uint8Array(buf.slice(0))}).promise;
     N=pdf.numPages;cur=clamp(page,0,N-1);info={};z=1;px=py=0;applyZ();busy=false;
-    curBuf=buf;curName=name;$('#empty').style.display='none';$('#pill').style.display='block';$('#fab').style.display='block';show('paper');
+    curBuf=buf;curName=name;$('#empty').style.display='none';$('#pill').style.display='block';
     if(save){dbSet('pdf',{name,buf});dbSet('pg',cur)}
     loadAll();const h=$('#hint');h.classList.remove('on');void h.offsetWidth;h.classList.add('on');
   }catch(err){alert('PDF திறக்க முடியவில்லை. இணைய இணைப்பு (pdf.js) அல்லது கோப்பைச் சரிபார்க்கவும்.')}
@@ -832,67 +755,7 @@ let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(pdf
 (async()=>{const d=await dbGet('pdf');if(d&&d.buf){const p=await dbGet('pg');openBuf(d.buf,d.name,p||0,false)}})();
 </script><script src="theme.js"></script>
 <script>AppTheme.mount&&AppTheme.get&&(function(){})();</script>
-<style>
-/* Owner-only local login gate. This is a convenience lock, not tamper-proof DRM. */
-#ownerGate{position:fixed;inset:0;z-index:999999;background:radial-gradient(ellipse at top,#4a0a10 0%,#1c0508 55%,#0a0204 100%);display:flex;align-items:center;justify-content:center;padding:20px;font-family:"Noto Sans Tamil","Latha","Nirmala UI",sans-serif;color:#13233c}
-#ownerGate[hidden]{display:none!important}
-#ownerCard{width:min(100%,420px);background:#fff;border-radius:22px;padding:28px 24px;box-shadow:0 25px 80px #0008;text-align:center}
-#ownerLogo{width:76px;height:76px;border-radius:20px;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(145deg,#FFD84D,#E0A400);color:#101010;font-size:34px;font-weight:900;box-shadow:0 8px 24px #e0a40044}
-#ownerCard h1{font-size:23px;margin:8px 0 4px;color:#101b31}
-#ownerCard .sub{font-size:13px;color:#65718a;margin:0 0 22px}
-#ownerCard label{text-align:left;color:#33415b;font-weight:700;margin:12px 0;gap:6px}
-#ownerCard input{background:#f7f9fc;border:1px solid #d5deed;border-radius:10px;padding:12px;color:#17233a}
-#ownerCard button{width:100%;margin-top:12px;border-radius:10px;background:var(--accent,#B3121A);color:var(--on,#fff);padding:13px}
-#ownerCard .hint{font-size:12px;color:#66738b;margin-top:15px;line-height:1.6}
-#ownerMsg{min-height:22px;font-size:13px;color:#c51c2c;margin-top:8px}
-#ownerLockBtn{position:fixed;right:12px;bottom:12px;z-index:99990;border-radius:999px;padding:9px 13px;box-shadow:0 3px 12px #0003;font-size:13px}
-</style>
-<div id="ownerGate" role="dialog" aria-modal="true" aria-labelledby="ownerTitle">
-  <section id="ownerCard">
-    <div id="ownerLogo">தீ</div>
-    <h1 id="ownerTitle">NEWS STUDIO</h1>
-    <p class="sub" id="ownerSubtitle">உரிமையாளர் உள்நுழைவு</p>
-    <form id="ownerForm" autocomplete="on">
-      <label>பயனர்பெயர்<input id="ownerUser" name="username" autocomplete="username" required maxlength="50" placeholder="உங்கள் பயனர்பெயர்"></label>
-      <label>கடவுச்சொல்<input id="ownerPass" name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="குறைந்தது 8 எழுத்துகள்"></label>
-      <label id="ownerConfirmWrap" hidden>கடவுச்சொல்லை மீண்டும் உள்ளிடவும்<input id="ownerConfirm" type="password" autocomplete="new-password" minlength="8" placeholder="உறுதிப்படுத்தவும்"></label>
-      <button id="ownerSubmit" type="submit">உள்நுழை</button>
-      <div id="ownerMsg" role="status" aria-live="polite"></div>
-    </form>
-    <p class="hint" id="ownerHint">இந்தச் சாதனத்தில் மட்டுமே உள்நுழைவு விவரங்கள் சேமிக்கப்படும். கடவுச்சொல்லை மறந்தால் தரவு இழப்பைத் தவிர்க்க முன்கூட்டியே backup வைத்திருங்கள்.</p>
-  </section>
-</div>
-<button id="ownerLockBtn" type="button" hidden>🔒 பூட்டு / வெளியேறு</button>
-<script>
-(()=>{
- const gate=document.getElementById('ownerGate'),form=document.getElementById('ownerForm'),user=document.getElementById('ownerUser'),pass=document.getElementById('ownerPass'),confirm=document.getElementById('ownerConfirm'),confirmWrap=document.getElementById('ownerConfirmWrap'),submit=document.getElementById('ownerSubmit'),msg=document.getElementById('ownerMsg'),subtitle=document.getElementById('ownerSubtitle'),hint=document.getElementById('ownerHint'),lock=document.getElementById('ownerLockBtn');
- const KEY='tk_owner_auth_v1'; let setup=false,failures=0,nextTry=0;
- const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){return null}};
- const bytesToHex=b=>Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
- const hexToBytes=h=>new Uint8Array((h.match(/.{1,2}/g)||[]).map(x=>parseInt(x,16)));
- async function digest(password,salt){
-   if(!crypto.subtle) throw new Error('இந்த WebView பாதுகாப்பான கடவுச்சொல் சரிபார்ப்பை ஆதரிக்கவில்லை. Android System WebView-ஐ புதுப்பிக்கவும்.');
-   const enc=new TextEncoder(),key=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveBits']);
-   return bytesToHex(await crypto.subtle.deriveBits({name:'PBKDF2',salt:hexToBytes(salt),iterations:210000,hash:'SHA-256'},key,256));
- }
- function show(){setup=!read();gate.hidden=false;lock.hidden=true;confirmWrap.hidden=!setup;subtitle.textContent=setup?'முதல் முறை — உரிமையாளர் கணக்கை உருவாக்கவும்':'உரிமையாளர் உள்நுழைவு';submit.textContent=setup?'கணக்கை உருவாக்கி திறக்கவும்':'உள்நுழை';hint.textContent=setup?'பயனர்பெயர் மற்றும் குறைந்தது 8 எழுத்துகளுள்ள வலுவான கடவுச்சொல்லை அமைக்கவும். இவை இந்தச் சாதனத்தில் சேமிக்கப்படும்.':'தனிப்பட்ட பயன்பாட்டிற்கான உள்நுழைவு. கடவுச்சொல்லை யாருடனும் பகிர வேண்டாம்.';msg.textContent='';pass.value='';confirm.value='';setTimeout(()=>user.focus(),100)}
- async function unlock(){gate.hidden=true;lock.hidden=false;}
- form.addEventListener('submit',async e=>{e.preventDefault();msg.textContent='';if(Date.now()<nextTry){msg.textContent='சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.';return}const u=user.value.trim(),p=pass.value;if(!u||p.length<8){msg.textContent='பயனர்பெயரை உள்ளிட்டு, குறைந்தது 8 எழுத்துகள் கொண்ட கடவுச்சொல்லைப் பயன்படுத்தவும்.';return}submit.disabled=true;
- try{
-  if(setup){if(p!==confirm.value){msg.textContent='இரண்டு கடவுச்சொற்களும் ஒன்றாக இல்லை.';return}const salt=bytesToHex(crypto.getRandomValues(new Uint8Array(16))),hash=await digest(p,salt);localStorage.setItem(KEY,JSON.stringify({username:u,salt,hash,version:1}));await unlock();}
-  else{const rec=read();if(!rec||u!==rec.username||await digest(p,rec.salt)!==rec.hash){failures++;if(failures>=5){nextTry=Date.now()+30000;failures=0}msg.textContent='பயனர்பெயர் அல்லது கடவுச்சொல் சரியில்லை.';return}failures=0;await unlock()}
- }catch(err){msg.textContent='பிழை: '+(err.message||'உள்நுழைவு செயல்படவில்லை');if(setup)localStorage.removeItem(KEY)}finally{submit.disabled=false}
- });
- lock.addEventListener('click',()=>{show()});
- // Always require owner login after a page/app reload.
- show();
- // Re-lock when the app returns from background after a short absence.
- let hiddenAt=0;document.addEventListener('visibilitychange',()=>{if(document.hidden){hiddenAt=Date.now()}else if(hiddenAt&&Date.now()-hiddenAt>120000&&gate.hidden){show()}});
-})();
-</script>
-
-
-<style>#ownerLockBtn{left:12px!important;right:auto!important;bottom:12px!important;opacity:.9;background:var(--accent,#B3121A);color:var(--on,#fff);border:0;font:inherit;font-weight:700}</style>
+<script src="owner-gate.js"></script>
 
 
 </body></html>

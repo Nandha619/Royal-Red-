@@ -85,7 +85,7 @@ summary{cursor:pointer;padding:12px 16px;font-weight:800;color:var(--gold)}
 <main>
 <h1 id="ttl">புத்தக நூலகம்</h1>
 <p class="hint">பக்கவாட்டில் தள்ளுங்கள் · பெரிய புத்தகத்தைத் தொட்டால் அதன் வீடியோ ஓடும்</p>
-<button class="editShelf" id="es" type="button" aria-label="புத்தகங்களைத் திருத்து">✎ புத்தகங்களைத் திருத்து</button>
+<button class="editShelf" id="es" type="button" aria-label="செட்டிங்ஸில் புத்தகங்களைத் திருத்து">⚙ செட்டிங்ஸில் திருத்து</button>
 
 <section class="info" id="info" aria-live="polite">
 <div class="lg" id="lg"></div>
@@ -248,11 +248,10 @@ location.href='book.html#play='+i;
 }
 function closeShelf(){try{P.close()}catch(e){}}
 $('#vid').onclick=function(){play(shown)};
-/* edit: ஸ்டுடியோவில் (book.html) புத்தகத் தகவலைத் திருத்தலாம் */
+/* edit: செட்டிங்ஸ் பக்கத்தில் புத்தகத் தகவலைத் திருத்தலாம் */
 $('#es').onclick=function(){
 if(P&&P.edit){try{P.edit();return}catch(e){}}
-if(P&&P.close){closeShelf();return}
-location.href='book.html';
+location.href='settings.html#shelf';
 };
 if(P){var cs=$('#cs');cs.hidden=false;cs.onclick=closeShelf}
 
