@@ -194,6 +194,13 @@ html,body{background:#000}
 .tb.on{background:rgba(255,255,255,.95);color:var(--red)}
 .tb.empty{opacity:.35;pointer-events:none}
 .tb .arr{font-size:9px;opacity:.9}
+/* Mobile TV ↔ E-Paper பொத்தான்: தொடத் தூண்டும் blink */
+#modeBtn{background:rgba(255,255,255,.2);box-shadow:inset 0 0 0 2px rgba(255,214,90,.9);animation:modeBlink 1.1s ease-in-out infinite}
+#modeBtn .ico{display:inline-block;animation:icoPop 1.1s ease-in-out infinite}
+@keyframes modeBlink{0%,100%{background:rgba(255,255,255,.14);box-shadow:inset 0 0 0 2px rgba(255,214,90,.55),0 0 0 0 rgba(255,214,90,0)}50%{background:rgba(255,214,90,.55);box-shadow:inset 0 0 0 2px #ffd65a,0 0 14px 3px rgba(255,214,90,.75)}}
+@keyframes icoPop{0%,100%{transform:scale(1)}50%{transform:scale(1.22)}}
+#modeBtn:active{animation:none;transform:scale(.95)}
+@media (prefers-reduced-motion:reduce){#modeBtn,#modeBtn .ico{animation:none}}
 #bar{position:relative}
 #subBar{display:none;position:absolute;left:8px;right:8px;top:calc(100% + 6px);z-index:30;gap:6px;padding:8px;border-radius:14px;background:var(--panel,#fff);border:1px solid var(--line,#ececec);box-shadow:0 10px 28px rgba(0,0,0,.45);overflow-x:auto;scrollbar-width:none}
 #subBar.on{display:flex;animation:dropIn2 .22s ease}
@@ -529,7 +536,7 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);
   <div class="top-switch-wrap">
     <button class="tb" type="button" id="modeBtn" aria-label="Mobile TV"><span class="ico" id="modeIco">📺</span><span id="modeLbl">Mobile TV</span></button>
     <button class="tb" type="button" id="shelfBtn" aria-label="Book Shelf" aria-expanded="false"><span class="ico">📚</span><span>Book Shelf <small class="arr">▾</small></span></button>
-    <a class="tb" id="setBtn" href="settings.html#epaper" aria-label="செட்டிங்ஸ்"><span class="ico">⚙</span><span>செட்டிங்ஸ்</span></a>
+    <button class="tb" type="button" id="actBtn" aria-label="செட்டிங்ஸ்"><span class="ico" id="actIco">⚙</span><span id="actLbl">செட்டிங்ஸ்</span></button>
     <span data-owner-slot style="display:flex;align-items:center"></span>
   </div>
   <div id="subBar" role="menu" aria-label="Book Shelf பிரிவுகள்"></div>
@@ -581,11 +588,15 @@ function show(v){
   $('#modeBtn').dataset.go=toTv?'tv':'paper';
   $('#modeIco').textContent=toTv?'📺':'📰';$('#modeLbl').textContent=toTv?'Mobile TV':'E-Paper';
   $('#modeBtn').setAttribute('aria-label',toTv?'Mobile TV':'E-Paper');
-  $('#modeBtn').classList.toggle('on',v==='paper'||v==='tv');
   $('#shelfBtn').classList.toggle('on',v==='books'||isSec);
   document.querySelectorAll('#subBar button').forEach(b=>b.classList.toggle('on',b.dataset.id===v));
   closeSub();
-  $('#setBtn').href='settings.html#'+SET_TAB[v];
+  /* பொத்தான் 3 (2-in-1): E-Paper-ல் Download + PDF தேதி; மற்ற பக்கங்களில் செட்டிங்ஸ் */
+  const dl=v==='paper';
+  $('#actBtn').dataset.act=dl?'dl':'set';
+  $('#actIco').textContent=dl?'⬇':'⚙';
+  $('#actLbl').textContent=dl?dlDateStr():'செட்டிங்ஸ்';
+  $('#actBtn').setAttribute('aria-label',dl?'Download '+dlDateStr():'செட்டிங்ஸ்');
   /* Mobile TV: இந்தக் காட்சிக்கு வரும்போது மட்டும் இயங்கும் (பேட்டரி சேமிப்பு) */
   if(v==='tv'&&!ifr){ifr=document.createElement('iframe');ifr.allow=FRAME_ALLOW;ifr.src='news.html?mode=view';$('#tv').appendChild(ifr)}
   if(v!=='tv'&&ifr){ifr.remove();ifr=null}
@@ -626,6 +637,7 @@ function openLib(){
 $('#bkBack').onclick=toShelf;
 $('#bkAgain').onclick=()=>{const a=bkApi();if(a)a.playSolo(lastBook)};
 $('#modeBtn').onclick=()=>{bkMode='shelf';show($('#modeBtn').dataset.go||'tv')};
+$('#actBtn').onclick=()=>{if($('#actBtn').dataset.act==='dl')downloadPdf();else location.href='settings.html#'+(SET_TAB[view]||'epaper')};
 /* பொத்தான் 2: Book Shelf — கீழே துணைத் தலைப்புகள் */
 function closeSub(){$('#subBar').classList.remove('on');$('#shelfBtn').setAttribute('aria-expanded','false');$('#shelfBtn .arr').textContent='▾'}
 function openSub(){$('#subBar').classList.add('on');$('#shelfBtn').setAttribute('aria-expanded','true');$('#shelfBtn .arr').textContent='▴'}
@@ -659,7 +671,6 @@ function getFb(){
     layout:()=>'single',
     isActive:()=>view==='paper',
     toast:m=>toast(m),
-    onDownload:()=>downloadPdf(),
     onPage:i=>{dbSet('pg',i);hideHint()}
   });
   return fb;
