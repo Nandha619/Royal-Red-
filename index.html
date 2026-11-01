@@ -193,7 +193,20 @@ html,body{background:#000}
 .tb:active{transform:scale(.96)}
 .tb.on{background:rgba(255,255,255,.95);color:var(--red)}
 .tb.empty{opacity:.35;pointer-events:none}
-.tb.sep{flex:0 0 1px;width:1px;min-width:0;height:28px;align-self:center;padding:0;background:rgba(255,255,255,.35);border-radius:0}
+.tb .arr{font-size:9px;opacity:.9}
+#bar{position:relative}
+#subBar{display:none;position:absolute;left:8px;right:8px;top:calc(100% + 6px);z-index:30;gap:6px;padding:8px;border-radius:14px;background:var(--panel,#fff);border:1px solid var(--line,#ececec);box-shadow:0 10px 28px rgba(0,0,0,.45);overflow-x:auto;scrollbar-width:none}
+#subBar.on{display:flex;animation:dropIn2 .22s ease}
+@keyframes dropIn2{from{opacity:0;transform:translateY(-8px)}}
+#subBar button{flex:1 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;border-radius:11px;padding:8px 10px;min-width:72px;font:inherit;font-size:12px;font-weight:800;background:var(--field,#f3f3f3);color:var(--fg,#101010);cursor:pointer;white-space:nowrap}
+#subBar button .ico{font-size:20px;line-height:1}
+#subBar button.on{background:var(--red);color:var(--on,#fff)}
+#sec{position:absolute;inset:0;z-index:8;display:none;overflow:auto;padding:18px 16px 28px;background:var(--bg,#fffdf0);color:var(--fg,#101010)}
+#sec.on{display:block;animation:fade .3s}
+#sec h2{font-size:22px;color:var(--red);padding-bottom:8px;margin-bottom:12px;border-bottom:3px solid var(--red)}
+#sec .body{white-space:pre-wrap;font-size:16px;line-height:1.75;overflow-wrap:anywhere;border:0;padding:0;min-height:0;border-radius:0}
+#sec .none{color:var(--muted,#777);font-size:14px;text-align:center;padding:40px 10px}
+#sec .none a{color:var(--red);font-weight:800}
 @media (max-width:480px){.tb{height:46px;font-size:9px}.tb .ico{font-size:18px}}
 </style></head>
 <body><script type="text/plain" id="linkSrc">/* book.html உள்ளே தானாக ஏற்றப்படும் இணைப்பு */
@@ -514,21 +527,19 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);
 <div id="app">
 <nav id="bar">
   <div class="top-switch-wrap">
-    <button class="tb on" type="button" data-v="paper" aria-label="E-Paper"><span class="ico">📰</span><span>E-Paper</span></button>
-    <button class="tb" type="button" data-v="tv" aria-label="Mobile TV"><span class="ico">📺</span><span>Mobile TV</span></button>
-    <button class="tb" type="button" data-v="books" aria-label="Book Shelf"><span class="ico">📚</span><span>Book Shelf</span></button>
-    <i class="tb sep" aria-hidden="true"></i>
-    <button class="tb" type="button" id="dlBtn" aria-label="Download"><span class="ico">⬇</span><span>Download</span></button>
+    <button class="tb" type="button" id="modeBtn" aria-label="Mobile TV"><span class="ico" id="modeIco">📺</span><span id="modeLbl">Mobile TV</span></button>
+    <button class="tb" type="button" id="shelfBtn" aria-label="Book Shelf" aria-expanded="false"><span class="ico">📚</span><span>Book Shelf <small class="arr">▾</small></span></button>
     <a class="tb" id="setBtn" href="settings.html#epaper" aria-label="செட்டிங்ஸ்"><span class="ico">⚙</span><span>செட்டிங்ஸ்</span></a>
     <span data-owner-slot style="display:flex;align-items:center"></span>
   </div>
+  <div id="subBar" role="menu" aria-label="Book Shelf பிரிவுகள்"></div>
 </nav>
 <div id="main"><div id="stage">
   <div id="empty"><div class="sheet"></div><h2>NEWS STUDIO</h2><p>செட்டிங்ஸ் → E-Paper பகுதியில் PDF-ஐச் சேர்த்தால், உண்மையான செய்தித்தாள் போல ஸ்வைப் செய்து புரட்டிப் படிக்கலாம்.</p><button class="big" id="pick">⚙ செட்டிங்ஸில் PDF சேர்</button></div>
   <div id="hint"><span><i>◀</i> பக்க ஓரத்தை இழுத்து / தொட்டுப் புரட்டவும் <i style="animation-direction:reverse">▶</i> &nbsp;|&nbsp; இருமுறை தட்டிப் பெரிதாக்கலாம்</span></div>
   <div id="load">ஏற்றுகிறது…</div>
 </div>
-<div id="tv"></div><div id="bk"></div><div id="lib"></div><div id="bkBar"><button type="button" id="bkBack">← அலமாரி</button><button type="button" id="bkAgain">↻ மீண்டும்</button></div></div><div id="toast"></div>
+<div id="sec"></div><div id="tv"></div><div id="bk"></div><div id="lib"></div><div id="bkBar"><button type="button" id="bkBack">← அலமாரி</button><button type="button" id="bkAgain">↻ மீண்டும்</button></div></div><div id="toast"></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="flipbook.js"></script>
@@ -548,7 +559,11 @@ const dlDateStr=()=>{const v=ls.get('np_dldate');if(v&&/^\d{4}-\d{2}-\d{2}$/.tes
 $('#pick').onclick=()=>{location.href='settings.html#epaper'};
 /* ---------- app interface: காட்சிகள் மட்டும் — E-Paper | Mobile TV | Book Shelf ----------
    எல்லா மாற்றங்களும் (PDF, செய்தி, புத்தகம், தோற்றம்…) settings.html பக்கத்தில் செய்யப்படும். */
-const VIEWS=['paper','tv','books'],SET_TAB={paper:'epaper',tv:'tv',books:'shelf'};
+const SECS=[['books','Books','📚'],['article','Articles','📝'],['shopping','Shopping','🛒'],['events','Events','🎪']];
+const SEC_ONLY=['article','shopping','events'];
+const VIEWS=['paper','tv','books',...SEC_ONLY],SET_TAB={paper:'epaper',tv:'tv',books:'shelf',article:'sections',shopping:'sections',events:'sections'};
+let names={};try{names=JSON.parse(ls.get('np_tabs')||'{}')||{}}catch(e){}
+const secName=id=>names[id]||(SECS.find(x=>x[0]===id)||[0,id])[1];
 let view='paper',bkMode='shelf',lastBook=0,ifr=null,bifr=null,lifr=null;
 const FRAME_ALLOW='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';
 function show(v){
@@ -558,8 +573,18 @@ function show(v){
   $('#bk').classList.toggle('on',v==='books');
   $('#lib').classList.toggle('on',v==='books'&&bkMode==='shelf');
   $('#bkBar').classList.toggle('on',v==='books'&&bkMode==='play');
-  document.querySelectorAll('.tb[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
-  $('#dlBtn').classList.toggle('empty',v!=='paper');
+  const isSec=SEC_ONLY.includes(v);
+  $('#sec').classList.toggle('on',isSec);
+  if(isSec)renderSec(v);
+  /* பொத்தான் 1 (2-in-1): E-Paper-ல் இருந்தால் Mobile TV; மற்ற இடங்களில் E-Paper */
+  const toTv=v==='paper';
+  $('#modeBtn').dataset.go=toTv?'tv':'paper';
+  $('#modeIco').textContent=toTv?'📺':'📰';$('#modeLbl').textContent=toTv?'Mobile TV':'E-Paper';
+  $('#modeBtn').setAttribute('aria-label',toTv?'Mobile TV':'E-Paper');
+  $('#modeBtn').classList.toggle('on',v==='paper'||v==='tv');
+  $('#shelfBtn').classList.toggle('on',v==='books'||isSec);
+  document.querySelectorAll('#subBar button').forEach(b=>b.classList.toggle('on',b.dataset.id===v));
+  closeSub();
   $('#setBtn').href='settings.html#'+SET_TAB[v];
   /* Mobile TV: இந்தக் காட்சிக்கு வரும்போது மட்டும் இயங்கும் (பேட்டரி சேமிப்பு) */
   if(v==='tv'&&!ifr){ifr=document.createElement('iframe');ifr.allow=FRAME_ALLOW;ifr.src='news.html?mode=view';$('#tv').appendChild(ifr)}
@@ -600,14 +625,28 @@ function openLib(){
 }
 $('#bkBack').onclick=toShelf;
 $('#bkAgain').onclick=()=>{const a=bkApi();if(a)a.playSolo(lastBook)};
-document.querySelectorAll('.tb[data-v]').forEach(b=>b.addEventListener('click',()=>{bkMode='shelf';show(b.dataset.v)}));
-/* Download (செயல்) — E-Paper காட்சியில் மட்டும் */
-$('#dlBtn').onclick=()=>{
-  if(view!=='paper')return;
+$('#modeBtn').onclick=()=>{bkMode='shelf';show($('#modeBtn').dataset.go||'tv')};
+/* பொத்தான் 2: Book Shelf — கீழே துணைத் தலைப்புகள் */
+function closeSub(){$('#subBar').classList.remove('on');$('#shelfBtn').setAttribute('aria-expanded','false');$('#shelfBtn .arr').textContent='▾'}
+function openSub(){$('#subBar').classList.add('on');$('#shelfBtn').setAttribute('aria-expanded','true');$('#shelfBtn .arr').textContent='▴'}
+(function(){const sb=$('#subBar');
+  SECS.forEach(([id,def,ico])=>{const b=document.createElement('button');b.type='button';b.dataset.id=id;b.innerHTML='<span class="ico">'+ico+'</span><span>'+secName(id)+'</span>';b.onclick=()=>{bkMode='shelf';show(id)};sb.appendChild(b)});
+  $('#shelfBtn').onclick=e=>{e.stopPropagation();sb.classList.contains('on')?closeSub():openSub()};
+  document.addEventListener('click',e=>{if(!e.target.closest('#subBar')&&!e.target.closest('#shelfBtn'))closeSub()});
+})();
+/* Books தவிர்த்த பிரிவுகள் — பார்வை மட்டும் (திருத்துதல் செட்டிங்ஸில்) */
+function renderSec(id){
+  const t=ls.get('np_s_'+id)||'',sc=$('#sec');
+  sc.innerHTML='<h2></h2>'+(t.trim()?'<div class="body"></div>':'<div class="none">இந்தப் பகுதியில் உள்ளடக்கம் இல்லை.<br><a href="settings.html#sections">செட்டிங்ஸில் சேர்க்கவும்</a></div>');
+  sc.querySelector('h2').textContent=secName(id);
+  const b=sc.querySelector('.body');if(b)b.textContent=t;
+}
+/* Download — E-Paper கீழ்க் கருவிப்பட்டியில் */
+function downloadPdf(){
   if(!curBuf){toast('முதலில் செட்டிங்ஸில் PDF-ஐச் சேர்க்கவும்');return}
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([curBuf],{type:'application/pdf'}));a.download='Theekkathir-'+dlDateStr()+'.pdf';document.body.appendChild(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast('PDF பதிவிறக்கம் ஆகிறது');
-};
+}
 /* செட்டிங்ஸில் இருந்து திரும்பும்போது (back / bfcache) புதிய தரவுடன் ஏற்று */
 addEventListener('pageshow',e=>{if(e.persisted)location.reload()});
 /* புத்தக ஸ்டுடியோ media ஏற்றி முடிந்ததும் அலமாரியைப் புதுப்பி */
@@ -620,6 +659,7 @@ function getFb(){
     layout:()=>'single',
     isActive:()=>view==='paper',
     toast:m=>toast(m),
+    onDownload:()=>downloadPdf(),
     onPage:i=>{dbSet('pg',i);hideHint()}
   });
   return fb;

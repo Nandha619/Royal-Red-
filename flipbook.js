@@ -94,7 +94,9 @@
       '<div class="fb-grp"><button class="fb-btn fb-bZo" type="button" aria-label="சிறிதாக்கு">' + I.zout + '</button>' +
       '<button class="fb-btn fb-bZi" type="button" aria-label="பெரிதாக்கு">' + I.zin + '</button>' +
       '<button class="fb-btn fb-bFs" type="button" aria-label="முழுத்திரை">' + I.full + '</button>' +
-      '<button class="fb-btn fb-bSn" type="button" aria-label="ஒலி">' + I.snd + '</button></div></div></div>';
+      '<button class="fb-btn fb-bSn" type="button" aria-label="ஒலி">' + I.snd + '</button>' +
+      (opt.onDownload ? '<button class="fb-btn fb-bDl" type="button" aria-label="பதிவிறக்கு"><svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 11l4.5 4.5 4.5-4.5M5 19.5h14"/></svg></button>' : '') +
+      '</div></div></div>';
     host.appendChild(root);
     var q$ = function (s) { return root.querySelector(s); };
     var view = q$('.fb-view'), zoomEl = q$('.fb-zoom'), book = q$('.fb-book'), pgL = q$('.fb-L'), pgR = q$('.fb-R'),
@@ -485,6 +487,7 @@
     prog.addEventListener('input', function () { var v = +prog.value; pgn.textContent = spread && v > 0 ? (v + 1) + (v + 2 <= N ? ' – ' + (v + 2) : '') + ' / ' + N : (v + 1) + ' / ' + N; });
     prog.addEventListener('change', function () { goPage(+prog.value); });
     bSn.onclick = function () { lsSet('np_sound', soundOn() ? '0' : '1'); updateUI(); if (opt.toast) opt.toast(soundOn() ? 'புரட்டும் ஒலி: இயக்கம்' : 'புரட்டும் ஒலி: நிறுத்தம்'); };
+    if (opt.onDownload) q$('.fb-bDl').onclick = function () { opt.onDownload(); };
     bTh.onclick = function () { var on = !thumbs.classList.contains('on'); thumbs.classList.toggle('on', on); bTh.classList.toggle('act', on); if (on) { loadThumbs(); var cur = thumbs.querySelector('.on'); if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'center' }); } };
     if (!root.requestFullscreen && !root.webkitRequestFullscreen) bFs.style.display = 'none';
     bFs.onclick = function () {

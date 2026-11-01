@@ -169,7 +169,7 @@ html,body{margin:0}
   if (window.AppTheme) AppTheme.mount('#themes');
 
   /* ---------- பிற பகுதிகள் (முன்பு Shelf மெனுவில் இருந்தவை) ---------- */
-  var SECS = [['article', 'Article'], ['shopping', 'Shopping'], ['sub', 'Sub Heading Title']];
+  var SECS = [['article', 'Articles'], ['shopping', 'Shopping'], ['events', 'Events']];
   var names = {}; try { names = JSON.parse(ls.get('np_tabs') || '{}') || {}; } catch (e) { names = {}; }
   (function buildSecs() {
     var box = $('#secList');
