@@ -18,7 +18,9 @@
     '#ownerMsg{min-height:22px;font-size:13px;color:#c51c2c;margin-top:8px}' +
     '#ownerLockBtn{position:fixed;left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:99990;width:38px;height:38px;border:0;border-radius:50%;padding:0;display:grid;place-items:center;box-shadow:0 3px 12px #0003;font:inherit;font-size:17px;line-height:1;opacity:.75;background:var(--accent,#B3121A);color:var(--on,#fff);cursor:pointer}' +
     '#ownerLockBtn:hover,#ownerLockBtn:focus-visible{opacity:1}' +
-    '#ownerLockBtn[hidden]{display:none!important}';
+    '#ownerLockBtn[hidden]{display:none!important}' +
+    '#ownerLockBtn.slotted{position:static;flex:none;width:38px;height:46px;border-radius:11px;background:transparent;box-shadow:none;opacity:.9;font-size:18px;margin-left:2px}' +
+    '.st-head #ownerLockBtn.slotted{height:40px;border-radius:99px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.55)}';
   var html = '' +
     '<div id="ownerGate" role="dialog" aria-modal="true" aria-labelledby="ownerTitle">' +
     '<section id="ownerCard">' +
@@ -42,6 +44,7 @@
     while (box.firstChild) document.body.appendChild(box.firstChild);
 
     var $ = function (id) { return document.getElementById(id); };
+    var slotEl = document.querySelector('[data-owner-slot]');
     var gate = $('ownerGate'), form = $('ownerForm'), user = $('ownerUser'), pass = $('ownerPass'), confirm = $('ownerConfirm'),
       confirmWrap = $('ownerConfirmWrap'), submit = $('ownerSubmit'), msg = $('ownerMsg'), subtitle = $('ownerSubtitle'),
       hint = $('ownerHint'), lock = $('ownerLockBtn');
@@ -84,6 +87,7 @@
       } catch (err) { msg.textContent = 'பிழை: ' + (err.message || 'உள்நுழைவு செயல்படவில்லை'); if (setup) localStorage.removeItem(KEY); }
       finally { submit.disabled = false; }
     });
+    if (slotEl) { slotEl.appendChild(lock); lock.classList.add('slotted'); }
     lock.addEventListener('click', function () { try { sessionStorage.removeItem(SESS); } catch (e) {} show(); });
 
     /* reload செய்தால் / புதிய tab-ல் எப்போதும் கேட்கும்; app ↔ settings மாறும்போது கேட்காது */
