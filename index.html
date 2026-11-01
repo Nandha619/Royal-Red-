@@ -8,7 +8,9 @@
 :root{--red:#d71920;--dark:#101010;--gold:#e0a823}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:#1b1b1b;color:#fff;font-family:'Noto Sans Tamil','Nirmala UI','Latha',system-ui,sans-serif;overflow:hidden;overscroll-behavior:none}
-#app{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+/* பக்கம் 1 = மொபைல் காட்சி மட்டும்: E-Paper, Mobile TV, Book Shelf மூன்றும் ஒரே 9:16 சட்டத்தில் */
+html,body{background:#000}
+#app{position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;width:min(100vw,calc(100vh * 9 / 16));width:min(100vw,calc(100dvh * 9 / 16));display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);background:#1b1b1b;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 0 60px rgba(0,0,0,.8)}
 #bar{position:relative;z-index:10;display:flex;align-items:center;gap:8px;padding:8px 10px 10px;background:linear-gradient(180deg,var(--red,#d71920),var(--deep,#7e0910))}
 #bar:after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:4px;background:linear-gradient(90deg,var(--red),var(--deep,#7e0910))}
 .nb{position:relative;overflow:hidden;flex:none;min-width:72px;border:0;border-radius:12px;padding:5px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:inherit;font-size:11px;font-weight:800;line-height:1.15;color:#fff;background:linear-gradient(180deg,var(--acc1,#e0242b),var(--acc2,#a80d14));box-shadow:0 3px 8px rgba(215,25,32,.4);cursor:pointer}
@@ -344,8 +346,6 @@ summary{cursor:pointer;padding:12px 16px;font-weight:800;color:var(--gold)}
 <main>
 <h1 id="ttl">புத்தக அலமாரி</h1>
 <p class="hint">பக்கவாட்டில் தள்ளுங்கள் · பெரிய புத்தகத்தைத் தொட்டால் அதன் வீடியோ ஓடும்</p>
-<button class="editShelf" id="es" type="button" aria-label="செட்டிங்ஸில் புத்தகங்களைத் திருத்து">⚙ செட்டிங்ஸில் திருத்து</button>
-
 <section class="info" id="info" aria-live="polite">
 <div class="lg" id="lg"></div>
 <div class="tx"><small id="pubL">பதிப்பகம்</small><b id="pub"></b></div>
@@ -489,12 +489,6 @@ if(P){try{P.playAt(i);return}catch(e){}}
 location.href='book.html#play='+i;
 }
 $('#vid').onclick=function(){play(shown)};
-/* ---------- edit: புத்தகத் தலைப்பு / எழுத்தாளர் / பதிப்பகம் / வகை / விலை / அட்டை திருத்த ஸ்டுடியோவைத் திறக்கும் ---------- */
-function editBooks(){
-if(P&&P.edit){try{P.edit();return}catch(e){}}
-location.href='settings.html#shelf';
-}
-$('#es').onclick=editBooks;
 if(P){document.body.classList.add('emb');document.querySelector('.hint').textContent='பெரிய புத்தகத்தைத் தொட்டால் அதன் வீடியோ ஓடும் · v4'}
 
 /* ---------- studio-ல் கொடுத்த அட்டை / லோகோவை தானாக நினைவில் வைக்கும் (தனியாக எதையும் கொடுக்க வேண்டாம்) ---------- */
@@ -623,7 +617,7 @@ addEventListener('message',e=>{if(e.data&&e.data.goto==='paper')show('paper')});
 function hideHint(){$('#hint').classList.remove('on')}
 function getFb(){
   if(!fb)fb=new FlipBook(stage,{
-    layout:()=>ls.get('np_layout')||'auto',
+    layout:()=>'single',
     isActive:()=>view==='paper',
     toast:m=>toast(m),
     onPage:i=>{dbSet('pg',i);hideHint()}
@@ -644,7 +638,6 @@ async function openBuf(buf,name,page,save){
   $('#load').classList.remove('on');
 }
 /* செட்டிங்ஸில் பக்க அமைப்பு மாற்றினால் உடனே பொருந்தும் */
-addEventListener('storage',e=>{if(e.key==='np_layout'&&fb)fb.relayout()});
 (async()=>{const d=await dbGet('pdf');if(d&&d.buf){const p=await dbGet('pg');openBuf(d.buf,d.name,p||0,false)}})();
 </script><script src="theme.js"></script>
 <script>AppTheme.mount&&AppTheme.get&&(function(){})();</script>

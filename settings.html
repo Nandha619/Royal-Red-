@@ -60,17 +60,6 @@ html,body{margin:0}
         <p class="note">காலியாக விட்டால் தினமும் இன்றைய தேதி தானாக வரும். கோப்புப் பெயர்: Theekkathir-DD-MM-YYYY.pdf</p>
       </div>
       <div class="sc">
-        <h2>📖 பக்கக் காட்சி</h2>
-        <label>புத்தகம் எப்படித் தெரிய வேண்டும்
-          <select id="layoutSel">
-            <option value="auto">தானாக (அகலத் திரை = இரட்டைப் பக்கம், மொபைல் = ஒற்றைப் பக்கம்)</option>
-            <option value="double">எப்போதும் இரட்டைப் பக்கம்</option>
-            <option value="single">எப்போதும் ஒற்றைப் பக்கம்</option>
-          </select>
-        </label>
-        <p class="note">முகப்பு அட்டை தனியாகவும், பிறகு இரண்டிரண்டு பக்கங்களாகவும் FlippingBook போலத் தெரியும். பக்க ஓரத்தை இழுத்து அல்லது தொட்டுப் புரட்டலாம்.</p>
-      </div>
-      <div class="sc">
         <h2>🔊 புரட்டும் ஒலி</h2>
         <label class="toggle"><span>பக்கம் புரட்டும்போது தாள் ஒலி</span><input type="checkbox" id="sndChk"></label>
       </div>
@@ -173,8 +162,6 @@ html,body{margin:0}
   $('#dlDate').value = ls.get('np_dldate') || '';
   $('#dlDate').onchange = function (e) { if (e.target.value) ls.set('np_dldate', e.target.value); else ls.del('np_dldate'); toast('✔ சேமிக்கப்பட்டது'); };
   $('#dlToday').onclick = function () { $('#dlDate').value = ''; ls.del('np_dldate'); toast('✔ இனி இன்றைய தேதி பயன்படும்'); };
-  $('#layoutSel').value = ls.get('np_layout') || 'auto';
-  $('#layoutSel').onchange = function (e) { if (e.target.value === 'auto') ls.del('np_layout'); else ls.set('np_layout', e.target.value); toast('✔ சேமிக்கப்பட்டது'); };
   $('#sndChk').checked = ls.get('np_sound') !== '0';
   $('#sndChk').onchange = function (e) { ls.set('np_sound', e.target.checked ? '1' : '0'); toast('✔ சேமிக்கப்பட்டது'); };
 
