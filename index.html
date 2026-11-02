@@ -221,6 +221,11 @@ html,body{background:#000}
 #sec .none{color:var(--muted,#777);font-size:14px;text-align:center;padding:40px 10px}
 #sec .none a{color:var(--red);font-weight:800}
 @media (max-width:480px){.tb{height:46px;font-size:9px}.tb .ico{font-size:18px}}
+/* மேல் பட்டியில் 3 பொத்தான்கள் மட்டும்: 1) பெரிய blink (Mobile TV/E-Paper) 2) Book Shelf 3) செட்டிங்ஸ்/Download. பூட்டு பொத்தான் செட்டிங்ஸ் பக்கத்தில் மட்டும். */
+#modeBtn{flex:1.7;height:58px;font-size:12px;gap:3px}
+#modeBtn .ico{font-size:30px}
+#shelfBtn,#actBtn{flex:1}
+#ownerLockBtn:not(.slotted){display:none!important}
 </style>
 <link rel="stylesheet" href="articles.css">
 </head>
@@ -545,7 +550,6 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);
     <button class="tb" type="button" id="modeBtn" aria-label="Mobile TV"><span class="ico" id="modeIco">📺</span><span id="modeLbl">Mobile TV</span></button>
     <button class="tb" type="button" id="shelfBtn" aria-label="Book Shelf" aria-expanded="false"><span class="ico">📚</span><span>Book Shelf <small class="arr">▾</small></span></button>
     <button class="tb" type="button" id="actBtn" aria-label="செட்டிங்ஸ்"><span class="ico" id="actIco">⚙</span><span id="actLbl">செட்டிங்ஸ்</span></button>
-    <span data-owner-slot style="display:flex;align-items:center"></span>
   </div>
   <div id="subBar" role="menu" aria-label="Book Shelf பிரிவுகள்"></div>
 </nav>
