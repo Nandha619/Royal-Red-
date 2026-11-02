@@ -4,8 +4,8 @@
   'use strict';
   var S;
   var CFG = {
-    shopping: { ico: '🛒', def: 'Shopping', add: '➕ பொருளைச் சேர்க்க', head: 'பொருள் விவரம்', nameL: 'விற்பவர் / கடை பெயர் *', roleL: 'தொடர்பு எண் / முகவரி', extraL: 'விலை (எ.கா. ₹250)', titleL: 'பொருளின் பெயர் *', sumL: 'சில வரிகள் *', bodyL: 'முழு விவரம் (விருப்பம்)', empty: 'இன்னும் பொருட்கள் இல்லை' },
-    events: { ico: '🎪', def: 'Events', add: '➕ நிகழ்வைச் சேர்க்க', head: 'நிகழ்வு விவரம்', nameL: 'ஏற்பாட்டாளர் பெயர் *', roleL: 'இடம்', extraL: 'தேதி & நேரம் (எ.கா. 15-11-2026, மாலை 5 மணி)', titleL: 'நிகழ்வின் பெயர் *', sumL: 'சில வரிகள் *', bodyL: 'முழு விவரம் (விருப்பம்)', empty: 'இன்னும் நிகழ்வுகள் இல்லை' }
+    shopping: { ico: '🛒', def: 'Shopping', add: '➕ போஸ்டர் சேர்க்க', head: 'கடை போஸ்டர் சேர்க்க', nameL: 'கடை / விற்பவர் பெயர் (விருப்பம்)', roleL: 'தொடர்பு எண் / முகவரி', extraL: 'விலை (எ.கா. ₹250)', titleL: 'கடை / பொருளின் பெயர் *', sumL: 'போஸ்டர் குறித்த சில வரிகள் (விருப்பம்)', bodyL: 'முழு விவரம் (விருப்பம்)', empty: 'இன்னும் கடை போஸ்டர்கள் இல்லை' },
+    events: { ico: '🎪', def: 'Events', add: '➕ போஸ்டர் சேர்க்க', head: 'நிகழ்வு போஸ்டர் சேர்க்க', nameL: 'ஏற்பாட்டாளர் பெயர் (விருப்பம்)', roleL: 'இடம்', extraL: 'தேதி & நேரம் (எ.கா. 15-11-2026, மாலை 5 மணி)', titleL: 'நிகழ்வின் பெயர் *', sumL: 'போஸ்டர் குறித்த சில வரிகள் (விருப்பம்)', bodyL: 'முழு விவரம் (விருப்பம்)', empty: 'இன்னும் நிகழ்வு போஸ்டர்கள் இல்லை' }
   };
   var root, host, kind, C, busyList = false;
   function h(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
@@ -35,10 +35,9 @@
     var g = h('div', 'pg');
     list.forEach(function (a) {
       var c = h('button', 'pc'); c.type = 'button';
-      var im = h('div', 'pi'); if (a.photo) { var i = h('img'); i.src = a.photo; i.alt = a.title; i.loading = 'lazy'; im.appendChild(i); } else im.textContent = C.ico;
-      c.appendChild(im); c.appendChild(h('div', 'pt2', a.title));
-      if (a.extra) c.appendChild(h('div', 'px', a.extra));
-      c.appendChild(h('div', 'ps2', a.summary)); c.onclick = function () { openDetail(a); }; g.appendChild(c);
+      if (a.photo) { var i = h('img'); i.src = a.photo; i.alt = a.title; i.loading = 'lazy'; c.appendChild(i); } else c.appendChild(h('div', 'pi', C.ico));
+      var cap = h('div', 'cap'); cap.appendChild(h('div', 'pt2', a.title)); if (a.extra) cap.appendChild(h('div', 'px', a.extra)); c.appendChild(cap);
+      c.onclick = function () { openDetail(a); }; g.appendChild(c);
     });
     as.appendChild(g); root.appendChild(as);
   }
@@ -54,10 +53,10 @@
     if (a.photo) { var f = h('div', 'pd-im'), i = h('img'); i.src = a.photo; i.alt = a.title; f.appendChild(i); pg.appendChild(f); }
     var meta = h('div', 'pd-meta');
     if (a.extra) meta.appendChild(h('div', 'pd-x', (kind === 'shopping' ? '💰 ' : '🗓 ') + a.extra));
-    meta.appendChild(h('div', '', (kind === 'shopping' ? '🏪 ' : '👤 ') + a.name));
+    if (a.name && a.name !== '-') meta.appendChild(h('div', '', (kind === 'shopping' ? '🏪 ' : '👤 ') + a.name));
     if (a.role && a.role !== '-') meta.appendChild(h('div', '', (kind === 'shopping' ? '📞 ' : '📍 ') + a.role));
-    pg.appendChild(meta);
-    var body = h('div', 'rd-body'); String(a.body).replace(/\r/g, '').split(/\n\s*\n/).forEach(function (p) { p = p.trim(); if (p) { var e = h('p'); e.textContent = p; body.appendChild(e); } });
+    if (meta.childNodes.length) pg.appendChild(meta);
+    var body = h('div', 'rd-body'); if (a.body !== a.title) String(a.body).replace(/\r/g, '').split(/\n\s*\n/).forEach(function (p) { p = p.trim(); if (p) { var e = h('p'); e.textContent = p; body.appendChild(e); } });
     pg.appendChild(body); rd.append(bar, pg); host.appendChild(rd); back.onclick = closeOv;
   }
   function openForm() {
@@ -66,7 +65,7 @@
     box.innerHTML =
       '<div class="fm-hd"><h2>' + C.ico + ' ' + C.head + '</h2><button class="fm-x" type="button" aria-label="மூடு">✕</button></div>' +
       '<p class="fm-note">யார் வேண்டுமானாலும் சேர்க்கலாம். நிர்வாகி ஒப்புதல் அளித்தால் மட்டுமே முதல் பக்கத்தில் தெரியும்.</p>' +
-      '<div class="fm-ph"><div class="fm-prev" id="pPv">JPG படம்</div><div class="fm-pt"><label class="fm-btn" for="pP" style="margin:0">📷 JPG படம் தேர்வு</label><input type="file" id="pP" accept="image/jpeg,image/png,image/*" hidden><div id="pS"></div></div></div>' +
+      '<div class="fm-ph"><div class="fm-prev" id="pPv">போஸ்டர்</div><div class="fm-pt"><label class="fm-btn" for="pP" style="margin:0">📷 போஸ்டர் (JPG) தேர்வு *</label><input type="file" id="pP" accept="image/jpeg,image/png,image/*" hidden><div id="pS"></div></div></div>' +
       '<label>' + C.titleL + '<input type="text" id="pT" maxlength="' + L.title + '"></label>' +
       '<label>' + C.extraL + '<input type="text" id="pX" maxlength="' + L.extra + '"></label>' +
       '<label>' + C.nameL + '<input type="text" id="pN" maxlength="' + L.name + '"></label>' +
@@ -83,7 +82,7 @@
       var f = e.target.files[0]; e.target.value = ''; if (!f) return;
       if (!/^image\//.test(f.type)) { err('படக் கோப்பை மட்டும் தேர்வு செய்யவும்'); return; }
       err(''); busy = true; q('#pSub').disabled = true; q('#pS').textContent = 'செயல்படுகிறது…';
-      shrink(f, 900).then(function (d) { photo = d; var im = h('img'); im.src = d; im.alt = ''; var pv = q('#pPv'); pv.innerHTML = ''; pv.appendChild(im); q('#pS').textContent = '✔ படம் சேர்க்கப்பட்டது'; })
+      shrink(f, 1100).then(function (d) { photo = d; var im = h('img'); im.src = d; im.alt = ''; var pv = q('#pPv'); pv.innerHTML = ''; pv.appendChild(im); q('#pS').textContent = '✔ படம் சேர்க்கப்பட்டது'; })
         .catch(function (x) { err(x.message); q('#pS').textContent = ''; }).then(function () { busy = false; q('#pSub').disabled = false; });
     };
     q('#pSub').onclick = function () {
@@ -92,7 +91,8 @@
       if (Date.now() - t0 < 3000) { err('சிறிது நேரம் கழித்து மீண்டும் அழுத்தவும்'); return; }
       var last = +localStorage.getItem('np_post_last') || 0; if (Date.now() - last < 20000) { err('அடுத்ததை சிறிது நேரம் கழித்து அனுப்பவும்'); return; }
       var a = { kind: kind, name: q('#pN').value, role: q('#pR').value, title: q('#pT').value, extra: q('#pX').value, summary: q('#pU').value, body: q('#pG').value, photo: photo, cutout: false };
-      if (!a.name.trim() || !a.title.trim() || !a.summary.trim()) { err('* குறித்த புலங்களை நிரப்பவும்'); return; }
+      if (!a.photo) { err('போஸ்டர் (JPG) படத்தைச் சேர்க்கவும்'); return; }
+      if (!a.title.trim()) { err('தலைப்பை எழுதவும்'); return; }
       q('#pSub').disabled = true; q('#pSub').textContent = 'அனுப்புகிறது…';
       S.submit(a).then(function () {
         try { localStorage.setItem('np_post_last', String(Date.now())); } catch (e) {}

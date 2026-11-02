@@ -92,6 +92,7 @@
       };
       if (r.kind !== 'article' && !r.body) r.body = r.summary;
       if (r.kind !== 'article' && !r.role) r.role = '-';
+      if (r.kind !== 'article') { if (!r.name) r.name = '-'; if (!r.summary) r.summary = r.title; if (!r.body) r.body = r.summary; }
       if (!r.name || !r.role || !r.title || !r.summary || !r.body) return Promise.reject(new Error('எல்லா புலங்களையும் நிரப்பவும்'));
       if (!cloud) {
         var l = jget(LKEY) || []; r.id = uid(); l.push(r);
