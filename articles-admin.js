@@ -2,8 +2,11 @@
    காத்திருப்பு (pending) கட்டுரைகளை ஏற்கலாம் / நிராகரிக்கலாம் / நீக்கலாம். ஏற்றவை மட்டுமே முதன்மைப் பக்கத்தில் தெரியும். */
 (function () {
   'use strict';
-  var S = window.ArticleStore;
-  var box, filter = 'pending', all = [], names = {};
+  var KIND = { article: ['📝', 'Articles', 'கட்டுரை'], shopping: ['🛒', 'Shopping', 'பொருள்'], events: ['🎪', 'Events', 'நிகழ்வு'] };
+  function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) {} return null; }
+  function create(box0, kind) {
+  var S = window.ArticleStore.forKind(kind);
+  var box = box0, filter = 'pending', all = [], K = KIND[kind] || KIND.article;
   var STAT = { pending: 'காத்திருப்பு', approved: 'ஏற்றவை', rejected: 'நிராகரித்தவை' };
   function h(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
   function toast(m) { var t = document.getElementById('toast'); if (!t) return; t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.remove('on'); }, 2400); }
@@ -11,10 +14,13 @@
 
   function render() {
     box.innerHTML = '';
-    var c = h('div', 'sc'); c.appendChild(h('h2', '', '✍ Articles — அட்மின் ஒப்புதல்'));
+    var names = {}; try { names = JSON.parse(ls('np_tabs') || '{}') || {}; } catch (e) {}
+    var c = h('div', 'sc'); var hd = h('h2', '', K[0] + ' ' + (names[kind] || K[1]) + ' — அட்மின் ஒப்புதல்'); c.appendChild(hd);
+    var l1 = h('label', '', 'பகுதியின் பெயர் (முதல் பக்கத்தில் தெரியும்)'), nm = h('input'); nm.type = 'text'; nm.value = names[kind] || ''; nm.placeholder = K[1]; l1.appendChild(nm); c.appendChild(l1);
+    nm.oninput = function () { var v = nm.value.trim(); if (v) names[kind] = v; else delete names[kind]; ls('np_tabs', JSON.stringify(names)); hd.textContent = K[0] + ' ' + (names[kind] || K[1]) + ' — அட்மின் ஒப்புதல்'; };
     var mode = h('p', 'note', S.mode === 'cloud'
       ? 'பகிரப்பட்ட முறை (Firebase): யாரும் எழுதிய கட்டுரைகள் இங்கே காத்திருப்பில் வரும்.'
-      : '⚠ சோதனை முறை: Firebase அமைக்கப்படவில்லை — கட்டுரைகள் இந்தச் சாதனத்தில் மட்டும். மற்றவர்களின் கட்டுரைகள் வர articles-config.js நிரப்பவும் (README → Articles அமைப்பு).');
+      : '⚠ சோதனை முறை: தரவு இந்தச் சாதனத்தில் மட்டும் (localStorage). பகிரப்பட்ட முறைக்கு articles-config.js நிரப்பவும் (README → Articles அமைப்பு).');
     c.appendChild(mode); box.appendChild(c);
     if (!S.isAdmin()) return login();
     panel();
@@ -57,10 +63,10 @@
       if (a.photo) { var p = h('img'); p.src = a.photo; p.alt = ''; p.style.cssText = 'width:100%;height:100%;object-fit:contain;object-position:bottom'; im.appendChild(p); } else im.textContent = (a.name || '✍').charAt(0);
       var tx = h('div'); tx.style.cssText = 'min-width:0;display:grid;gap:2px';
       var t = h('strong', '', a.title); t.style.overflowWrap = 'anywhere';
-      var by = h('span', 'note', a.name + ' · ' + a.role + (a.photo ? (a.cutout ? ' · ✂ cut-out' : ' · (அசல் படம்)') : ''));
+      var by = h('span', 'note', a.name + (a.role && a.role !== '-' ? ' · ' + a.role : '') + (a.extra ? ' · ' + a.extra : '') + (a.photo && kind === 'article' ? (a.cutout ? ' · ✂ cut-out' : ' · (அசல் படம்)') : ''));
       var dt = h('span', 'note', date(a.createdAt)); tx.append(t, by, dt); top.append(im, tx); c.appendChild(top);
       c.appendChild(h('p', 'note', a.summary));
-      var det = document.createElement('details'), sm = h('summary', '', 'முழுக் கட்டுரையைப் படி'), bd = h('div', 'body'); bd.style.cssText = 'white-space:pre-wrap;line-height:1.8;overflow-wrap:anywhere';
+      var det = document.createElement('details'), sm = h('summary', '', 'முழு விவரத்தைப் படி'), bd = h('div', 'body'); bd.style.cssText = 'white-space:pre-wrap;line-height:1.8;overflow-wrap:anywhere';
       bd.textContent = a.body; det.append(sm, bd); c.appendChild(det);
       var row = h('div', 'st-row');
       function btn(txt, cls, fn) { var b = h('button', cls, txt); b.type = 'button'; b.onclick = function () { b.disabled = true; fn().then(load).catch(function (e) { toast('⚠ ' + e.message); b.disabled = false; if (/உள்நுழை|அமர்வு/.test(e.message)) render(); }); }; row.appendChild(b); }
@@ -74,10 +80,13 @@
 
   function load() {
     if (!S.isAdmin()) return render();
-    return S.listAll().then(function (l) { all = l; render(); }).catch(function (e) {
+    return S.listAll(kind).then(function (l) { all = l; render(); }).catch(function (e) {
       if (/உள்நுழை|அமர்வு|401|403|PERMISSION/i.test(e.message)) { S.logout(); } else toast('⚠ ' + e.message);
       render();
     });
   }
-  window.ArticleAdmin = { mount: function (el) { box = el; if (S.isAdmin()) load(); else render(); } };
+  return { mount: function (el) { box = el; if (S.isAdmin()) load(); else render(); } };
+  }
+  var inst = {};
+  window.ArticleAdmin = { mount: function (el, kind) { kind = kind || 'article'; (inst[kind] = inst[kind] || create(el, kind)).mount(el); } };
 })();

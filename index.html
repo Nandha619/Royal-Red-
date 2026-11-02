@@ -562,6 +562,7 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);
 <script src="article-store.js"></script>
 <script src="cutout.js"></script>
 <script src="articles.js"></script>
+<script src="posts.js"></script>
 <script src="flipbook.js"></script>
 <script>
 const $=s=>document.querySelector(s),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -581,7 +582,7 @@ $('#pick').onclick=()=>{location.href='settings.html#epaper'};
    எல்லா மாற்றங்களும் (PDF, செய்தி, புத்தகம், தோற்றம்…) settings.html பக்கத்தில் செய்யப்படும். */
 const SECS=[['books','Books','📚'],['article','Articles','📝'],['shopping','Shopping','🛒'],['events','Events','🎪']];
 const SEC_ONLY=['article','shopping','events'];
-const VIEWS=['paper','tv','books',...SEC_ONLY],SET_TAB={paper:'epaper',tv:'tv',books:'shelf',article:'articles',shopping:'sections',events:'sections'};
+const VIEWS=['paper','tv','books',...SEC_ONLY],SET_TAB={paper:'epaper',tv:'tv',books:'shelf',article:'articles',shopping:'shopping',events:'events'};
 let names={};try{names=JSON.parse(ls.get('np_tabs')||'{}')||{}}catch(e){}
 const secName=id=>names[id]||(SECS.find(x=>x[0]===id)||[0,id])[1];
 let view='paper',bkMode='shelf',lastBook=0,ifr=null,bifr=null,lifr=null;
@@ -662,8 +663,9 @@ function openSub(){$('#subBar').classList.add('on');$('#shelfBtn').setAttribute(
 /* Books தவிர்த்த பிரிவுகள் — பார்வை மட்டும் (திருத்துதல் செட்டிங்ஸில்) */
 function renderSec(id){
   const sc=$('#sec');
-  if(id==='article'&&window.ArticleShelf){ArticleShelf.mount(sc,$('#main'));return}
+  if(id==='article'&&window.ArticleShelf){if(window.PostBoard)PostBoard.unmount(sc);ArticleShelf.mount(sc,$('#main'));return}
   if(window.ArticleShelf)ArticleShelf.unmount(sc);
+  if((id==='shopping'||id==='events')&&window.PostBoard){PostBoard.mount(sc,$('#main'),id);return}
   const t=ls.get('np_s_'+id)||'';let meta=[];try{meta=JSON.parse(ls.get('np_si_'+id)||'[]')||[]}catch(e){}
   sc.innerHTML='<h2></h2><div class="gal"></div>'+(t.trim()?'<div class="body"></div>':'')+(!t.trim()&&!meta.length?'<div class="none">இந்தப் பகுதியில் உள்ளடக்கம் இல்லை.<br><a href="settings.html#sections">செட்டிங்ஸில் சேர்க்கவும்</a></div>':'');
   sc.querySelector('h2').textContent=secName(id);

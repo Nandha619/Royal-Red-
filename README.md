@@ -51,18 +51,20 @@ JPG புகைப்படம் பதிவேற்றினால் உ�
 rules_version = '2';
 service cloud.firestore {
   match /databases/{db}/documents {
-    match /articles/{id} {
-      allow read: if resource.data.status == 'approved'
-                  || (request.auth != null && request.auth.token.email == 'ADMIN@EMAIL');
-      allow create: if request.resource.data.status == 'pending'
-                    && request.resource.data.keys().hasOnly(['name','role','title','summary','body','photo','cutout','status','createdAt'])
+    function isAdmin() { return request.auth != null && request.auth.token.email == 'ADMIN@EMAIL'; }
+    // articles, shopping, events — மூன்றுக்கும் ஒரே விதி
+    match /{col}/{id} {
+      allow read: if col in ['articles','shopping','events'] && (resource.data.status == 'approved' || isAdmin());
+      allow create: if col in ['articles','shopping','events']
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.keys().hasOnly(['name','role','title','summary','body','photo','cutout','status','createdAt','kind','extra'])
                     && request.resource.data.name.size() <= 80
                     && request.resource.data.role.size() <= 120
                     && request.resource.data.title.size() <= 200
                     && request.resource.data.summary.size() <= 400
                     && request.resource.data.body.size() <= 30000
                     && request.resource.data.photo.size() <= 800000;
-      allow update, delete: if request.auth != null && request.auth.token.email == 'ADMIN@EMAIL';
+      allow update, delete: if col in ['articles','shopping','events'] && isAdmin();
     }
   }
 }
@@ -75,3 +77,6 @@ service cloud.firestore {
 - எல்லா Articles தரவு அணுகலும் `article-store.js` (`window.ArticleStore`) ஒரே இடத்தில் உள்ளது: `listApproved / submit / listAll / setStatus / remove / login`. UI (`articles.js`, `articles-admin.js`) இந்த API-ஐ மட்டுமே அழைக்கும்.
 - பின்தளம் மாற்ற: `article-store.js`-ல் அதே முறைகளை புதிய சேவைக்கு (Firebase, அல்லது சொந்த API) செயல்படுத்தினால் போதும்; UI மாற்றம் தேவையில்லை. Firebase ஏற்கனவே எழுதப்பட்டுள்ளது — `articles-config.js` நிரப்பினால் இயங்கும்.
 - Shopping / Events படங்கள் (`MediaStore` + `np_si_*`) அதே முறையில் பின்னர் சேவையகத்திற்கு நகர்த்தலாம்.
+
+### செட்டிங்ஸ் அமைப்பு
+செட்டிங்ஸ் → **Book Shelf** தாவலுக்குள் துணைத் தாவல்கள்: **Books · Articles · Shopping · Events**. Articles / Shopping / Events மூன்றிலும்: பகுதியின் பெயர் மாற்றம், காத்திருப்பு / ஏற்றவை / நிராகரித்தவை, ஏற்று · நிராகரி · நீக்கு. Shopping / Events-ஐ யார் வேண்டுமானாலும் (JPG படத்துடன்) சேர்க்கலாம்; ஒப்புதலுக்குப் பின்னரே முதல் பக்கத்தில் தெரியும். (`posts.js`)

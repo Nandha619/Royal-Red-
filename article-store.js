@@ -5,8 +5,12 @@
   'use strict';
   var C = window.ARTICLES_CFG || {};
   var cloud = !!(C.projectId && C.apiKey);
-  var LKEY = 'np_articles_local_v1', CKEY = 'np_articles_cache_v1', AKEY = 'np_art_admin_v1';
-  var LIM = { name: 80, role: 120, title: 200, summary: 400, body: 30000 };
+  var AKEY = 'np_art_admin_v1';
+  var COL = { article: 'articles', shopping: 'shopping', events: 'events' };
+  var LKEYS = { article: 'np_articles_local_v1', shopping: 'np_shopping_local_v1', events: 'np_events_local_v1' };
+  var LIM = { name: 80, role: 120, title: 200, summary: 400, body: 30000, extra: 120 };
+  var KINDS = ['article', 'shopping', 'events'];
+  var kindOf = function (a) { return a.kind || 'article'; };
 
   function jget(k, s) { try { return JSON.parse((s ? sessionStorage : localStorage).getItem(k) || 'null'); } catch (e) { return null; } }
   function jset(k, v, s) { try { (s ? sessionStorage : localStorage).setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
@@ -17,16 +21,17 @@
   function enc(a) {
     return { fields: {
       name: { stringValue: a.name }, role: { stringValue: a.role }, title: { stringValue: a.title },
-      summary: { stringValue: a.summary }, body: { stringValue: a.body }, photo: { stringValue: a.photo || '' },
+      summary: { stringValue: a.summary }, extra: { stringValue: a.extra || '' }, body: { stringValue: a.body }, photo: { stringValue: a.photo || '' },
       cutout: { booleanValue: !!a.cutout }, status: { stringValue: a.status },
+      kind: { stringValue: a.kind || 'article' }, extra: { stringValue: a.extra || '' },
       createdAt: { integerValue: String(a.createdAt) }
     } };
   }
   function dec(d) {
     var f = d.fields || {}, s = function (k) { return f[k] && f[k].stringValue != null ? f[k].stringValue : ''; };
     return {
-      id: d.name.split('/').pop(), name: s('name'), role: s('role'), title: s('title'), summary: s('summary'), body: s('body'),
-      photo: s('photo'), cutout: !!(f.cutout && f.cutout.booleanValue), status: s('status') || 'pending',
+      id: d.name.split('/').pop(), name: s('name'), role: s('role'), title: s('title'), summary: s('summary'), extra: s('extra'), body: s('body'),
+      photo: s('photo'), kind: s('kind') || 'article', extra: s('extra'), cutout: !!(f.cutout && f.cutout.booleanValue), status: s('status') || 'pending',
       createdAt: f.createdAt && f.createdAt.integerValue ? +f.createdAt.integerValue : 0
     };
   }
@@ -41,8 +46,8 @@
       });
     });
   }
-  function query(status, tok) {
-    var sq = { from: [{ collectionId: 'articles' }], limit: 200 };
+  function query(col, status, tok) {
+    var sq = { from: [{ collectionId: col }], limit: 200 };
     if (status) sq.where = { fieldFilter: { field: { fieldPath: 'status' }, op: 'EQUAL', value: { stringValue: status } } };
     return http(DOC() + ':runQuery?key=' + encodeURIComponent(C.apiKey), { method: 'POST', body: JSON.stringify({ structuredQuery: sq }) }, tok)
       .then(function (rows) { return (rows || []).filter(function (r) { return r.document; }).map(function (r) { return dec(r.document); }); });
@@ -62,7 +67,10 @@
     }).catch(function () { try { sessionStorage.removeItem(AKEY); } catch (e) {} throw new Error('அமர்வு முடிந்தது — மீண்டும் உள்நுழையவும்'); });
   }
 
+  function make(kind) {
+  var col = COL[kind] || 'articles', LKEY = LKEYS[kind] || LKEYS.article, CKEY = 'np_' + kind + '_cache_v1';
   var Store = {
+    kind: kind,
     mode: cloud ? 'cloud' : 'local',
     limits: LIM,
     adminEmail: C.adminEmail || '',
@@ -70,23 +78,26 @@
     /* பொது: ஏற்கப்பட்ட கட்டுரைகள் */
     listApproved: function () {
       if (!cloud) return Promise.resolve((jget(LKEY) || []).filter(function (a) { return a.status === 'approved'; }).sort(byNew));
-      return query('approved').then(function (l) { l.sort(byNew); jset(CKEY, l.slice(0, 30)); return l; })
+      return query(col, 'approved').then(function (l) { l.sort(byNew); jset(CKEY, l.slice(0, 30)); return l; })
         .catch(function (e) { var c = jget(CKEY); if (c) return c; throw e; });
     },
     /* பொது: புதிய கட்டுரை → எப்போதும் pending */
     submit: function (a) {
       var r = {
         name: String(a.name || '').trim().slice(0, LIM.name), role: String(a.role || '').trim().slice(0, LIM.role),
-        title: String(a.title || '').trim().slice(0, LIM.title), summary: String(a.summary || '').trim().slice(0, LIM.summary),
+        title: String(a.title || '').trim().slice(0, LIM.title), summary: String(a.summary || '').trim().slice(0, LIM.summary), extra: String(a.extra || '').trim().slice(0, LIM.extra),
         body: String(a.body || '').trim().slice(0, LIM.body), photo: a.photo || '', cutout: !!a.cutout,
+        kind: KINDS.indexOf(a.kind) >= 0 ? a.kind : 'article', extra: String(a.extra || '').trim().slice(0, LIM.extra),
         status: 'pending', createdAt: Date.now()
       };
+      if (r.kind !== 'article' && !r.body) r.body = r.summary;
+      if (r.kind !== 'article' && !r.role) r.role = '-';
       if (!r.name || !r.role || !r.title || !r.summary || !r.body) return Promise.reject(new Error('எல்லா புலங்களையும் நிரப்பவும்'));
       if (!cloud) {
         var l = jget(LKEY) || []; r.id = uid(); l.push(r);
         return jset(LKEY, l) ? Promise.resolve(r.id) : Promise.reject(new Error('சேமிக்க இடம் போதவில்லை — சிறிய படத்தைப் பயன்படுத்தவும்'));
       }
-      return http(DOC() + '/articles?key=' + encodeURIComponent(C.apiKey), { method: 'POST', body: JSON.stringify(enc(r)) })
+      return http(DOC() + '/' + col + '?key=' + encodeURIComponent(C.apiKey), { method: 'POST', body: JSON.stringify(enc(r)) })
         .then(function (d) { return d.name.split('/').pop(); });
     },
 
@@ -104,23 +115,28 @@
     logout: function () { try { sessionStorage.removeItem(AKEY); } catch (e) {} },
     listAll: function () {
       if (!cloud) return Promise.resolve((jget(LKEY) || []).slice().sort(byNew));
-      return token().then(function (t) { return query('', t); }).then(function (l) { return l.sort(byNew); });
+      return token().then(function (t) { return query(col, '', t); }).then(function (l) { return l.sort(byNew); });
     },
     setStatus: function (id, status) {
       if (!cloud) {
         var l = jget(LKEY) || []; l.forEach(function (a) { if (a.id === id) a.status = status; }); jset(LKEY, l); return Promise.resolve();
       }
       return token().then(function (t) {
-        return http(DOC() + '/articles/' + encodeURIComponent(id) + '?updateMask.fieldPaths=status&key=' + encodeURIComponent(C.apiKey),
+        return http(DOC() + '/' + col + '/' + encodeURIComponent(id) + '?updateMask.fieldPaths=status&key=' + encodeURIComponent(C.apiKey),
           { method: 'PATCH', body: JSON.stringify({ fields: { status: { stringValue: status } } }) }, t);
       });
     },
     remove: function (id) {
       if (!cloud) { jset(LKEY, (jget(LKEY) || []).filter(function (a) { return a.id !== id; })); return Promise.resolve(); }
       return token().then(function (t) {
-        return http(DOC() + '/articles/' + encodeURIComponent(id) + '?key=' + encodeURIComponent(C.apiKey), { method: 'DELETE' }, t);
+        return http(DOC() + '/' + col + '/' + encodeURIComponent(id) + '?key=' + encodeURIComponent(C.apiKey), { method: 'DELETE' }, t);
       });
     }
   };
-  window.ArticleStore = Store;
+  return Store;
+  }
+  var cache = {};
+  var Main = make('article');
+  Main.forKind = function (k) { return cache[k] || (cache[k] = k === 'article' ? Main : make(k)); };
+  window.ArticleStore = Main;
 })();
