@@ -1,48 +1,62 @@
-/* Articles — எழுத்தாளர் அலமாரி (Book Shelf பாணி), வாசிப்புப் பக்கம் (பழங்காலத் தாள்), எழுதும் படிவம் */
-#sec.art{padding:0;background:radial-gradient(ellipse 80% 45% at 50% 30%,rgba(255,196,110,.30),transparent 70%),repeating-linear-gradient(90deg,rgba(0,0,0,.14) 0 2px,transparent 2px 52px),linear-gradient(#3B2314,#190D06);color:#FBEFD5;--ag:#E3B04B;--ai:#FBEFD5;--am:#D9C49A;--ad:#190D06;--ap:rgba(30,15,6,.82)}
-.as{position:relative;max-width:640px;margin:0 auto;padding:14px 14px calc(env(safe-area-inset-bottom,0px) + 28px);font:500 15px/1.55 "Noto Sans Tamil",sans-serif}
+/* Articles — தமிழ் ஓலைச்சுவடி பாணி; வாசிப்புப் பக்கம் (பழங்காலத் தாள்); எழுதும் படிவம் */
+#sec.art{padding:0;color:#2B1A08;--ar:#8E2B1B;--ag:#B8862B;--ai:#2B1A08;--am:#6B4A1E;
+background:repeating-linear-gradient(0deg,rgba(110,80,25,.11) 0 1px,transparent 1px 6px),radial-gradient(ellipse 90% 40% at 50% 0,rgba(255,244,200,.7),transparent 70%),linear-gradient(90deg,#C9B278,#E4D49C 7%,#EADDAE 50%,#E4D49C 93%,#C9B278)}
+.as{position:relative;max-width:640px;margin:0 auto;padding:10px 14px calc(env(safe-area-inset-bottom,0px) + 28px);font:500 15px/1.55 "Noto Sans Tamil",sans-serif}
 .as *{box-sizing:border-box}
-.as h1{font:800 clamp(22px,6vw,30px)/1.25 "Noto Serif Tamil",serif;margin:4px 0 2px;text-align:center;color:var(--ag);text-shadow:0 2px 12px rgba(0,0,0,.6)}
-.as .hint{margin:0 0 8px;text-align:center;color:var(--am);font-size:13px}
-.as .wr{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 12px;height:38px;padding:0 18px;border-radius:99px;border:2px solid var(--ag);background:linear-gradient(#FFF1B8,var(--ag) 55%,#B98A22);color:#2A1709;font:800 15px "Noto Sans Tamil",sans-serif;cursor:pointer;box-shadow:0 0 16px rgba(227,176,75,.45)}
+.as .orn{text-align:center;color:var(--ar);letter-spacing:12px;font-size:15px;line-height:1;margin:2px 0 4px;opacity:.85}
+.as h1{font:800 clamp(24px,7vw,32px)/1.3 "Noto Serif Tamil",serif;margin:0 0 2px;text-align:center;color:var(--ar);text-shadow:0 1px 0 rgba(255,248,220,.8)}
+.as .hint{margin:0 0 8px;text-align:center;color:var(--am);font-size:12.5px;font-weight:600}
+.as .wr{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 auto 10px;height:40px;padding:0 20px;border-radius:99px;border:2px solid #6E1A0F;background:linear-gradient(#B3392A,#8E2B1B);color:#FFF3D0;font:800 14.5px "Noto Sans Tamil",sans-serif;cursor:pointer;box-shadow:0 3px 10px rgba(90,30,10,.35)}
 .as .wr:active{transform:scale(.97)}
-.as .info{position:relative;z-index:2;display:grid;grid-template-columns:auto 1fr;gap:2px 14px;align-items:center;background:var(--ap);border:2px solid var(--ag);border-radius:18px;padding:10px 14px;margin:0 auto 6px;box-shadow:0 10px 26px rgba(0,0,0,.5);min-height:84px}
-.as .info.pop{animation:apop .45s cubic-bezier(.2,.9,.3,1.2)}
-@keyframes apop{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
-.as .lg{grid-row:1/3;width:64px;height:64px;border-radius:50%;background:var(--ag) center/cover no-repeat;display:grid;place-items:center;font:800 28px "Noto Serif Tamil",serif;color:#2A1709;box-shadow:0 0 0 3px rgba(0,0,0,.35),0 0 18px rgba(227,176,75,.6);overflow:hidden}
-.as .lg img{width:100%;height:100%;object-fit:cover;object-position:top;background:linear-gradient(#FFE9A8,#E3B04B)}
-.as .tx{min-width:0}
-.as .tx small{display:block;color:var(--am);font-size:12px;line-height:1.3}
-.as .tx b{display:block;font:800 clamp(17px,4.6vw,21px)/1.3 "Noto Serif Tamil",serif;overflow-wrap:anywhere}
-.as .stage{position:relative;z-index:1;height:calc(var(--bh,300px) + 46px);perspective:1000px;touch-action:pan-y;user-select:none;-webkit-user-select:none;margin-top:6px}
-.as .row{position:absolute;left:0;right:0;top:0;bottom:30px;transform-style:preserve-3d}
-.as .bk{position:absolute;left:50%;bottom:0;width:var(--bw,200px);height:var(--bh,296px);transform-origin:50% 100%;cursor:pointer;will-change:transform,filter;transition:transform .5s cubic-bezier(.2,.8,.2,1),filter .5s}
+.as .info{position:relative;z-index:2;display:grid;grid-template-columns:auto 1fr;gap:0 14px;align-items:center;background:rgba(255,248,222,.7);border:1.5px solid #8A5A22;border-radius:6px;padding:10px 14px;margin:0 auto 4px;box-shadow:0 0 0 3px rgba(255,248,222,.5),0 4px 12px rgba(80,50,10,.25)}
+.as .info.pop{animation:apop .4s ease}
+@keyframes apop{from{opacity:0;transform:translateY(10px)}}
+.as .lg{width:62px;height:62px;border-radius:50%;background:#B8862B center/cover no-repeat;display:grid;place-items:center;font:800 28px "Noto Serif Tamil",serif;color:#FFF3D0;border:2.5px solid #8E2B1B;box-shadow:0 0 0 2px #E9DCAB;overflow:hidden}
+.as .lg img{width:100%;height:100%;object-fit:cover;object-position:top;background:linear-gradient(#F4DFA6,#D9B568)}
+.as .tx{min-width:0;display:grid;gap:1px}
+.as .tx b{font:800 clamp(19px,5vw,23px)/1.3 "Noto Serif Tamil",serif;color:#1C0E05;overflow-wrap:anywhere}
+.as .tx span{font:700 14px/1.4 "Noto Sans Tamil",sans-serif;color:var(--ar);overflow-wrap:anywhere}
+.as .tx em{font:700 12px "Noto Sans Tamil",sans-serif;color:var(--am);font-style:normal}
+.as .stage{position:relative;z-index:1;height:calc(var(--bh,220px) + 16px);perspective:1000px;touch-action:pan-y;user-select:none;-webkit-user-select:none;margin-top:8px}
+.as .row{position:absolute;left:0;right:0;top:0;bottom:8px;transform-style:preserve-3d}
+.as .bk{position:absolute;left:50%;bottom:0;width:var(--bw,170px);height:var(--bh,210px);transform-origin:50% 100%;cursor:pointer;will-change:transform,filter;transition:transform .5s cubic-bezier(.2,.8,.2,1),filter .5s}
 .as .drag .bk{transition:none}
-.as .bk .pt{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center}
+/* ஓலை: இரு துளைகள் + நூல் */
+.as .lf{position:relative;width:100%;height:100%;border-radius:10px;overflow:hidden;background:repeating-linear-gradient(0deg,rgba(110,80,25,.12) 0 1px,transparent 1px 6px),linear-gradient(90deg,#D3BE84,#EFE3B8 12%,#F3E9C4 50%,#EFE3B8 88%,#D3BE84);border:2px solid #8A5A22;box-shadow:0 10px 20px rgba(60,35,8,.4)}
+.as .lf:before,.as .lf:after{content:"";position:absolute;top:50%;width:9px;height:9px;margin-top:-5px;border-radius:50%;background:#7A5A22;box-shadow:inset 0 1px 2px rgba(0,0,0,.6);z-index:3}
+.as .lf:before{left:6px}.as .lf:after{right:6px}
+.as .bk.on .lf{box-shadow:0 0 0 3px rgba(142,43,27,.55),0 14px 26px rgba(60,35,8,.5)}
+.as .pt{position:absolute;left:0;right:0;top:0;bottom:30px;display:flex;align-items:flex-end;justify-content:center;background:radial-gradient(ellipse 60% 55% at 50% 62%,rgba(184,134,43,.5),transparent 72%)}
 .as .bk.on .pt{animation:afl 4.5s ease-in-out infinite}
-@keyframes afl{50%{transform:translateY(-6px)}}
-.as .bk .pt:before{content:"";position:absolute;left:8%;right:8%;bottom:-4px;height:26px;border-radius:50%;background:radial-gradient(rgba(0,0,0,.55),transparent 70%)}
-.as .bk.on .pt:after{content:"";position:absolute;left:5%;right:5%;top:8%;bottom:0;border-radius:50% 50% 0 0;background:radial-gradient(ellipse at 50% 35%,rgba(255,214,140,.32),transparent 68%);z-index:0}
-.as .bk img{position:relative;z-index:1;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;object-position:bottom;display:block;pointer-events:none;filter:drop-shadow(0 10px 14px rgba(0,0,0,.55))}
-.as .bk img.flat{border-radius:14px 14px 4px 4px;border:3px solid var(--ag);background:#2A1709;width:78%;height:92%;object-fit:cover;object-position:top}
-.as .bk .ph{position:relative;z-index:1;width:78%;height:70%;border-radius:50% 50% 8px 8px/38% 38% 8px 8px;display:grid;place-items:center;font:800 64px "Noto Serif Tamil",serif;color:#FFF6E0;background:linear-gradient(150deg,#7A2E22,#1c120a);box-shadow:inset 0 0 0 3px rgba(255,235,180,.4)}
-.as .plank{position:absolute;left:-14px;right:-14px;bottom:0;height:36px;border-radius:4px;background:linear-gradient(#a8703a,#6b4220 35%,#35200d);border-top:3px solid #d1a06a;box-shadow:0 16px 26px rgba(0,0,0,.65)}
-.as .bt{position:relative;z-index:2;text-align:center;margin:6px 0 0;min-height:30px}
-.as .bt h2{font:800 clamp(18px,4.8vw,22px)/1.3 "Noto Serif Tamil",serif;margin:0 0 4px;overflow-wrap:anywhere;color:var(--ai);border:0;padding:0}
-.as .chip{display:inline-block;background:var(--ag);color:#2A1709;font-weight:800;font-size:12px;border-radius:99px;padding:1px 14px}
-.as .ctl{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:14px;margin:4px 0}
-.as .arrow{width:42px;height:42px;border-radius:50%;border:2px solid var(--ag);background:var(--ap);color:var(--ag);font-size:22px;cursor:pointer;display:grid;place-items:center}
+@keyframes afl{50%{transform:translateY(-3px)}}
+.as .pt img{max-width:92%;max-height:96%;width:auto;height:auto;object-fit:contain;object-position:bottom;display:block;pointer-events:none;filter:drop-shadow(0 6px 8px rgba(50,25,5,.5))}
+.as .pt img.flat{width:76%;height:88%;object-fit:cover;object-position:top;border:2px solid #8A5A22;border-radius:50% 50% 6px 6px/36% 36% 6px 6px;margin-bottom:4px}
+.as .pt .ph{width:70%;height:68%;margin-bottom:6px;border-radius:50% 50% 8px 8px/38% 38% 8px 8px;display:grid;place-items:center;font:800 54px "Noto Serif Tamil",serif;color:#FFF3D0;background:linear-gradient(150deg,#8E2B1B,#3b1608)}
+.as .rb{position:absolute;left:0;right:0;bottom:0;height:30px;display:grid;place-items:center;padding:0 16px;background:linear-gradient(#9C3322,#7A1F12);color:#FFF3D0;font:800 13px "Noto Serif Tamil",serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-top:2px solid #D9B04A}
+.as .lf.mo{display:grid;place-content:center;justify-items:center;gap:4px;text-align:center;padding:0 18px}
+.as .mi{font-size:42px;line-height:1}
+.as .mt{font:800 16px/1.35 "Noto Serif Tamil",serif;color:var(--ar)}
+.as .mn{font:700 12px "Noto Sans Tamil",sans-serif;color:var(--am)}
+.as .ctl{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:14px;margin:2px 0 8px}
+.as .arrow{width:40px;height:40px;border-radius:50%;border:2px solid #8A5A22;background:#F3E9C4;color:var(--ar);font-size:22px;cursor:pointer;display:grid;place-items:center}
 .as .arrow:disabled{opacity:.35;cursor:default}
-.as .cnt{min-width:64px;text-align:center;font-weight:800;color:var(--ag);font-size:15px}
-.as .card{position:relative;z-index:2;display:block;width:100%;text-align:left;margin:8px 0 0;padding:14px 16px 12px;border:2px solid var(--ag);border-radius:16px;background:linear-gradient(180deg,#F3E3B8,#E6CF9A);color:#2A1709;cursor:pointer;font:inherit;box-shadow:0 10px 24px rgba(0,0,0,.45),inset 0 0 30px rgba(120,70,20,.25)}
+.as .cnt{min-width:60px;text-align:center;font-weight:800;color:var(--ar);font-size:15px}
+.as .cards{display:grid;gap:10px;position:relative;z-index:2}
+.as .card{display:block;width:100%;text-align:left;padding:12px 16px 10px;border:1.5px solid #8A5A22;border-left:6px solid var(--ar);border-radius:8px;background:rgba(255,250,232,.85);color:#2B1A08;cursor:pointer;font:inherit;box-shadow:0 4px 12px rgba(80,50,10,.25)}
 .as .card:active{transform:scale(.99)}
-.as .card .k{font:800 12px "Noto Sans Tamil",sans-serif;color:#7A4A1A;margin-bottom:4px;letter-spacing:.3px}
-.as .card p{margin:0;font:600 16px/1.75 "Noto Serif Tamil",serif;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
-.as .card .go{display:flex;justify-content:flex-end;margin-top:8px;font:800 14px "Noto Sans Tamil",sans-serif;color:#8E2B1B}
+.as .card .k{font:700 12px "Noto Sans Tamil",sans-serif;color:var(--am);margin-bottom:2px}
+.as .card .ct{font:800 18px/1.5 "Noto Serif Tamil",serif;color:var(--ar);overflow-wrap:anywhere}
+.as .card p{margin:4px 0 0;font:600 15.5px/1.8 "Noto Serif Tamil",serif;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.as .card .go{display:flex;justify-content:flex-end;margin-top:6px;font:800 13.5px "Noto Sans Tamil",sans-serif;color:var(--ar)}
 .as .msg{position:relative;z-index:2;text-align:center;color:var(--am);padding:34px 12px;font-size:15px;line-height:1.8}
-.as .msg b{color:var(--ag)}
-.as .msg button{margin-top:10px;font:800 14px "Noto Sans Tamil",sans-serif;color:#2A1709;background:var(--ag);border:0;border-radius:99px;padding:8px 18px;cursor:pointer}
-.as button:focus-visible,.as input:focus-visible,.as textarea:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.as .msg b{color:var(--ar);font-size:18px}
+.as .msg button{margin-top:10px;font:800 14px "Noto Sans Tamil",sans-serif;color:#FFF3D0;background:var(--ar);border:0;border-radius:99px;padding:8px 18px;cursor:pointer}
+.as button:focus-visible,.as input:focus-visible,.as textarea:focus-visible{outline:3px solid #1b4fd8;outline-offset:2px}
+/* தலைப்புப் பட்டியல் */
+.rd .tl{display:grid;gap:8px;margin-top:6px}
+.rd .tr{display:grid;gap:2px;text-align:left;width:100%;padding:12px 14px;border:1.5px solid #8A5A22;border-left:6px solid #8E2B1B;border-radius:8px;background:rgba(255,250,232,.7);cursor:pointer;font:inherit;color:#24140A}
+.rd .tr .tt{font:800 18px/1.5 "Noto Serif Tamil",serif;color:#8E2B1B;overflow-wrap:anywhere}
+.rd .tr .tw{font:700 13px "Noto Sans Tamil",sans-serif;color:#6B4A1E}
 
 /* ===== வாசிப்புப் பக்கம்: பழங்காலத் தாள் ===== */
 .rd{position:absolute;inset:0;z-index:20;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background-color:#E8D3A0;

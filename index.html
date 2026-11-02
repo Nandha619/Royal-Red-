@@ -212,6 +212,12 @@ html,body{background:#000}
 #sec.on{display:block;animation:fade .3s}
 #sec h2{font-size:22px;color:var(--red);padding-bottom:8px;margin-bottom:12px;border-bottom:3px solid var(--red)}
 #sec .body{white-space:pre-wrap;font-size:16px;line-height:1.75;overflow-wrap:anywhere;border:0;padding:0;min-height:0;border-radius:0}
+#sec .gal{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+#sec .gal figure{margin:0;cursor:zoom-in}
+#sec .gal img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;background:rgba(128,128,128,.2);display:block}
+#sec .gal figcaption{font-size:13px;font-weight:700;margin-top:4px;line-height:1.4}
+.zoom{position:absolute;inset:0;z-index:30;background:rgba(0,0,0,.92);display:grid;place-items:center;padding:10px}
+.zoom img{max-width:100%;max-height:100%;object-fit:contain}
 #sec .none{color:var(--muted,#777);font-size:14px;text-align:center;padding:40px 10px}
 #sec .none a{color:var(--red);font-weight:800}
 @media (max-width:480px){.tb{height:46px;font-size:9px}.tb .ico{font-size:18px}}
@@ -551,6 +557,7 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);
 <div id="sec"></div><div id="tv"></div><div id="bk"></div><div id="lib"></div><div id="bkBar"><button type="button" id="bkBack">← அலமாரி</button><button type="button" id="bkAgain">↻ மீண்டும்</button></div></div><div id="toast"></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="media-store.js"></script>
 <script src="articles-config.js"></script>
 <script src="article-store.js"></script>
 <script src="cutout.js"></script>
@@ -657,10 +664,19 @@ function renderSec(id){
   const sc=$('#sec');
   if(id==='article'&&window.ArticleShelf){ArticleShelf.mount(sc,$('#main'));return}
   if(window.ArticleShelf)ArticleShelf.unmount(sc);
-  const t=ls.get('np_s_'+id)||'';
-  sc.innerHTML='<h2></h2>'+(t.trim()?'<div class="body"></div>':'<div class="none">இந்தப் பகுதியில் உள்ளடக்கம் இல்லை.<br><a href="settings.html#sections">செட்டிங்ஸில் சேர்க்கவும்</a></div>');
+  const t=ls.get('np_s_'+id)||'';let meta=[];try{meta=JSON.parse(ls.get('np_si_'+id)||'[]')||[]}catch(e){}
+  sc.innerHTML='<h2></h2><div class="gal"></div>'+(t.trim()?'<div class="body"></div>':'')+(!t.trim()&&!meta.length?'<div class="none">இந்தப் பகுதியில் உள்ளடக்கம் இல்லை.<br><a href="settings.html#sections">செட்டிங்ஸில் சேர்க்கவும்</a></div>':'');
   sc.querySelector('h2').textContent=secName(id);
   const b=sc.querySelector('.body');if(b)b.textContent=t;
+  const g=sc.querySelector('.gal');
+  if(!meta.length){g.remove();return}
+  meta.forEach(m=>{
+    const f=document.createElement('figure');const im=document.createElement('img');im.alt=m.cap||'';im.loading='lazy';f.appendChild(im);
+    if(m.cap){const c=document.createElement('figcaption');c.textContent=m.cap;f.appendChild(c)}
+    f.onclick=()=>{if(!im.src)return;const o=document.createElement('div');o.className='zoom';const z=document.createElement('img');z.src=im.src;o.appendChild(z);o.onclick=()=>o.remove();$('#main').appendChild(o)};
+    g.appendChild(f);
+    if(window.MediaStore)MediaStore.get(m.k).then(u=>{if(u)im.src=u;else f.remove()});
+  });
 }
 /* Download — E-Paper கீழ்க் கருவிப்பட்டியில் */
 function downloadPdf(){

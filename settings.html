@@ -99,6 +99,7 @@ html,body{margin:0}
 
 <script src="theme.js"></script>
 <script src="owner-gate.js"></script>
+<script src="media-store.js"></script>
 <script src="articles-config.js"></script>
 <script src="article-store.js"></script>
 <script src="articles-admin.js"></script>
@@ -181,6 +182,57 @@ html,body{margin:0}
   /* ---------- பிற பகுதிகள் (முன்பு Shelf மெனுவில் இருந்தவை) ---------- */
   var SECS = [['shopping', 'Shopping'], ['events', 'Events']];
   var names = {}; try { names = JSON.parse(ls.get('np_tabs') || '{}') || {}; } catch (e) { names = {}; }
+  /* Shopping / Events: JPG படங்கள் (MediaStore-ல் சேமிப்பு; app அதையே காட்டும்) */
+  function shrinkJpg(file, max) {
+    return new Promise(function (res, rej) {
+      var u = URL.createObjectURL(file), im = new Image();
+      im.onload = function () {
+        var k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(im.width * k)); c.height = Math.max(1, Math.round(im.height * k));
+        var g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(u); res(c.toDataURL('image/jpeg', 0.82));
+      };
+      im.onerror = function () { URL.revokeObjectURL(u); rej(new Error('bad image')); };
+      im.src = u;
+    });
+  }
+  function imageBlock(id) {
+    var MK = 'np_si_' + id, wrap = document.createElement('div'); wrap.style.cssText = 'display:grid;gap:10px';
+    var lab = document.createElement('div'); lab.className = 'lab'; lab.textContent = '🖼 படங்கள் (JPG)';
+    var row = document.createElement('div'); row.className = 'st-row';
+    var pick = document.createElement('label'); pick.className = 'btn'; pick.textContent = '＋ JPG படம் சேர்'; pick.style.cursor = 'pointer';
+    var fi = document.createElement('input'); fi.type = 'file'; fi.accept = 'image/jpeg,image/png,image/*'; fi.multiple = true; fi.hidden = true; pick.appendChild(fi); row.appendChild(pick);
+    var grid = document.createElement('div'); grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px';
+    var note = document.createElement('p'); note.className = 'note'; note.textContent = 'சேர்க்கும் படங்கள் முதல் பக்கத்தில் இந்தப் பகுதியில் தெரியும். ஒவ்வொரு படத்திற்கும் விருப்பமெனில் தலைப்பு எழுதலாம்.';
+    wrap.append(lab, row, grid, note);
+    var meta = function () { try { return JSON.parse(ls.get(MK) || '[]') || []; } catch (e) { return []; } };
+    function draw() {
+      grid.innerHTML = '';
+      meta().forEach(function (m, i) {
+        var card = document.createElement('div'); card.style.cssText = 'display:grid;gap:6px';
+        var im = document.createElement('div'); im.style.cssText = 'aspect-ratio:4/3;border-radius:10px;background:#8883 center/cover no-repeat';
+        MediaStore.get(m.k).then(function (u) { if (u) im.style.backgroundImage = 'url(' + u + ')'; });
+        var cap = document.createElement('input'); cap.type = 'text'; cap.placeholder = 'தலைப்பு (விருப்பம்)'; cap.value = m.cap || '';
+        cap.oninput = function () { var a = meta(); if (a[i]) { a[i].cap = cap.value; ls.set(MK, JSON.stringify(a)); } };
+        var del = document.createElement('button'); del.type = 'button'; del.className = 'warn'; del.textContent = '🗑 நீக்கு';
+        del.onclick = function () { var a = meta(), r = a.splice(i, 1)[0]; ls.set(MK, JSON.stringify(a)); if (r) MediaStore.del(r.k); draw(); };
+        card.append(im, cap, del); grid.appendChild(card);
+      });
+    }
+    fi.onchange = function (e) {
+      var files = [].slice.call(e.target.files); e.target.value = ''; if (!files.length) return;
+      files.reduce(function (p, f) {
+        return p.then(function () {
+          if (!/^image\//.test(f.type)) return;
+          return shrinkJpg(f, 1100).then(function (u) {
+            var k = 'sec:' + id + ':' + Date.now() + Math.random().toString(36).slice(2, 6), a = meta(); a.push({ k: k, cap: '' });
+            return MediaStore.put(k, u).then(function () { ls.set(MK, JSON.stringify(a)); });
+          }).catch(function () { toast('⚠ ஒரு படத்தைச் சேர்க்க முடியவில்லை'); });
+        });
+      }, Promise.resolve()).then(function () { draw(); toast('✔ படங்கள் சேர்க்கப்பட்டன'); });
+    };
+    draw(); return wrap;
+  }
   (function buildSecs() {
     var box = $('#secList');
     SECS.forEach(function (s) {
@@ -192,7 +244,7 @@ html,body{margin:0}
       var tx = document.createElement('textarea'); tx.className = 'big'; tx.value = ls.get('np_s_' + id) || ''; tx.placeholder = 'இங்கே எழுதவும் / ஒட்டவும்'; l2.appendChild(tx);
       nm.oninput = function () { var v = nm.value.trim(); if (v) names[id] = v; else delete names[id]; ls.set('np_tabs', JSON.stringify(names)); h.textContent = '📝 ' + (names[id] || s[1]); };
       tx.oninput = function () { ls.set('np_s_' + id, tx.value); };
-      c.appendChild(h); c.appendChild(l1); c.appendChild(l2); box.appendChild(c);
+      c.appendChild(h); c.appendChild(l1); c.appendChild(l2); c.appendChild(imageBlock(id)); box.appendChild(c);
     });
   })();
 
