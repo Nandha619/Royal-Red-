@@ -28,6 +28,7 @@ html,body{margin:0}
     <button class="st-tab" role="tab" data-t="epaper" type="button">📰 E-Paper</button>
     <button class="st-tab" role="tab" data-t="tv" type="button">📺 Mobile TV</button>
     <button class="st-tab" role="tab" data-t="shelf" type="button">📚 Book Shelf</button>
+    <button class="st-tab" role="tab" data-t="articles" type="button">✍ Articles</button>
     <button class="st-tab" role="tab" data-t="theme" type="button">🎨 தோற்றம்</button>
     <button class="st-tab" role="tab" data-t="sections" type="button">📝 பிற பகுதிகள்</button>
   </nav>
@@ -72,6 +73,11 @@ html,body{margin:0}
   <!-- ===== Book Shelf (book.html?mode=settings) ===== -->
   <section class="st-pane" id="p-shelf" role="tabpanel"></section>
 
+  <!-- ===== Articles: அட்மின் ஒப்புதல் ===== -->
+  <section class="st-pane" id="p-articles" role="tabpanel">
+    <div class="st-native" id="artBox"></div>
+  </section>
+
   <!-- ===== தோற்றம் ===== -->
   <section class="st-pane" id="p-theme" role="tabpanel">
     <div class="st-native">
@@ -93,6 +99,9 @@ html,body{margin:0}
 
 <script src="theme.js"></script>
 <script src="owner-gate.js"></script>
+<script src="articles-config.js"></script>
+<script src="article-store.js"></script>
+<script src="articles-admin.js"></script>
 <script>
 (function () {
   'use strict';
@@ -106,8 +115,8 @@ html,body{margin:0}
   function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 2400); }
 
   /* ---------- தாவல்கள் ---------- */
-  var TABS = ['epaper', 'tv', 'shelf', 'theme', 'sections'];
-  var VIEW_OF = { epaper: 'paper', tv: 'tv', shelf: 'books', theme: 'paper', sections: 'paper' };
+  var TABS = ['epaper', 'tv', 'shelf', 'articles', 'theme', 'sections'];
+  var VIEW_OF = { epaper: 'paper', tv: 'tv', shelf: 'books', articles: 'article', theme: 'paper', sections: 'paper' };
   var SRC = { tv: 'news.html?mode=settings', shelf: 'book.html?mode=settings' };
   var cur = '';
   function fitFrames() {
@@ -129,6 +138,7 @@ html,body{margin:0}
     try { if (push !== false) history.replaceState(null, '', '#' + id); } catch (e) {}
     fitFrames(); window.scrollTo(0, 0);
     if (id === 'epaper') loadPdfInfo();
+    if (id === 'articles' && window.ArticleAdmin) ArticleAdmin.mount($('#artBox'));
   }
   $('#tabs').addEventListener('click', function (e) { var b = e.target.closest('.st-tab'); if (b) openTab(b.dataset.t); });
   addEventListener('resize', fitFrames);
@@ -169,7 +179,7 @@ html,body{margin:0}
   if (window.AppTheme) AppTheme.mount('#themes');
 
   /* ---------- பிற பகுதிகள் (முன்பு Shelf மெனுவில் இருந்தவை) ---------- */
-  var SECS = [['article', 'Articles'], ['shopping', 'Shopping'], ['events', 'Events']];
+  var SECS = [['shopping', 'Shopping'], ['events', 'Events']];
   var names = {}; try { names = JSON.parse(ls.get('np_tabs') || '{}') || {}; } catch (e) { names = {}; }
   (function buildSecs() {
     var box = $('#secList');

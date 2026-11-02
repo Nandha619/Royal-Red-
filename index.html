@@ -215,7 +215,9 @@ html,body{background:#000}
 #sec .none{color:var(--muted,#777);font-size:14px;text-align:center;padding:40px 10px}
 #sec .none a{color:var(--red);font-weight:800}
 @media (max-width:480px){.tb{height:46px;font-size:9px}.tb .ico{font-size:18px}}
-</style></head>
+</style>
+<link rel="stylesheet" href="articles.css">
+</head>
 <body><script type="text/plain" id="linkSrc">/* book.html உள்ளே தானாக ஏற்றப்படும் இணைப்பு */
 (function(){
 'use strict';
@@ -549,6 +551,10 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);
 <div id="sec"></div><div id="tv"></div><div id="bk"></div><div id="lib"></div><div id="bkBar"><button type="button" id="bkBack">← அலமாரி</button><button type="button" id="bkAgain">↻ மீண்டும்</button></div></div><div id="toast"></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="articles-config.js"></script>
+<script src="article-store.js"></script>
+<script src="cutout.js"></script>
+<script src="articles.js"></script>
 <script src="flipbook.js"></script>
 <script>
 const $=s=>document.querySelector(s),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -568,7 +574,7 @@ $('#pick').onclick=()=>{location.href='settings.html#epaper'};
    எல்லா மாற்றங்களும் (PDF, செய்தி, புத்தகம், தோற்றம்…) settings.html பக்கத்தில் செய்யப்படும். */
 const SECS=[['books','Books','📚'],['article','Articles','📝'],['shopping','Shopping','🛒'],['events','Events','🎪']];
 const SEC_ONLY=['article','shopping','events'];
-const VIEWS=['paper','tv','books',...SEC_ONLY],SET_TAB={paper:'epaper',tv:'tv',books:'shelf',article:'sections',shopping:'sections',events:'sections'};
+const VIEWS=['paper','tv','books',...SEC_ONLY],SET_TAB={paper:'epaper',tv:'tv',books:'shelf',article:'articles',shopping:'sections',events:'sections'};
 let names={};try{names=JSON.parse(ls.get('np_tabs')||'{}')||{}}catch(e){}
 const secName=id=>names[id]||(SECS.find(x=>x[0]===id)||[0,id])[1];
 let view='paper',bkMode='shelf',lastBook=0,ifr=null,bifr=null,lifr=null;
@@ -648,7 +654,10 @@ function openSub(){$('#subBar').classList.add('on');$('#shelfBtn').setAttribute(
 })();
 /* Books தவிர்த்த பிரிவுகள் — பார்வை மட்டும் (திருத்துதல் செட்டிங்ஸில்) */
 function renderSec(id){
-  const t=ls.get('np_s_'+id)||'',sc=$('#sec');
+  const sc=$('#sec');
+  if(id==='article'&&window.ArticleShelf){ArticleShelf.mount(sc,$('#main'));return}
+  if(window.ArticleShelf)ArticleShelf.unmount(sc);
+  const t=ls.get('np_s_'+id)||'';
   sc.innerHTML='<h2></h2>'+(t.trim()?'<div class="body"></div>':'<div class="none">இந்தப் பகுதியில் உள்ளடக்கம் இல்லை.<br><a href="settings.html#sections">செட்டிங்ஸில் சேர்க்கவும்</a></div>');
   sc.querySelector('h2').textContent=secName(id);
   const b=sc.querySelector('.body');if(b)b.textContent=t;
