@@ -695,4 +695,11 @@ async function openBuf(buf,name,page,save){
 <script src="owner-gate.js"></script>
 
 
+<script>
+/* சட்டத்தின் உள்ளடக்கப் பகுதி சரியாக 9:16 ஆக இருக்க: அகலம் = (உயரம் − மேல் பட்டை) × 9/16 */
+(function(){var a=document.getElementById('app'),b=document.getElementById('bar');
+function fit(){try{var h=innerHeight-(b?b.offsetHeight:0),w=Math.min(innerWidth,Math.floor(h*9/16));a.style.width=w+'px'}catch(e){}}
+fit();addEventListener('resize',fit);addEventListener('orientationchange',fit);
+if(window.ResizeObserver&&b)new ResizeObserver(fit).observe(b);})();
+</script>
 </body></html>
