@@ -222,8 +222,13 @@ html,body{background:#000}
 #sec .none a{color:var(--red);font-weight:800}
 @media (max-width:480px){.tb{height:46px;font-size:9px}.tb .ico{font-size:18px}}
 /* மேல் பட்டியில் 3 பொத்தான்கள் மட்டும்: 1) பெரிய blink (Mobile TV/E-Paper) 2) Book Shelf 3) செட்டிங்ஸ்/Download. பூட்டு பொத்தான் செட்டிங்ஸ் பக்கத்தில் மட்டும். */
-#modeBtn{flex:1.7;height:58px;font-size:12px;gap:3px}
-#modeBtn .ico{font-size:30px}
+#modeBtn{flex:1.7;font-size:11px;position:relative;overflow:visible;
+  background:linear-gradient(180deg,#FFE27A,#F2B600)!important;color:#3A0A0E!important;
+  box-shadow:inset 0 0 0 2px #fff,0 0 0 0 rgba(255,214,90,.9);animation:tapPulse 1.4s ease-out infinite!important}
+#modeBtn .ico{font-size:22px;animation:icoPop 1.1s ease-in-out infinite}
+#modeBtn:after{content:"தொடு ▸";position:absolute;right:7px;top:3px;font-size:8px;font-weight:800;color:#8E0E15;opacity:.85}
+@keyframes tapPulse{0%{box-shadow:inset 0 0 0 2px #fff,0 0 0 0 rgba(255,226,122,.95)}70%{box-shadow:inset 0 0 0 2px #fff,0 0 0 10px rgba(255,226,122,0)}100%{box-shadow:inset 0 0 0 2px #fff,0 0 0 0 rgba(255,226,122,0)}}
+@media (prefers-reduced-motion:reduce){#modeBtn,#modeBtn .ico{animation:none!important}}
 #shelfBtn,#actBtn{flex:1}
 #ownerLockBtn:not(.slotted){display:none!important}
 </style>
@@ -694,7 +699,7 @@ function downloadPdf(){
 addEventListener('pageshow',e=>{if(e.persisted)location.reload()});
 /* புத்தக ஸ்டுடியோ media ஏற்றி முடிந்ததும் அலமாரியைப் புதுப்பி */
 addEventListener('message',e=>{if(e.data&&e.data.bkReady&&lifr){try{lifr.contentWindow.__refresh()}catch(err){}}});
-show((location.hash||'').slice(1)||'paper');
+show((location.hash||'').slice(1)||'tv');
 addEventListener('message',e=>{if(e.data&&e.data.goto==='paper')show('paper')});
 function hideHint(){$('#hint').classList.remove('on')}
 function getFb(){
