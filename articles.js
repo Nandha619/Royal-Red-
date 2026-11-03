@@ -179,9 +179,10 @@
       '<div id="fF">' +
       '<label>எழுத்தாளர் பெயர் *<input type="text" id="fN" maxlength="' + L.name + '" autocomplete="name"></label>' +
       '<label>பதவி *<small>எ.கா. ஆசிரியர், மாணவர், பத்திரிகையாளர்</small><input type="text" id="fR" maxlength="' + L.role + '"></label>' +
-      '<div class="fm-ph"><div class="fm-prev" id="fPv">படம் இல்லை</div><div class="fm-pt"><div>உங்கள் புகைப்படம் (JPG) — உருவம் மட்டும் தானாக வெட்டப்படும்</div>' +
+      '<div class="fm-ph"><div class="fm-prev" id="fPv">படம் இல்லை</div><div class="fm-pt"><div>உங்கள் புகைப்படம் (JPG) — zoom / crop செய்து, விரும்பினால் உருவம் மட்டும் வெட்டலாம்</div>' +
       '<label class="fm-btn" for="fP" style="margin:0">📷 புகைப்படம் தேர்வு</label><input type="file" id="fP" accept="image/jpeg,image/png,image/webp,image/*" hidden>' +
       '<div class="fm-bar" id="fB" hidden><i></i></div><div id="fS"></div></div></div>' +
+      '<div class="fm-ed" id="fEd" hidden></div>' +
       '<label>கட்டுரைத் தலைப்பு *<input type="text" id="fT" maxlength="' + L.title + '"></label>' +
       '<label>கட்டுரை குறித்த சில வரிகள் *<small>முகப்பில் கட்டத்தில் தெரியும் (அதிகபட்சம் ' + L.summary + ' எழுத்துகள்)</small><textarea id="fU" maxlength="' + L.summary + '"></textarea></label>' +
       '<label>முழுக் கட்டுரை *<small>பத்திகளுக்கு இடையே ஒரு வெற்று வரி விடவும்</small><textarea class="lg" id="fG" maxlength="' + L.body + '"></textarea></label>' +
@@ -193,16 +194,78 @@
     host.appendChild(fm);
     var q = function (s) { return box.querySelector(s); }, err = function (m) { q('#fE').textContent = m || ''; };
     q('.fm-x').onclick = closeOverlays;
+    /* ---------- புகைப்பட எடிட்டர்: இழு (நகர்த்து) · zoom in/out · சட்டத்துக்குள் crop · cut-out அல்லது அப்படியே ---------- */
+    var FW = 300, FH = 400, ed = null;
+    function openEditor(file) {
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var host2 = q('#fEd'); host2.hidden = false; host2.innerHTML =
+          '<div class="ed-hint">படத்தை இழுத்து நகர்த்துங்கள் · இரு விரலால் அல்லது கீழே zoom செய்யுங்கள்</div>' +
+          '<canvas id="eC" width="' + FW + '" height="' + FH + '"></canvas>' +
+          '<div class="ed-z"><button type="button" class="fm-btn" id="eM" aria-label="Zoom out">−</button><input type="range" id="eZ" min="0" max="100" value="0" aria-label="Zoom"><button type="button" class="fm-btn" id="eP" aria-label="Zoom in">+</button></div>' +
+          '<div class="ed-mode"><label><input type="radio" name="eMd" value="cut" checked> ✂ உருவம் மட்டும் வெட்டு (cut-out)</label><label><input type="radio" name="eMd" value="keep"> 🖼 அப்படியே வை (பின்னணியுடன்)</label></div>' +
+          '<div class="ed-b"><button type="button" class="fm-btn" id="eX">✕ ரத்து</button><button type="button" class="fm-btn pri" id="eOk" style="width:auto;margin:0;padding:10px 18px;font-size:15px">✔ பயன்படுத்து</button></div>';
+        var cv = host2.querySelector('#eC'), g = cv.getContext('2d'), zr = host2.querySelector('#eZ');
+        var iw = img.naturalWidth, ih = img.naturalHeight, cover = Math.max(FW / iw, FH / ih), contain = Math.min(FW / iw, FH / ih);
+        var maxS = cover * 4, sc = cover, ox = (FW - iw * sc) / 2, oy = (FH - ih * sc) / 2;
+        function clampPos() {
+          var w = iw * sc, hh = ih * sc;
+          ox = w <= FW ? (FW - w) / 2 : Math.min(0, Math.max(FW - w, ox));
+          oy = hh <= FH ? (FH - hh) / 2 : Math.min(0, Math.max(FH - hh, oy));
+        }
+        function draw(k) {   /* k: வெளியீட்டுப் பெருக்கல் */
+          g.setTransform(k, 0, 0, k, 0, 0); g.fillStyle = '#F4EAD0'; g.fillRect(0, 0, FW, FH); g.drawImage(img, ox, oy, iw * sc, ih * sc);
+        }
+        function sync() { clampPos(); draw(1); zr.value = Math.round((Math.log(sc / contain) / Math.log(maxS / contain)) * 100); }
+        function zoomTo(ns, cx, cy) {
+          ns = Math.min(maxS, Math.max(contain, ns)); var r = ns / sc; ox = cx - (cx - ox) * r; oy = cy - (cy - oy) * r; sc = ns; sync();
+        }
+        zr.oninput = function () { zoomTo(contain * Math.pow(maxS / contain, zr.value / 100), FW / 2, FH / 2); };
+        host2.querySelector('#eM').onclick = function () { zoomTo(sc / 1.2, FW / 2, FH / 2); };
+        host2.querySelector('#eP').onclick = function () { zoomTo(sc * 1.2, FW / 2, FH / 2); };
+        var pts = {}, last = null, dist0 = 0, sc0 = 1;
+        var pos = function (e) { var r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * FW / r.width, y: (e.clientY - r.top) * FH / r.height }; };
+        cv.addEventListener('pointerdown', function (e) { cv.setPointerCapture(e.pointerId); pts[e.pointerId] = pos(e); var ks = Object.keys(pts); if (ks.length === 2) { var a = pts[ks[0]], b = pts[ks[1]]; dist0 = Math.hypot(a.x - b.x, a.y - b.y); sc0 = sc; } last = pos(e); });
+        cv.addEventListener('pointermove', function (e) {
+          if (!pts[e.pointerId]) return; var p = pos(e), ks = Object.keys(pts); pts[e.pointerId] = p;
+          if (ks.length >= 2) { var a = pts[ks[0]], b = pts[ks[1]], d = Math.hypot(a.x - b.x, a.y - b.y); if (dist0 > 0) zoomTo(sc0 * d / dist0, (a.x + b.x) / 2, (a.y + b.y) / 2); }
+          else { ox += p.x - last.x; oy += p.y - last.y; last = p; sync(); }
+        });
+        var up = function (e) { delete pts[e.pointerId]; last = pos(e); dist0 = 0; };
+        cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+        cv.addEventListener('wheel', function (e) { e.preventDefault(); var p = pos(e); zoomTo(sc * (e.deltaY < 0 ? 1.1 : 1 / 1.1), p.x, p.y); }, { passive: false });
+        sync(); ed = true;
+        host2.querySelector('#eX').onclick = function () { host2.hidden = true; host2.innerHTML = ''; ed = null; };
+        host2.querySelector('#eOk').onclick = function () {
+          var mode = host2.querySelector('input[name=eMd]:checked').value;
+          var out = document.createElement('canvas'); out.width = FW * 2; out.height = FH * 2;
+          var og = out.getContext('2d'); og.fillStyle = '#F4EAD0'; og.fillRect(0, 0, out.width, out.height); og.drawImage(img, ox * 2, oy * 2, iw * sc * 2, ih * sc * 2);
+          host2.hidden = true; host2.innerHTML = ''; ed = null;
+          err(''); busy = true; photo = ''; cut = false; q('#fSub').disabled = true;
+          var pv = q('#fPv'), bar = q('#fB'), fill = bar.firstChild;
+          function done(d, c, msg) { photo = d; cut = c; var im = h('img'); im.src = d; im.alt = ''; pv.innerHTML = ''; pv.appendChild(im); q('#fS').textContent = msg; }
+          function fin() { busy = false; bar.hidden = true; q('#fSub').disabled = false; }
+          if (mode === 'keep') {
+            var d = out.toDataURL('image/jpeg', 0.85), qq = .85; while (d.length * .75 > 600000 && qq > .4) { qq -= .1; d = out.toDataURL('image/jpeg', qq); }
+            done(d, false, '✔ படம் அப்படியே சேர்க்கப்பட்டது'); fin(); return;
+          }
+          bar.hidden = false; pv.textContent = '…';
+          out.toBlob(function (blob) {
+            PhotoCutout.process(blob, function (msg, frac) { q('#fS').textContent = msg; fill.style.width = Math.round((frac || 0) * 100) + '%'; }).then(function (r) {
+              done(r.dataUrl, r.cutout, r.cutout ? '✔ உருவம் மட்டும் வெட்டப்பட்டது' : '⚠ தானாக வெட்ட முடியவில்லை (இணையம் தேவை) — அசல் படம் பயன்படும்');
+            }).catch(function (x) { err(x.message || 'படத்தைச் செயல்படுத்த முடியவில்லை'); pv.textContent = 'படம் இல்லை'; q('#fS').textContent = ''; }).then(fin);
+          }, 'image/png');
+        };
+        host2.scrollIntoView({ block: 'nearest' });
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); err('படத்தைப் படிக்க முடியவில்லை'); };
+      img.src = url;
+    }
     q('#fP').onchange = function (e) {
       var f = e.target.files[0]; e.target.value = ''; if (!f) return;
       if (!/^image\//.test(f.type)) { err('படக் கோப்பை மட்டும் தேர்வு செய்யவும்'); return; }
-      err(''); busy = true; photo = ''; cut = false; q('#fSub').disabled = true;
-      var bar = q('#fB'), fill = bar.firstChild; bar.hidden = false; q('#fPv').textContent = '…';
-      PhotoCutout.process(f, function (msg, frac) { q('#fS').textContent = msg; fill.style.width = Math.round((frac || 0) * 100) + '%'; }).then(function (r) {
-        photo = r.dataUrl; cut = r.cutout; var im = h('img'); im.src = photo; im.alt = ''; var pv = q('#fPv'); pv.innerHTML = ''; pv.appendChild(im);
-        q('#fS').textContent = cut ? '✔ உருவம் மட்டும் வெட்டப்பட்டது' : '⚠ தானாக வெட்ட முடியவில்லை (இணையம் தேவை) — அசல் படம் பயன்படும்';
-      }).catch(function (x) { err(x.message || 'படத்தைச் செயல்படுத்த முடியவில்லை'); q('#fPv').textContent = 'படம் இல்லை'; q('#fS').textContent = ''; })
-        .then(function () { busy = false; bar.hidden = true; q('#fSub').disabled = false; });
+      err(''); openEditor(f);
     };
     q('#fSub').onclick = function () {
       err(''); if (busy) { err('படம் செயல்படுகிறது, சற்று காத்திருக்கவும்'); return; }

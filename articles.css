@@ -129,3 +129,14 @@ color:#24140A;animation:rdin .35s ease}
 .pd .pd-im img{width:100%;height:auto;border-radius:8px;border:2px solid #8A5A22;display:block}
 .pd .pd-meta{display:grid;gap:4px;margin:0 0 14px;padding:10px 12px;border-top:1.5px solid #8A5A22;border-bottom:1.5px solid #8A5A22;font:700 15px/1.5 "Noto Sans Tamil",sans-serif;color:#3A1F08}
 .pd .pd-x{font-size:17px;color:#8E2B1B}
+
+/* ===== புகைப்பட எடிட்டர் ===== */
+.fm-ed{margin:8px 0 12px;padding:10px;border:1.5px solid #CDB27A;border-radius:12px;background:#FFFDF4;display:grid;gap:10px;justify-items:center}
+.fm-ed .ed-hint{font:600 12.5px/1.5 "Noto Sans Tamil",sans-serif;color:#6B431A;text-align:center}
+.fm-ed canvas{width:min(100%,260px);aspect-ratio:3/4;border:2px solid #8E2B1B;border-radius:10px;touch-action:none;cursor:grab;background:#F4EAD0;display:block}
+.fm-ed .ed-z{display:flex;align-items:center;gap:10px;width:min(100%,300px)}
+.fm-ed .ed-z input{flex:1;accent-color:#8E2B1B}
+.fm-ed .ed-z .fm-btn{padding:4px 14px;font-size:20px;line-height:1.2}
+.fm-ed .ed-mode{display:grid;gap:6px;width:100%;font:700 14px "Noto Sans Tamil",sans-serif;color:#3A1F08}
+.fm-ed .ed-mode label{display:flex;gap:8px;align-items:center;margin:0;font-size:14px}
+.fm-ed .ed-b{display:flex;gap:10px;justify-content:space-between;width:100%}
