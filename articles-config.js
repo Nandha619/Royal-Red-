@@ -6,5 +6,5 @@
 window.ARTICLES_CFG = {
   projectId: '',   // எ.கா. 'news-studio-12345'
   apiKey: '',      // Firebase → Project settings → Web API Key
-  adminEmail: ''   // அட்மின் உள்நுழைவு மின்னஞ்சல் (Firebase Authentication-ல் உருவாக்கியது)
+  adminEmail: 'nandhatn24@gmail.com'   // அட்மின் உள்நுழைவு மின்னஞ்சல் (Firebase Authentication-ல் உருவாக்கியது)
 };

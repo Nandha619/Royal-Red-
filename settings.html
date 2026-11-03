@@ -34,6 +34,7 @@ html,body{margin:0}
     <button class="st-tab" role="tab" data-t="epaper" type="button">📰 E-Paper</button>
     <button class="st-tab" role="tab" data-t="tv" type="button">📺 Mobile TV</button>
     <button class="st-tab" role="tab" data-t="shelf" type="button">📚 Book Shelf</button>
+    <button class="st-tab" role="tab" data-t="share" type="button">📣 பகிர்</button>
     <button class="st-tab" role="tab" data-t="theme" type="button">🎨 தோற்றம்</button>
   </nav>
 </header>
@@ -83,6 +84,11 @@ html,body{margin:0}
     <div class="st-sub" id="s-events"><div class="st-native"></div></div>
   </section>
 
+  <!-- ===== பகிர்: ஒரே இடத்தில் எழுதி இணையதளம் + Meta + WhatsApp ===== -->
+  <section class="st-pane" id="p-share" role="tabpanel">
+    <div class="st-native" id="shareBox"></div>
+  </section>
+
   <!-- ===== தோற்றம் ===== -->
   <section class="st-pane" id="p-theme" role="tabpanel">
     <div class="st-native">
@@ -102,6 +108,7 @@ html,body{margin:0}
 <script src="articles-config.js"></script>
 <script src="article-store.js"></script>
 <script src="articles-admin.js"></script>
+<script src="share-hub.js"></script>
 <script>
 (function () {
   'use strict';
@@ -115,11 +122,11 @@ html,body{margin:0}
   function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 2400); }
 
   /* ---------- தாவல்கள் ---------- */
-  var TABS = ['epaper', 'tv', 'shelf', 'theme'];
+  var TABS = ['epaper', 'tv', 'shelf', 'share', 'theme'];
   var SUBS = ['books', 'articles', 'shopping', 'events'];          /* Book Shelf பிரிவுகள் — அனைத்தும் ஒரே பக்கத்தில் */
   var SUBVIEW = { books: 'books', articles: 'article', shopping: 'shopping', events: 'events' };
   var SUBDEF = { books: ['📚', 'Books'], articles: ['📝', 'Articles'], shopping: ['🛒', 'Shopping'], events: ['🎪', 'Events'] };
-  var VIEW_OF = { epaper: 'paper', tv: 'tv', shelf: 'books', theme: 'paper' };
+  var VIEW_OF = { epaper: 'paper', tv: 'tv', shelf: 'books', share: 'paper', theme: 'paper' };
   var SRC = { tv: 'news.html?mode=settings' };
   var cur = '', sub = 'books';
   function tabNames() { try { return JSON.parse(ls.get('np_tabs') || '{}') || {}; } catch (e) { return {}; } }
@@ -165,6 +172,7 @@ html,body{margin:0}
     try { if (push !== false) history.replaceState(null, '', '#' + (id === 'shelf' ? sub : id)); } catch (e) {}
     fitFrames(); window.scrollTo(0, 0);
     if (id === 'epaper') loadPdfInfo();
+    if (id === 'share' && window.ShareHub) ShareHub.mount($('#shareBox'));
   }
   $('#tabs').addEventListener('click', function (e) { var b = e.target.closest('.st-tab'); if (b) { if (b.dataset.t === 'shelf') sub = sub || 'books'; openTab(b.dataset.t); } });
   $('#subtabs').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { openSub(b.dataset.s); try { history.replaceState(null, '', '#' + b.dataset.s); } catch (x) {} window.scrollTo(0, 0); } });

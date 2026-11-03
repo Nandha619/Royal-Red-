@@ -230,7 +230,7 @@ html,body{background:#000}
 @keyframes tapPulse{0%{box-shadow:inset 0 0 0 2px #fff,0 0 0 0 rgba(255,226,122,.95)}70%{box-shadow:inset 0 0 0 2px #fff,0 0 0 10px rgba(255,226,122,0)}100%{box-shadow:inset 0 0 0 2px #fff,0 0 0 0 rgba(255,226,122,0)}}
 @media (prefers-reduced-motion:reduce){#modeBtn,#modeBtn .ico{animation:none!important}}
 #shelfBtn,#actBtn{flex:1}
-#ownerLockBtn:not(.slotted){display:none!important}
+
 </style>
 <link rel="stylesheet" href="articles.css">
 </head>
@@ -574,6 +574,7 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);
 <script src="posts.js"></script>
 <script src="flipbook.js"></script>
 <script>
+const ADMIN=(()=>{try{return localStorage.getItem('np_admin_device')==='1'}catch(e){return false}})();
 const $=s=>document.querySelector(s),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const stage=$('#stage');
 let curBuf=null,curName="",pdf=null,fb=null;
@@ -587,6 +588,7 @@ const today=()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return p(d.ge
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.remove('on');void t.offsetWidth;t.classList.add('on')};
 const dlDateStr=()=>{const v=ls.get('np_dldate');if(v&&/^\d{4}-\d{2}-\d{2}$/.test(v)){const[y,m,d]=v.split('-');return d+'-'+m+'-'+y}return today()};
 $('#pick').onclick=()=>{location.href='settings.html#epaper'};
+if(!ADMIN){const e=$('#empty');if(e){const p=e.querySelector('p');if(p)p.textContent='இன்றைய இதழ் விரைவில் வெளியாகும். அதுவரை Mobile TV, கட்டுரைகளைப் பாருங்கள்.';$('#pick').remove()}}
 /* ---------- app interface: காட்சிகள் மட்டும் — E-Paper | Mobile TV | Book Shelf ----------
    எல்லா மாற்றங்களும் (PDF, செய்தி, புத்தகம், தோற்றம்…) settings.html பக்கத்தில் செய்யப்படும். */
 const SECS=[['books','Books','📚'],['article','Articles','📝'],['shopping','Shopping','🛒'],['events','Events','🎪']];
@@ -615,7 +617,7 @@ function show(v){
   document.querySelectorAll('#subBar button').forEach(b=>b.classList.toggle('on',b.dataset.id===v));
   closeSub();
   /* பொத்தான் 3 (2-in-1): E-Paper-ல் Download + PDF தேதி; மற்ற பக்கங்களில் செட்டிங்ஸ் */
-  const dl=v==='paper';
+  const dl=v==='paper'||!ADMIN;
   $('#actBtn').dataset.act=dl?'dl':'set';
   $('#actIco').textContent=dl?'⬇':'⚙';
   $('#actLbl').textContent=dl?dlDateStr():'செட்டிங்ஸ்';
@@ -676,7 +678,7 @@ function renderSec(id){
   if(window.ArticleShelf)ArticleShelf.unmount(sc);
   if((id==='shopping'||id==='events')&&window.PostBoard){PostBoard.mount(sc,$('#main'),id);return}
   const t=ls.get('np_s_'+id)||'';let meta=[];try{meta=JSON.parse(ls.get('np_si_'+id)||'[]')||[]}catch(e){}
-  sc.innerHTML='<h2></h2><div class="gal"></div>'+(t.trim()?'<div class="body"></div>':'')+(!t.trim()&&!meta.length?'<div class="none">இந்தப் பகுதியில் உள்ளடக்கம் இல்லை.<br><a href="settings.html#sections">செட்டிங்ஸில் சேர்க்கவும்</a></div>':'');
+  sc.innerHTML='<h2></h2><div class="gal"></div>'+(t.trim()?'<div class="body"></div>':'')+(!t.trim()&&!meta.length?'<div class="none">இந்தப் பகுதியில் உள்ளடக்கம் இல்லை.'+(ADMIN?'<br><a href="settings.html#sections">செட்டிங்ஸில் சேர்க்கவும்</a>':'')+'</div>':'');
   sc.querySelector('h2').textContent=secName(id);
   const b=sc.querySelector('.body');if(b)b.textContent=t;
   const g=sc.querySelector('.gal');
@@ -691,7 +693,7 @@ function renderSec(id){
 }
 /* Download — E-Paper கீழ்க் கருவிப்பட்டியில் */
 function downloadPdf(){
-  if(!curBuf){toast('முதலில் செட்டிங்ஸில் PDF-ஐச் சேர்க்கவும்');return}
+  if(!curBuf){toast(ADMIN?'முதலில் செட்டிங்ஸில் PDF-ஐச் சேர்க்கவும்':'இன்றைய இதழ் இன்னும் வெளியாகவில்லை');return}
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([curBuf],{type:'application/pdf'}));a.download='Theekkathir-'+dlDateStr()+'.pdf';document.body.appendChild(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);toast('PDF பதிவிறக்கம் ஆகிறது');
 }
@@ -728,7 +730,6 @@ async function openBuf(buf,name,page,save){
 (async()=>{const d=await dbGet('pdf');if(d&&d.buf){const p=await dbGet('pg');openBuf(d.buf,d.name,p||0,false)}})();
 </script><script src="theme.js"></script>
 <script>AppTheme.mount&&AppTheme.get&&(function(){})();</script>
-<script src="owner-gate.js"></script>
 
 
 <script>

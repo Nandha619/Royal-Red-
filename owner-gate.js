@@ -64,7 +64,7 @@
       hint.textContent = setup ? 'பயனர்பெயர் மற்றும் குறைந்தது 8 எழுத்துகளுள்ள வலுவான கடவுச்சொல்லை அமைக்கவும். இவை இந்தச் சாதனத்தில் சேமிக்கப்படும்.' : 'தனிப்பட்ட பயன்பாட்டிற்கான உள்நுழைவு. கடவுச்சொல்லை யாருடனும் பகிர வேண்டாம்.';
       msg.textContent = ''; pass.value = ''; confirm.value = ''; setTimeout(function () { user.focus(); }, 100);
     }
-    function unlock() { gate.hidden = true; lock.hidden = false; try { sessionStorage.setItem(SESS, '1'); } catch (e) {} }
+    function unlock() { gate.hidden = true; lock.hidden = false; try { sessionStorage.setItem(SESS, '1'); localStorage.setItem('np_admin_device', '1'); } catch (e) {} }
     form.addEventListener('submit', async function (e) {
       e.preventDefault(); msg.textContent = '';
       if (Date.now() < nextTry) { msg.textContent = 'சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.'; return; }
