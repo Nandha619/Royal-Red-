@@ -269,7 +269,11 @@ function css(){
    +'html.__pl header.top,html.__pl .side,html.__pl .row2,html.__pl .hint,html.__pl .player{display:none!important}'
    +'html.__pl .shell{grid-template-columns:minmax(0,1fr)!important;gap:0!important}'
    +'html.__pl .stage{position:static!important}'
-   +'html.__pl .phone{width:min(100%,400px,calc((100vh - 76px)*9/16))!important}';
+   +'html.__pl,html.__pl body{height:100%;overflow:hidden;background:#000!important}'
+   +'html.__pl body{padding:0!important}html.__pl .wrap{padding:0!important;max-width:none!important;margin:0!important}'
+   +'html.__pl .stage{position:fixed!important;inset:0;display:block!important;margin:0;gap:0;min-width:0}'
+   +'html.__pl .phone{position:absolute!important;inset:0;width:100%!important;max-width:none!important;height:100%;aspect-ratio:auto!important;margin:0!important;border-radius:0!important;box-shadow:none!important;background:#000}'
+   +'html.__pl .phone canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}';
   document.head.appendChild(st);
 }
 function pause(){var pb=$('#play');if(pb&&pb.textContent.trim()==='நிறுத்து')pb.click()}
@@ -617,7 +621,7 @@ function show(v){
   document.querySelectorAll('#subBar button').forEach(b=>b.classList.toggle('on',b.dataset.id===v));
   closeSub();
   /* பொத்தான் 3 (2-in-1): E-Paper-ல் Download + PDF தேதி; மற்ற பக்கங்களில் செட்டிங்ஸ் */
-  const dl=v==='paper'||!ADMIN;
+  const dl=v==='paper';
   $('#actBtn').dataset.act=dl?'dl':'set';
   $('#actIco').textContent=dl?'⬇':'⚙';
   $('#actLbl').textContent=dl?dlDateStr():'செட்டிங்ஸ்';
