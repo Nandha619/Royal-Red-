@@ -304,50 +304,58 @@ function HEADER(t,p){
   ctx.restore();
 }
 
-/* ---------- BREAKING NEWS: நடுவில் சீரமைந்த; BREAKING இடமிருந்து → , NEWS வலமிருந்து ← சறுக்கி மோதும் (impact) ;
-   பிறகு police siren போல தனித்தனியாக மாறி மாறி மின்னும் (theme நிறங்கள்: BREAKING = சிவப்பு, NEWS = மஞ்சள்; ~2.5 மின்னல்/வினாடி — பாதுகாப்பான வேகம்)
-   நேரம்: பட்டை (.0–.35) · BREAKING (.3–.8) · NEWS (.4–.9) · impact (.9) · siren (1.0 →) */
+/* ---------- BREAKING NEWS: நடுவில் சீரமைந்த. கட்டங்கள் (BREAKING சிவப்பு, NEWS மஞ்சள்) நிலையாக இருக்கும்;
+   எழுத்துகள் வெளிப்படையாக (transparent / வெட்டப்பட்டு) இருக்கும் — அந்த எழுத்துகளின் உள்ளே மட்டும் police siren ஒளி மாறி மாறி மின்னும் (~2.5/வினாடி).
+   இயக்கம் ஒவ்வொரு CYC வினாடிக்கும் திரும்பும்: BREAKING இடமிருந்து → , NEWS வலமிருந்து ← சறுக்கி மோதி (impact) → siren → இரண்டும் வெளியே சறுக்கி → மீண்டும். */
 const BLUR_OK=typeof ctx.filter==="string";
 const blurT=px=>{if(BLUR_OK&&!STILL&&px>.4)ctx.filter="blur("+px.toFixed(1)+"px)"};
+const BRK_CYC=5,BRK_T0=.3;
+const _bo=document.createElement("canvas");
 function BRKBAND(it,t){
   const y0=HB,h=BRH,S=STILL,ws=(G.brk||"").trim().split(/\s+/),l=ws[0]||"",r=ws.slice(1).join(" ");
-  const eB=S?1:ease((t-.0)/.35);if(eB<=0)return;
-  const eL=S?1:ease((t-.3)/.5),eN=S?1:ease((t-.4)/.5);
+  const eB=S?1:ease(t/.35);if(eB<=0)return;
+  /* சுழற்சி நேரம் u: 0 → CYC */
+  const u=S?1:Math.max(0,t-BRK_T0)%BRK_CYC,
+    inL=S?1:ease(u/.5),inN=S?1:ease((u-.1)/.5),outP=S?0:clamp((u-(BRK_CYC-.7))/.5),
+    eL=Math.min(inL,1-ease(outP)),eN=Math.min(inN,1-ease(clamp(outP-.1/.5))),
+    cyc=S?0:Math.floor(Math.max(0,t-BRK_T0)/BRK_CYC)+(t<BRK_T0?-1:0);
   const sk=26,pad=34,gap=16;let fs=44;const mw=q=>{ctx.font=`800 italic ${fs}px ${FONT}`;return ctx.measureText(q).width};
   while(fs>24&&mw(l)+mw(r)+pad*4+gap+sk*2>W-60)fs-=2;
   const lw=Math.round(mw(l)+pad*2),rw=Math.round(mw(r)+pad*2),tot=lw+gap+rw+sk,x0=Math.round((W-tot)/2),xr=x0+lw+gap;
   const cy=y0+h/2-1,top=y0+6,bot=y0+h-10;
-  /* siren: 1.0வினாடிக்குப் பிறகு ஒவ்வொரு 0.2வினா மாறி மாறி — ஒவ்வொன்றும் வினாடிக்கு 2.5 முறை */
-  const sir=!S&&t>=1.0,ph=sir?Math.floor((t-1.0)*5)%2:0,onL=!sir||ph===0,onN=!sir||ph===1;
-  /* impact: சந்திக்கும் தருணத்தில் சிறு அதிர்வு + வெள்ளை ஒளி */
-  const im=(S||t<.9)?0:clamp(1-(t-.9)/.28),shake=(im>0)?Math.sin(t*90)*3*im:0;
+  /* siren: மோதலுக்குப் பிறகு (u>.7) வெளியே சறுக்கும் வரை, ஒவ்வொரு .2வினா மாறி மாறி */
+  const sir=!S&&u>=.7&&outP<=0,ph=sir?Math.floor((u-.7)*5)%2:0,onL=!sir||ph===0,onN=!sir||ph===1;
+  const im=(S||u<.6)?0:clamp(1-(u-.6)/.28),shake=(im>0)?Math.sin(t*90)*3*im:0;
   ctx.save();
   ctx.globalAlpha=eB;ctx.translate(shake,-(1-eB)*24);
-  /* இருண்ட பட்டை + மெல்லிய நகரும் கோடுகள் */
   ctx.fillStyle=TKB;ctx.fillRect(-10,y0,W+20,h);
   if(!S){ctx.save();ctx.beginPath();ctx.rect(0,y0,W,h);ctx.clip();for(let k=0;k<3;k++){const x=((t*70+k*420)%1500)-200;ctx.fillStyle="rgba("+YR+",.05)";poly([[x,y0],[x+46,y0],[x-30,y0+h],[x-76,y0+h]]);ctx.fill()}ctx.restore()}
-  /* siren விளக்குகள்: இடது சிவப்பு · வலது மஞ்சள் — அந்தந்த பக்கம் எரியும்போது ஒளிரும் */
-  if(sir){
-    const beacon=(cx,col,on)=>{if(!on)return;const g=ctx.createRadialGradient(cx,cy,0,cx,cy,h*1.1);g.addColorStop(0,col+"cc");g.addColorStop(1,col+"00");ctx.save();ctx.beginPath();ctx.rect(0,y0,W,h);ctx.clip();ctx.fillStyle=g;ctx.fillRect(cx-h*1.2,y0,h*2.4,h);ctx.restore()};
-    beacon(54,RED,onL);beacon(W-54,YEL,onN)
-  }
-  /* கீழ் எல்லை: ஒளிரும் கோடு (siren நிறத்தில்) */
-  ctx.save();const bc=sir?(onL?RED:YEL):YEL;ctx.shadowColor=bc;ctx.shadowBlur=S?4:14;ctx.fillStyle=bc;ctx.fillRect(0,y0+h-4,W,4);ctx.restore();
-  /* ஒரு தொகுதி (parallelogram) */
-  const block=(x,w,fill,txt,col,tcol,on,glow,e,dir)=>{
+  /* கீழ் எல்லை: நிலையான theme கோடு */
+  ctx.save();ctx.shadowColor=YEL;ctx.shadowBlur=S?4:8;ctx.fillStyle=YEL;ctx.fillRect(0,y0+h-4,W,4);ctx.restore();
+  /* ஒரு தொகுதி: நிலையான கட்டம் + வெளிப்படையான (வெட்டப்பட்ட) எழுத்துகள்; உள்ளே siren ஒளி */
+  const block=(x,w,fill,txt,lit,on,e,dir)=>{
+    if(e<=0.001)return;
+    _bo.width=W;_bo.height=h;const o=_bo.getContext("2d");o.clearRect(0,0,W,h);
+    const P=[[x+sk,top-y0],[x+w+sk,top-y0],[x+w,bot-y0],[x,bot-y0]];
+    o.beginPath();P.forEach((q,i)=>i?o.lineTo(q[0],q[1]):o.moveTo(q[0],q[1]));o.closePath();
+    const g=o.createLinearGradient(0,top-y0,0,bot-y0);g.addColorStop(0,_sh(fill,.12));g.addColorStop(1,_sh(fill,-.12));o.fillStyle=g;o.fill();
+    o.fillStyle="rgba(255,255,255,.14)";o.save();o.clip();o.fillRect(x,top-y0,w+sk,(bot-top)*.42);o.restore();
+    o.globalCompositeOperation="destination-out";o.fillStyle="#000";o.textAlign="center";o.font=`800 italic ${fs}px ${FONT}`;o.fillText(txt,x+(w+sk)/2,cy-y0+fs*.34-2);
     ctx.save();ctx.globalAlpha=eB*e;ctx.translate(dir*(1-e)*(dir<0?x+w+sk+60:W-x+60),0);blurT((1-e)*10);
-    const P=[[x+sk,top],[x+w+sk,top],[x+w,bot],[x,bot]];
-    ctx.save();ctx.shadowColor=on?glow:"transparent";ctx.shadowBlur=S?0:(on?26:0);ctx.fillStyle=on?fill:_sh(col,-.6);poly(P);ctx.fill();ctx.restore();
-    ctx.save();poly(P);ctx.clip();ctx.fillStyle="rgba(255,255,255,.14)";ctx.fillRect(x,top,w+sk,(bot-top)*.42);ctx.restore();
-    ctx.fillStyle=on?tcol:_sh(col,-.1);ctx.globalAlpha*=on?1:.55;ctx.textAlign="center";ctx.font=`800 italic ${fs}px ${FONT}`;ctx.fillText(txt,x+(w+sk)/2,cy+fs*.34-2);
-    ctx.restore()};
-  block(x0,lw,RG2(RED),l,RED,"#ffffff",onL,RED,eL,-1);
-  block(xr,rw,RG2(YEL),r,YEL,"#101010",onN,YEL,eN,1);
-  /* impact ஒளி */
+    ctx.drawImage(_bo,0,y0);
+    /* எழுத்துகளின் உள்ளே ஒளி: எரியும்போது பிரகாசம், அணையும்போது மங்கல் */
+    ctx.textAlign="center";ctx.font=`800 italic ${fs}px ${FONT}`;
+    const tx=x+(w+sk)/2,ty=cy+fs*.34-2;
+    ctx.save();ctx.beginPath();poly([[x+sk,top],[x+w+sk,top],[x+w,bot],[x,bot]]);ctx.clip();
+    if(on){ctx.shadowColor=lit;ctx.shadowBlur=S?0:22;ctx.fillStyle=lit;ctx.fillText(txt,tx,ty);ctx.shadowBlur=0;ctx.globalAlpha=.9;ctx.fillStyle="#fff";ctx.fillText(txt,tx,ty)}
+    else{ctx.globalAlpha=.22;ctx.fillStyle=lit;ctx.fillText(txt,tx,ty)}
+    ctx.restore();ctx.restore()};
+  /* BREAKING: சிவப்பு கட்டம், உள்ளே மஞ்சள்-வெள்ளை ஒளி · NEWS: மஞ்சள் கட்டம், உள்ளே சிவப்பு-வெள்ளை ஒளி */
+  block(x0,lw,RED,l,YEL,onL,eL,-1);
+  block(xr,rw,YEL,r,RED,onN,eN,1);
   if(im>0){ctx.save();ctx.globalAlpha=.55*im;ctx.fillStyle="#fff";ctx.fillRect(xr-gap-4,y0,10+gap,h);ctx.restore()}
   ctx.restore();ctx.textAlign="left"
 }
-const RG2=c=>{const g=ctx.createLinearGradient(0,HB+8,0,HB+BRH-12);g.addColorStop(0,_sh(c,.12));g.addColorStop(1,_sh(c,-.12));return g};
 /* ---------- date + location band (inside the media frame) ---------- */
 function FRAMEFX(it,t,fx,fy,fw,fh){
   const dt=it.date||"",lc=it.loc||"",ca=STILL?1:ease((t-1)/.5);
@@ -646,7 +654,7 @@ function sfxRender(it,D,SR){
   const beep=(t0,len,vol,f)=>{const a=Math.round(t0*SR),m=Math.round(len*SR);for(let i=0;i<m&&a+i<n;i++){const u=i/m;o[a+i]+=Math.sin(2*Math.PI*f*i/SR)*Math.sin(Math.PI*u)*vol}};
   const tick=(t0,vol)=>{const a=Math.round(t0*SR),m=Math.round(.022*SR);for(let i=0;i<m&&a+i<n;i++){const u=i/m;o[a+i]+=Math.sin(2*Math.PI*2100*i/SR)*Math.exp(-u*7)*vol}};
   const L=headlineLayout(it);
-  if(it.breaking){whoosh(.28,.5,.16,500,2600);whoosh(.38,.5,.14,2400,600);impact(.9,.6);for(let k=0;k<6;k++)beep(1.0+k*.2,.16,.05,k%2?960:720)}
+  if(it.breaking){for(let c=0,b0=.3;b0<D-.3;c++,b0=.3+5*c){whoosh(b0,.5,.16,500,2600);whoosh(b0+.1,.5,.14,2400,600);impact(b0+.6,.6);for(let k=0;k<4;k++)beep(b0+.7+k*.2,.16,.05,k%2?960:720);if(b0+4.3<D)whoosh(b0+4.3,.45,.1,1800,500)}}
   else whoosh(.42,.55,.13,450,2200);
   if(G.tick){const st=Math.max(.06,L.dur/Math.max(1,L.N));for(let t=L.T0,c=0;t<L.T0+L.dur&&c<60;t+=st*2,c++)tick(t,.08)}
   let pk=0;for(let i=0;i<n;i++)pk=Math.max(pk,Math.abs(o[i]));if(pk>.9)for(let i=0;i<n;i++)o[i]*=.9/pk;
