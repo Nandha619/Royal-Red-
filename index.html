@@ -179,7 +179,10 @@ html,body{background:#000}
 }
 #bkBar{display:none;position:absolute;left:0;right:0;top:0;z-index:12;padding:8px 10px;justify-content:space-between;gap:8px;pointer-events:none}
 #bkBar.on{display:flex}
-#bkBar button{pointer-events:auto;height:42px;padding:0 18px;border-radius:99px;border:2px solid #e3b04b;background:#190d06;color:#e3b04b;font:800 14px inherit;font-family:inherit;cursor:pointer}
+#bkBar{padding:8px 8px 0}
+#bkBar button{pointer-events:auto;width:34px;height:34px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.55);background:rgba(0,0,0,.38);color:#fff;font:700 17px/1 inherit;font-family:inherit;cursor:pointer;opacity:.6;display:grid;place-items:center;backdrop-filter:blur(2px)}
+#bkBar button:active{opacity:1}
+#app.fs #bar{display:none}
 #bkBar[data-mode=edit] #bkAgain{display:none}
 #vidPop{display:none;position:absolute;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 10px);z-index:12;height:46px;padding:0 24px;border-radius:99px;border:2px solid #e3b04b;background:linear-gradient(#FFF1B8,#e3b04b 55%,#b98a22);color:#2a1709;font:800 16px inherit;font-family:inherit;box-shadow:0 8px 22px rgba(0,0,0,.55);cursor:pointer;white-space:nowrap}
 #vidPop.on{display:block;animation:vpIn .4s cubic-bezier(.2,.9,.3,1.2)}
@@ -567,7 +570,7 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);
   <div id="hint"><span><i>◀</i> பக்க ஓரத்தை இழுத்து / தொட்டுப் புரட்டவும் <i style="animation-direction:reverse">▶</i> &nbsp;|&nbsp; இருமுறை தட்டிப் பெரிதாக்கலாம்</span></div>
   <div id="load">ஏற்றுகிறது…</div>
 </div>
-<div id="sec"></div><div id="tv"></div><div id="bk"></div><div id="lib"></div><div id="bkBar"><button type="button" id="bkBack">← அலமாரி</button><button type="button" id="bkAgain">↻ மீண்டும்</button></div></div><div id="toast"></div>
+<div id="sec"></div><div id="tv"></div><div id="bk"></div><div id="lib"></div><div id="bkBar"><button type="button" id="bkBack" aria-label="அலமாரிக்குத் திரும்பு" title="அலமாரி">←</button><button type="button" id="bkAgain" aria-label="மீண்டும் இயக்கு" title="மீண்டும்">↻</button></div></div><div id="toast"></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="media-store.js"></script>
@@ -609,6 +612,7 @@ function show(v){
   $('#bk').classList.toggle('on',v==='books');
   $('#lib').classList.toggle('on',v==='books'&&bkMode==='shelf');
   $('#bkBar').classList.toggle('on',v==='books'&&bkMode==='play');
+  $('#app').classList.toggle('fs',v==='books'&&bkMode==='play');
   const isSec=SEC_ONLY.includes(v);
   $('#sec').classList.toggle('on',isSec);
   if(isSec)renderSec(v);
