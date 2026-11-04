@@ -77,6 +77,7 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
   <label>தலைப்பு (வரி 1 கருப்பு, வரி 2 சிவப்பு; *சொல்* = சிவப்பு)<textarea data-k="headline" rows="3"></textarea></label>
   <label>செய்தி ஸ்கிரிப்ட் (*சொல்* = சிவப்பு; நீளமானால் 3 கட்டமாக தோன்றி, மீண்டும் மீண்டும் சுழலும்)<textarea data-k="script" rows="6"></textarea></label><small id="pgInfo"></small>
   <label>டிக்கர் (| கொண்டு பிரிக்கவும்)<input data-k="ticker"></label>
+  <label>🎬 வீடியோ புரோமோ எழுத்து (இந்தச் செய்திக்கு; காலியாக விட்டால் இயல்புநிலை வரும்; பல வார்த்தைகளை | கொண்டு பிரிக்கவும்)<input data-k="promo" placeholder="BREAKING NEWS | JUST IN | NEWS UPDATE"></label>
   <div class="row">
     <label>வீடியோக்கள் / படங்கள் (ஒன்றுக்கு மேல் தேர்வு செய்யலாம்)<input type="file" id="fMedia" accept="video/*,image/*" multiple><small id="mInfo"></small></label>
     <label style="flex:0 0 150px">BREAKING<input type="checkbox" data-k="breaking" style="width:28px;height:28px"></label>
@@ -97,6 +98,10 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
         <label>ஒரு படம் / வினாடி<input id="gSl" type="number" min="1" max="15"></label>
       </div>
       <div class="row"><label>BREAKING எழுத்து<input id="gBrk"></label></div>
+      <div class="row" style="align-items:center;flex-wrap:wrap;gap:14px"><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gPrOn" style="width:auto"> 🎬 வீடியோ மேல் புரோமோ அனிமேஷன்</label></div>
+      <div class="row"><label>இயல்புநிலை புரோமோ எழுத்து<input id="gPrDef" placeholder="BREAKING NEWS"></label></div>
+      <div class="row"><label>எத்தனை வினாடிக்கு ஒருமுறை<input id="gPrEvery" type="number" min="5" max="90"></label><label>எத்தனை வினாடி தெரியும்<input id="gPrDur" type="number" min="2" max="10"></label></div>
+      <div class="row"><button class="alt" id="bPrTest" type="button">▶ புரோமோவைச் சோதி</button></div>
       <div class="row"><label>டிக்கர் பேட்ஜ் வரி 1<input id="gTk1"></label><label>டிக்கர் பேட்ஜ் வரி 2<input id="gTk2"></label></div>
       <div class="row"><label>End card வாசகம்<input id="gEnd"></label><label>End card நன்றி வரி<input id="gThx"></label></div>
       <div class="row"><label>தொடர்பு தலைப்பு (மேல் வலது)<input id="gCt"></label><label>போன் நம்பர்<input id="gPh"></label></div>
@@ -204,7 +209,7 @@ function draw(it,t){
   const dm=(m,al)=>{ctx.save();ctx.globalAlpha=al;if(m.type==="v"){if(m.el.readyState>=2)cover(m.el,m.el.videoWidth,m.el.videoHeight,fx,fy,fw,fh,uz,it.px,it.py)}else cover(m.el,m.el.naturalWidth,m.el.naturalHeight,fx,fy,fw,fh,uz,it.px,it.py);ctx.restore()};
   if(nM){dm(ML[si],p);if(nM>1&&st2>SL-.5)dm(ML[nx],p*ease((st2-(SL-.5))/.5))}
   else{ctx.save();ctx.fillStyle="#242424";ctx.fillRect(fx,fy,fw,fh);const gg=ctx.createLinearGradient(fx+((t*260)%1500)-400,0,fx+((t*260)%1500),0);gg.addColorStop(0,"rgba(255,255,255,0)");gg.addColorStop(.5,"rgba(255,255,255,.1)");gg.addColorStop(1,"rgba(255,255,255,0)");ctx.fillStyle=gg;ctx.fillRect(fx,fy,fw,fh);ctx.fillStyle="#9a9a9a";ctx.font=`700 44px ${FONT}`;ctx.textAlign="center";ctx.fillText("வீடியோ / படம் இங்கே",W/2,vy+vh/2+14);ctx.restore();ctx.textAlign="left"}
-  WMARK(fx,fy,fw,fh);FRAMEFX(it,t,fx,fy,fw,fh);
+  WMARK(fx,fy,fw,fh);FRAMEFX(it,t,fx,fy,fw,fh);PROMO(it,t,fx,fy,fw,fh);
   if(nM>1){for(let j=0;j<nM;j++){ctx.fillStyle=j===si?GOLD:"rgba(255,255,255,.45)";ctx.beginPath();ctx.arc(vx+vw/2-(nM-1)*14+j*28,vy+vh-30,7,0,7);ctx.fill()}}
   FRAMEBORDER(vx,vy,vw,vh,t,p);
   ctx.restore();
@@ -375,6 +380,53 @@ function FRAMEFX(it,t,fx,fy,fw,fh){
   if(lc){const z=shrink(lc,560,42,800);ctx.font=`800 ${z}px ${FONT}`;ctx.textAlign="right";ctx.strokeText(lc,fx+fw-24,yy);ctx.fillStyle="#fff";ctx.fillText(lc,fx+fw-24,yy);{const lw3=ctx.measureText(lc).width;ctx.save();ctx.shadowBlur=0;pin(fx+fw-24-lw3-28,yy-4+(STILL?0:3*Math.sin(t*5)),RED);ctx.restore()}}
   ctx.restore();ctx.textAlign="left"
 }
+/* ---------- வீடியோ மேல் புரோமோ அனிமேஷன் (திரை முன்னோட்டம் + MP4 ரெண்டர் இரண்டிலும் ஒரே குறியீடு) ----------
+   ஒவ்வொரு G.prEvery வினாடிக்கும் (30, 60, 90…) வீடியோ கட்டத்திற்குள் வெடித்து வந்து, G.prDur வினாடி தெரிந்து மறையும்.
+   வீடியோ பின்னால் தொடர்ந்து ஓடும். நிறங்கள்: RED / YEL (தீம் மாற்றினால் தானாக மாறும்). */
+function promoWords(it){const raw=(it.promo&&it.promo.trim())?it.promo:(G.prDef==null?"BREAKING NEWS":G.prDef);return raw.split("|").map(s=>s.trim()).filter(Boolean)}
+function PROMO(it,t,fx,fy,fw,fh){
+  if(STILL||G.prOn===false)return;
+  const words=promoWords(it);if(!words.length)return;
+  const E=clamp(+G.prEvery||30,5,90),DU=clamp(+G.prDur||4,2,10),k=Math.floor(t/E);
+  if(k<1)return;const T0=k*E,u=t-T0;
+  if(u>=DU||T0+DU>durOf(it))return;
+  const text=words[(k-1)%words.length],IN=.5,OUT=.45,sk=34;
+  const pin=ease(u/IN),pg=ease((u-.08)/IN),po=u>DU-OUT?ease((u-(DU-OUT))/OUT):0;
+  const cy=fy+fh/2,bh=Math.min(170,fh*.3),xL=fx-sk-6,xR=fx+fw+sk+6,span=xR-xL,y0=cy-bh/2,y1=cy+bh/2;
+  const par=(a,b,ya,yb)=>poly([[a,ya],[b,ya],[b-sk*(yb-ya)/bh,yb],[a-sk*(yb-ya)/bh,yb]]);
+  ctx.save();ctx.beginPath();ctx.rect(fx,fy,fw,fh);ctx.clip();
+  ctx.shadowBlur=0;ctx.textAlign="left";
+  /* மங்கலாக்கு + தொடக்க மின்னல் */
+  ctx.globalAlpha=.4*Math.min(ease(u/.3),1-po);ctx.fillStyle="#000";ctx.fillRect(fx,fy,fw,fh);
+  if(u<.16){ctx.globalAlpha=.32*(1-u/.16);ctx.fillStyle="#fff";ctx.fillRect(fx,fy,fw,fh)}
+  ctx.globalAlpha=1;
+  /* தங்கக் கீற்றுகள் (வலமிருந்து இடம்) */
+  const gl=xR-pg*span,gr=xR-po*span;
+  if(gr-gl>2){ctx.fillStyle=RG(fx,fx+fw);par(gl,gr,y0-24,y0-10);ctx.fill();par(gl,gr,y1+10,y1+24);ctx.fill()}
+  /* சிவப்புப் பட்டை (இடமிருந்து வலம்) */
+  const a=xL+po*span,b=xL+pin*span;
+  if(b-a>2){
+    ctx.shadowColor="rgba(0,0,0,.55)";ctx.shadowBlur=24;ctx.fillStyle=GG(fx,fx+fw);par(a,b,y0,y1);ctx.fill();ctx.shadowBlur=0;
+    ctx.save();par(a,b,y0,y1);ctx.clip();
+    const sh=(u-.45)/1.0;if(sh>0&&sh<1){const sx=fx-160+sh*(fw+320);ctx.fillStyle="rgba(255,255,255,.4)";poly([[sx,y0],[sx+70,y0],[sx+70-sk,y1],[sx-sk,y1]]);ctx.fill()}
+    ctx.restore();
+    ctx.strokeStyle=YEL;ctx.lineWidth=4;ctx.globalAlpha=.9;par(a,b,y0,y1);ctx.stroke();ctx.globalAlpha=1;
+  }
+  /* எழுத்து */
+  const tp=ease((u-.28)/.35),ta=tp*(1-po);
+  if(ta>.01){
+    const s=shrink(text,fw-190,86,"800 italic"),sc=.78+.22*tp+.07*Math.sin(Math.PI*tp)+.012*Math.sin(u*9)*tp,cx=fx+fw/2-sk/2;
+    ctx.save();ctx.globalAlpha=ta;ctx.translate(cx,cy);ctx.scale(sc,sc);
+    ctx.font=`800 italic ${s}px ${FONT}`;ctx.textAlign="center";
+    const tw=ctx.measureText(text).width,ty=s*.34;
+    ctx.lineJoin="round";ctx.lineWidth=7;ctx.strokeStyle="rgba(0,0,0,.4)";ctx.strokeText(text,0,ty);
+    ctx.fillStyle="#fff";ctx.fillText(text,0,ty);
+    const pl=.55+.45*Math.sin(u*12);ctx.fillStyle=YEL;ctx.globalAlpha=ta*pl;
+    [-1,1].forEach(d=>{ctx.beginPath();ctx.arc(d*(tw/2+34),0,10,0,7);ctx.fill()});
+    ctx.restore();
+  }
+  ctx.restore();ctx.textAlign="left"
+}
 /* தமிழ் எழுத்துக்கூட்டு (grapheme) பிரிப்பு — தட்டச்சு animation-ல் எழுத்துகள் உடையாமல் வர */
 let _seg=null;const GR=s=>{try{_seg=_seg||new Intl.Segmenter("ta",{granularity:"grapheme"});return Array.from(_seg.segment(s),x=>x.segment)}catch(e){return Array.from(s)}};
 function headlineLayout(it){
@@ -467,7 +519,7 @@ t=rec?Math.min(t,DD):playing?t%DD:4;if(playing&&!rec){if(cur!==_sc||t<_st-.5)sfx
 
 /* ---------- UI ---------- */
 function tabs(){["#tabs","#ctabs"].forEach(q=>{const t=$(q);t.innerHTML="";items.forEach((_,i)=>{const b=document.createElement("button");b.textContent=i+1;b.className=i===cur?"on":"";b.onclick=()=>sel(i);t.appendChild(b)})})}
-function fill(){document.querySelectorAll("[data-k]").forEach(e=>{const v=items[cur][e.dataset.k];if(e.type==="checkbox")e.checked=!!v;else e.value=v==null?e.defaultValue:v});$("#gName").value=G.name;$("#gDur").value=G.dur;$("#gSub").value=G.sub;$("#gSl").value=G.slide;FL.forEach(([i,k])=>{$("#"+i).value=G[k]});wmFill();$("#gSfx").checked=G.sfx!==false;$("#gTick").checked=!!G.tick;$("#gSfxP").checked=!!G.sfxp;fillCard()}
+function fill(){document.querySelectorAll("[data-k]").forEach(e=>{const v=items[cur][e.dataset.k];if(e.type==="checkbox")e.checked=!!v;else e.value=v==null?e.defaultValue:v});$("#gName").value=G.name;$("#gDur").value=G.dur;$("#gSub").value=G.sub;$("#gSl").value=G.slide;FL.forEach(([i,k])=>{$("#"+i).value=G[k]});wmFill();promoFill();$("#gSfx").checked=G.sfx!==false;$("#gTick").checked=!!G.tick;$("#gSfxP").checked=!!G.sfxp;fillCard()}
 function sel(i){cur=i;if(cardMode)getCard(items[i]);startT=performance.now();tabs();fill();playMedia()}
 function playMedia(){Object.values(media).forEach(L=>L.forEach(m=>{m.el._on=false;if(m.type==="v")m.el.pause()}))}
 document.querySelectorAll("[data-k]").forEach(e=>e.addEventListener("input",()=>{items[cur][e.dataset.k]=e.type==="checkbox"?e.checked:e.type==="range"?+e.value:e.value;if(e.dataset.k==="date")items[cur].dm=true;save()}));
@@ -571,6 +623,12 @@ $("#bAll").onclick=async()=>{setCard(false);if(!okRec()){$("#st").textContent="C
 
 /* ---------- editable watermark ---------- */
 [["gSfx","sfx"],["gTick","tick"],["gSfxP","sfxp"]].forEach(([i,k])=>{$("#"+i).onchange=e=>{G[k]=e.target.checked;save()}});
+function promoFill(){$("#gPrOn").checked=G.prOn!==false;$("#gPrDef").value=G.prDef==null?"BREAKING NEWS":G.prDef;$("#gPrEvery").value=G.prEvery||30;$("#gPrDur").value=G.prDur||4}
+$("#gPrOn").onchange=e=>{G.prOn=e.target.checked;save()};
+$("#gPrDef").oninput=e=>{G.prDef=e.target.value;save()};
+$("#gPrEvery").onchange=e=>{G.prEvery=clamp(+e.target.value||30,5,90);e.target.value=G.prEvery;save()};
+$("#gPrDur").onchange=e=>{G.prDur=clamp(+e.target.value||4,2,10);e.target.value=G.prDur;save()};
+$("#bPrTest").onclick=()=>{const E=clamp(+G.prEvery||30,5,90);if(durOf(items[cur])<E+(+G.prDur||4)){$("#st").textContent="வீடியோ நீளம் "+E+" வினாடிக்கு மேல் இருந்தால்தான் புரோமோ வரும்.";return}G.prOn=true;$("#gPrOn").checked=true;playing=true;$("#bPlay").textContent="⏸ முன்னோட்டம்";startT=performance.now()-(E-.5)*1000;$("#st").textContent="புரோமோ 0.5 வினாடியில் வரும்…"};
 function wmFill(){$("#gWmS").value=G.wmS||56;$("#gWmO").value=G.wmO==null?.4:G.wmO;$("#gWmX").value=G.wmX==null?100:G.wmX;$("#gWmY").value=G.wmY==null?100:G.wmY;$("#gWmC").value=G.wmC||"#ffffff"}
 [["gWmS","wmS",1],["gWmO","wmO",1],["gWmX","wmX",1],["gWmY","wmY",1],["gWmC","wmC",0]].forEach(([i,k,n])=>{$("#"+i).oninput=e=>{G[k]=n?+e.target.value:e.target.value;save()}});
 function WMARK(fx,fy,fw,fh){
