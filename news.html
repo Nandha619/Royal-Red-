@@ -99,7 +99,7 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
       </div>
       <div class="row"><label>BREAKING எழுத்து<input id="gBrk"></label></div>
       <div class="row" style="align-items:center;flex-wrap:wrap;gap:14px"><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gPrOn" style="width:auto"> 🎬 வீடியோ மேல் புரோமோ அனிமேஷன்</label></div>
-      <div class="row"><label>இயல்புநிலை புரோமோ எழுத்து<input id="gPrDef" placeholder="BREAKING NEWS"></label></div>
+      <div class="row"><label>இயல்புநிலை புரோமோ எழுத்து<input id="gPrDef" placeholder="BREAKING NEWS"></label><label>புரோமோ பாணி<select id="gPrStyle"><option value="full">முழுக் கட்டம் (சேனல் இடைவேளை)</option><option value="band">நடுப் பட்டை</option></select></label></div>
       <div class="row"><label>எத்தனை வினாடிக்கு ஒருமுறை<input id="gPrEvery" type="number" min="5" max="90"></label><label>எத்தனை வினாடி தெரியும்<input id="gPrDur" type="number" min="2" max="10"></label></div>
       <div class="row"><button class="alt" id="bPrTest" type="button">▶ புரோமோவைச் சோதி</button></div>
       <div class="row"><label>டிக்கர் பேட்ஜ் வரி 1<input id="gTk1"></label><label>டிக்கர் பேட்ஜ் வரி 2<input id="gTk2"></label></div>
@@ -390,7 +390,11 @@ function PROMO(it,t,fx,fy,fw,fh){
   const E=clamp(+G.prEvery||30,5,90),DU=clamp(+G.prDur||4,2,10),k=Math.floor(t/E);
   if(k<1)return;const T0=k*E,u=t-T0;
   if(u>=DU||T0+DU>durOf(it))return;
-  const text=words[(k-1)%words.length],IN=.5,OUT=.45,sk=34;
+  (G.prStyle==="band"?promoBand:promoFull)(words[(k-1)%words.length],u,DU,fx,fy,fw,fh)
+}
+/* பாணி 2: நடுப் பட்டை */
+function promoBand(text,u,DU,fx,fy,fw,fh){
+  const IN=.5,OUT=.45,sk=34;
   const pin=ease(u/IN),pg=ease((u-.08)/IN),po=u>DU-OUT?ease((u-(DU-OUT))/OUT):0;
   const cy=fy+fh/2,bh=Math.min(170,fh*.3),xL=fx-sk-6,xR=fx+fw+sk+6,span=xR-xL,y0=cy-bh/2,y1=cy+bh/2;
   const par=(a,b,ya,yb)=>poly([[a,ya],[b,ya],[b-sk*(yb-ya)/bh,yb],[a-sk*(yb-ya)/bh,yb]]);
@@ -423,6 +427,55 @@ function PROMO(it,t,fx,fy,fw,fh){
     ctx.fillStyle="#fff";ctx.fillText(text,0,ty);
     const pl=.55+.45*Math.sin(u*12);ctx.fillStyle=YEL;ctx.globalAlpha=ta*pl;
     [-1,1].forEach(d=>{ctx.beginPath();ctx.arc(d*(tw/2+34),0,10,0,7);ctx.fill()});
+    ctx.restore();
+  }
+  ctx.restore();ctx.textAlign="left"
+}
+/* பாணி 1 (இயல்பு): செய்தி சேனல் இடைவேளை போல வீடியோ கட்டம் முழுவதும் — வண்ணத் திரைகள் துடைத்து வந்து → எழுத்து → துடைத்து வெளியேறும்; பின்னால் வீடியோ தொடர்ந்து ஓடும் */
+function promoFull(text,u,DU,fx,fy,fw,fh){
+  const IN=Math.min(.75,DU*.2),OUT=IN,sk=90,xL=fx-sk-20,span=fw+sk*2+40,y0=fy,y1=fy+fh,cx=fx+fw/2,cy=fy+fh/2,hold0=IN+.18,hold1=DU-OUT;
+  const dIn=[0,.09,.18],dOut=[.18,.09,0];
+  const E=k=>xL+ease((u-dIn[k])/IN)*span,Lf=k=>xL+ease((u-hold1-dOut[k])/OUT)*span;
+  const lay=k=>{const a=Lf(k),b=E(k);if(b-a<1.5)return false;poly([[a,y0],[b,y0],[b-sk,y1],[a-sk,y1]]);return true};
+  const dark=ctx.createLinearGradient(fx,0,fx+fw,0);dark.addColorStop(0,_sh(RED,-.7));dark.addColorStop(1,_sh(RED,-.82));
+  ctx.save();ctx.beginPath();ctx.rect(fx,fy,fw,fh);ctx.clip();ctx.shadowBlur=0;ctx.textAlign="left";
+  /* துடைக்கும் அடுக்குகள்: தங்கம் → அடர் சிவப்பு → சிவப்பு */
+  if(lay(0)){ctx.fillStyle=RG(fx,fx+fw);ctx.fill()}
+  if(lay(1)){ctx.fillStyle=dark;ctx.fill()}
+  if(lay(2)){
+    ctx.fillStyle=GG(fx,fx+fw);ctx.fill();
+    ctx.save();lay(2);ctx.clip();
+    /* ஒளி வட்டம் */
+    const gl=ctx.createRadialGradient(cx,cy,0,cx,cy,fw*.62);gl.addColorStop(0,"rgba(255,255,255,.22)");gl.addColorStop(1,"rgba(255,255,255,0)");ctx.fillStyle=gl;ctx.fillRect(fx,fy,fw,fh);
+    /* சுழலும் கதிர்கள் */
+    const N=14,a0=u*.32,R=fw;ctx.fillStyle="rgba(255,255,255,.07)";
+    for(let i=0;i<N;i+=2){const a=a0+i*Math.PI*2/N;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,a,a+Math.PI*2/N);ctx.closePath();ctx.fill()}
+    /* நகரும் சாய்வுக் கீற்றுகள் */
+    [[420,40,.10],[300,18,.12],[560,70,.07]].forEach(([sp,w,al],i)=>{const x=((u*sp+i*390)%(fw+500))+fx-250;ctx.fillStyle=`rgba(255,255,255,${al})`;poly([[x,y0],[x+w,y0],[x+w-sk,y1],[x-sk,y1]]);ctx.fill()});
+    /* மேல்/கீழ் தங்கக் கோடுகள் (நடுவிலிருந்து விரியும்) */
+    const lw=fw*ease((u-.45)/.5)*(1-ease((u-(hold1-.1))/.3));
+    ctx.fillStyle=YEL;ctx.fillRect(cx-lw/2,fy+30,lw,5);ctx.fillRect(cx-lw/2,fy+fh-35,lw,5);
+    ctx.fillStyle="rgba(255,255,255,.7)";ctx.fillRect(cx-lw/2,fy+40,lw,2);ctx.fillRect(cx-lw/2,fy+fh-45,lw,2);
+    /* மின்னல் பளபளப்பு */
+    const sh=(u-hold0-.55)/.9;if(sh>0&&sh<1){const sx=fx-200+sh*(fw+400);ctx.fillStyle="rgba(255,255,255,.2)";poly([[sx,y0],[sx+110,y0],[sx+110-sk,y1],[sx-sk,y1]]);ctx.fill()}
+    ctx.restore();
+  }
+  /* உள்ளடக்கம் */
+  const tp=ease((u-hold0+.1)/.4),ca=tp*(1-ease((u-(hold1-.12))/.26));
+  if(ca>.01){
+    const s=shrink(text,fw-150,128,"800 italic"),sc=.7+.3*tp+.06*Math.sin(Math.PI*tp)+.01*Math.sin(u*8)*tp,ty=s*.3;
+    ctx.save();ctx.globalAlpha=ca;ctx.translate(cx,cy+(1-tp)*40);ctx.scale(sc,sc);
+    ctx.font=`800 italic ${s}px ${FONT}`;ctx.textAlign="center";
+    const tw=ctx.measureText(text).width;
+    ctx.shadowColor="rgba(0,0,0,.5)";ctx.shadowBlur=22;ctx.lineJoin="round";ctx.lineWidth=11;ctx.strokeStyle="rgba(0,0,0,.35)";ctx.strokeText(text,0,ty);
+    ctx.shadowBlur=0;ctx.fillStyle="#fff";ctx.fillText(text,0,ty);
+    const bw=tw*ease((u-hold0-.1)/.45);ctx.fillStyle=YEL;ctx.beginPath();ctx.roundRect(-bw/2,ty+24,bw,10,5);ctx.fill();
+    /* சேனல் பெயர் பட்டம் */
+    const nm=(G.name||"").trim();
+    if(nm){ctx.font=`800 34px ${FONT}`;const pw=ctx.measureText(nm).width+86,ph=56,py=-s*.62-62;
+      ctx.fillStyle=YEL;ctx.beginPath();ctx.roundRect(-pw/2,py-ph/2,pw,ph,ph/2);ctx.fill();
+      ctx.fillStyle=RED;ctx.globalAlpha=ca*(.55+.45*Math.sin(u*10));ctx.beginPath();ctx.arc(-pw/2+30,py,9,0,7);ctx.fill();
+      ctx.globalAlpha=ca;ctx.fillStyle="#101010";ctx.textAlign="left";ctx.fillText(nm,-pw/2+52,py+12)}
     ctx.restore();
   }
   ctx.restore();ctx.textAlign="left"
@@ -623,8 +676,9 @@ $("#bAll").onclick=async()=>{setCard(false);if(!okRec()){$("#st").textContent="C
 
 /* ---------- editable watermark ---------- */
 [["gSfx","sfx"],["gTick","tick"],["gSfxP","sfxp"]].forEach(([i,k])=>{$("#"+i).onchange=e=>{G[k]=e.target.checked;save()}});
-function promoFill(){$("#gPrOn").checked=G.prOn!==false;$("#gPrDef").value=G.prDef==null?"BREAKING NEWS":G.prDef;$("#gPrEvery").value=G.prEvery||30;$("#gPrDur").value=G.prDur||4}
+function promoFill(){$("#gPrOn").checked=G.prOn!==false;$("#gPrDef").value=G.prDef==null?"BREAKING NEWS":G.prDef;$("#gPrEvery").value=G.prEvery||30;$("#gPrDur").value=G.prDur||4;$("#gPrStyle").value=G.prStyle==="band"?"band":"full"}
 $("#gPrOn").onchange=e=>{G.prOn=e.target.checked;save()};
+$("#gPrStyle").onchange=e=>{G.prStyle=e.target.value;save()};
 $("#gPrDef").oninput=e=>{G.prDef=e.target.value;save()};
 $("#gPrEvery").onchange=e=>{G.prEvery=clamp(+e.target.value||30,5,90);e.target.value=G.prEvery;save()};
 $("#gPrDur").onchange=e=>{G.prDur=clamp(+e.target.value||4,2,10);e.target.value=G.prDur;save()};
