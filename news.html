@@ -66,8 +66,8 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
   </div>
   <div id="st">தயார். 1080×1920 · 30 FPS</div><small id="net"></small>
   <div class="row">
-    <label>தரம்<select id="xRes"><option value="720">720 × 1280 (பரிந்துரை, சிறிய கோப்பு)</option><option value="1080">1080 × 1920 (அதிக தெளிவு, நீண்ட நேரம்)</option></select></label>
-    <label>உருவாக்கும் வேகம்<select id="xFps"><option value="20">மிக வேகம் (20 fps)</option><option value="24">வேகம் (24 fps, பரிந்துரை)</option><option value="30">மென்மையாக (30 fps, மெதுவு)</option></select></label>
+    <label>தரம்<select id="xRes"><option value="1080" selected>1080 × 1920 (HD, பரிந்துரை)</option><option value="720">720 × 1280 (சிறிய கோப்பு, விரைவு)</option></select></label>
+    <label>உருவாக்கும் வேகம்<select id="xFps"><option value="20">விரைவு (20 fps)</option><option value="24">சமநிலை (24 fps)</option><option value="30" selected>மென்மையாக (30 fps, பரிந்துரை)</option></select></label>
   </div>
   <div class="bar" aria-hidden="true"><div id="xProg"></div></div>
   <div class="row"><button id="xCancel" class="gold" hidden>நிறுத்து</button></div>
@@ -206,7 +206,7 @@ function draw(it,t){
   const fx=vx+12,fy=vy+12,fw=vw-24,fh=vh-24,ML=MLF(it),uz=(it.zoom||1)*(1+.03*(t/D));
   const SL=G.slide||3,nM=ML.length,si=nM?Math.max(0,Math.floor(t/SL))%nM:0,st2=t%SL,nx=nM?(si+1)%nM:0;
   if(!STILL&&!window._exp)ML.forEach((m,i)=>{if(m.type!=="v")return;const on=i===si||(nM>1&&i===nx&&st2>SL-.6);if(on&&!m.el._on){m.el._on=true;m.el.currentTime=0;m.el.play().catch(()=>{})}else if(!on&&m.el._on){m.el._on=false;m.el.pause()}m.el.muted=!(rec&&i===si)});
-  const dm=(m,al)=>{ctx.save();ctx.globalAlpha=al;if(m.type==="v"){if(m.el.readyState>=2)cover(m.el,m.el.videoWidth,m.el.videoHeight,fx,fy,fw,fh,uz,it.px,it.py)}else cover(m.el,m.el.naturalWidth,m.el.naturalHeight,fx,fy,fw,fh,uz,it.px,it.py);ctx.restore()};
+  const dm=(m,al)=>{ctx.save();ctx.globalAlpha=al;if(m.type==="v"){if(m.el.readyState>=2){cover(m.el,m.el.videoWidth,m.el.videoHeight,fx,fy,fw,fh,uz,it.px,it.py);if(window._exp)snapFrame(m)}else if(window._exp&&m._lc)cover(m._lc,m._lc.width,m._lc.height,fx,fy,fw,fh,uz,it.px,it.py)}else cover(m.el,m.el.naturalWidth,m.el.naturalHeight,fx,fy,fw,fh,uz,it.px,it.py);ctx.restore()};
   if(nM){dm(ML[si],p);if(nM>1&&st2>SL-.5)dm(ML[nx],p*ease((st2-(SL-.5))/.5))}
   else{ctx.save();ctx.fillStyle="#242424";ctx.fillRect(fx,fy,fw,fh);const gg=ctx.createLinearGradient(fx+((t*260)%1500)-400,0,fx+((t*260)%1500),0);gg.addColorStop(0,"rgba(255,255,255,0)");gg.addColorStop(.5,"rgba(255,255,255,.1)");gg.addColorStop(1,"rgba(255,255,255,0)");ctx.fillStyle=gg;ctx.fillRect(fx,fy,fw,fh);ctx.fillStyle="#9a9a9a";ctx.font=`700 44px ${FONT}`;ctx.textAlign="center";ctx.fillText("வீடியோ / படம் இங்கே",W/2,vy+vh/2+14);ctx.restore();ctx.textAlign="left"}
   WMARK(fx,fy,fw,fh);FRAMEFX(it,t,fx,fy,fw,fh);PROMO(it,t,fx,fy,fw,fh);
@@ -521,7 +521,7 @@ t=rec?Math.min(t,DD):playing?t%DD:4;if(playing&&!rec){if(cur!==_sc||t<_st-.5)sfx
 function tabs(){["#tabs","#ctabs"].forEach(q=>{const t=$(q);t.innerHTML="";items.forEach((_,i)=>{const b=document.createElement("button");b.textContent=i+1;b.className=i===cur?"on":"";b.onclick=()=>sel(i);t.appendChild(b)})})}
 function fill(){document.querySelectorAll("[data-k]").forEach(e=>{const v=items[cur][e.dataset.k];if(e.type==="checkbox")e.checked=!!v;else e.value=v==null?e.defaultValue:v});$("#gName").value=G.name;$("#gDur").value=G.dur;$("#gSub").value=G.sub;$("#gSl").value=G.slide;FL.forEach(([i,k])=>{$("#"+i).value=G[k]});wmFill();promoFill();$("#gSfx").checked=G.sfx!==false;$("#gTick").checked=!!G.tick;$("#gSfxP").checked=!!G.sfxp;fillCard()}
 function sel(i){cur=i;if(cardMode)getCard(items[i]);startT=performance.now();tabs();fill();playMedia()}
-function playMedia(){Object.values(media).forEach(L=>L.forEach(m=>{m.el._on=false;if(m.type==="v")m.el.pause()}))}
+function playMedia(){Object.values(media).forEach(L=>L.forEach(m=>{m.el._on=false;if(m.type==="v"){m.el.pause();m.el.playbackRate=1;m._pb=false}}))}
 document.querySelectorAll("[data-k]").forEach(e=>e.addEventListener("input",()=>{items[cur][e.dataset.k]=e.type==="checkbox"?e.checked:e.type==="range"?+e.value:e.value;if(e.dataset.k==="date")items[cur].dm=true;save()}));
 $("#gName").oninput=e=>{G.name=e.target.value;save()};
 $("#gSub").oninput=e=>{G.sub=e.target.value;save()};
@@ -645,7 +645,7 @@ async function record(i){
   let wl=null;try{wl=await navigator.wakeLock.request("screen")}catch(e){}
   try{
     const ML=media[i]||[];let best=null;
-    for(const mt of mimes()){for(const br of [6e6,2.5e6]){
+    for(const mt of mimes()){for(const br of [9e6,4e6]){
       const st=cv.captureStream(30);
       ML.forEach(m=>{if(m.type==="v"){try{m.el.captureStream().getAudioTracks().forEach(t=>st.addTrack(t))}catch(e){}}});
       const sx=sfxStream(items[i]);if(sx)sx.tracks.forEach(t=>st.addTrack(t));
@@ -703,15 +703,44 @@ const xMC=new MessageChannel();
 const yieldNow=()=>new Promise(r=>{xMC.port1.onmessage=()=>r();xMC.port2.postMessage(0)});
 function seekTo(v,time){return new Promise(res=>{
   if(Math.abs(v.currentTime-time)<.002&&v.readyState>=2){res();return}
-  let done=false;const fin=()=>{if(done)return;done=true;v.removeEventListener("seeked",fin);res()};
-  v.addEventListener("seeked",fin);try{v.currentTime=time}catch(e){fin()}setTimeout(fin,700)})}
-async function syncVideos(ML,t){
+  let done=false;const fin=()=>{if(done)return;done=true;v.removeEventListener("seeked",fin);clearTimeout(tm);res()};
+  const tm=setTimeout(fin,4000);
+  v.addEventListener("seeked",fin);try{v.currentTime=time}catch(e){fin()}})}
+/* ---------- வேகமான ரெண்டர்: ஒவ்வொரு ஃப்ரேமுக்கும் seek செய்யாமல், வீடியோவை முன்னோக்கி ஓடவிட்டு ஏற்றுமதி நேரத்துடன் ஒத்திசைத்தல் ----------
+   தாவல் (seek) clip மாறும்போது / வீடியோ சுழலும்போது மட்டும்; மற்ற நேரங்களில் playbackRate-ஐ ஏற்றுமதி வேகத்துக்கு ஏற்ப மாற்றி ஃப்ரேம்களைப் பிடிக்கிறோம். */
+const HAS_RVFC="requestVideoFrameCallback"in HTMLVideoElement.prototype;
+function trackMT(el){if(el._trk||!HAS_RVFC)return;el._trk=true;const f=(n,md)=>{el._mt=md.mediaTime;el.requestVideoFrameCallback(f)};el.requestVideoFrameCallback(f)}
+const curOf=el=>(HAS_RVFC&&el._mt!=null)?el._mt:el.currentTime;
+function waitFrame(el,ms){return new Promise(res=>{if(!HAS_RVFC){setTimeout(res,50);return}let d=false;const fin=()=>{if(!d){d=true;clearTimeout(tm);res()}};const tm=setTimeout(fin,ms);el.requestVideoFrameCallback(fin)})}
+const cdist=(target,cur,dur)=>((target-cur+dur/2)%dur+dur)%dur-dur/2;
+/* வீடியோ ஃப்ரேம்களுக்கு இடையில் நிறுத்தப்பட்டிருக்கும்; தேவையான ஃப்ரேம் வரும் வரை மட்டும் 2x வேகத்தில் ஓடும் — அதனால் ஒத்திசைவு தவறாது, தாவலும் தேவையில்லை */
+async function driveVideo(m,lt,tol){
+  const el=m.el,dur=el.duration||1,target=lt%dur;trackMT(el);
+  const d=cdist(target,curOf(el),dur);
+  if(!m._pb||d<-.15||d>.6){
+    el.pause();await seekTo(el,target);el._mt=null;el.playbackRate=2;
+    try{await el.play()}catch(e){}
+    m._pb=true;await waitFrame(el,1500);el.pause();return}
+  if(d<=tol)return;
+  el.playbackRate=2;try{await el.play()}catch(e){}
+  const t0=performance.now();
+  while(performance.now()-t0<1500){if(cdist(target,curOf(el),dur)<=tol)break;await waitFrame(el,200)}
+  el.pause()
+}
+async function syncVideos(ML,t,fps){
   const SL=G.slide||3,nM=ML.length;if(!nM)return;
-  const k0=Math.floor(t/SL),si=k0%nM,st2=t%SL,nx=(si+1)%nM,jobs=[];
+  const k0=Math.floor(t/SL),si=k0%nM,st2=t%SL,nx=(si+1)%nM,tol=.5/(fps||24),jobs=[];
   ML.forEach((m,i)=>{if(m.type!=="v")return;let lt=null;
     if(nM===1)lt=t;else if(i===si)lt=st2+(k0>0?.6:0);else if(i===nx&&st2>SL-.6)lt=st2-(SL-.6);
-    if(lt==null)return;jobs.push(seekTo(m.el,lt%(m.el.duration||1)))});
+    if(lt==null){if(m._pb){m.el.pause();m._pb=false}return}
+    jobs.push(driveVideo(m,lt,tol))});
   await Promise.all(jobs)}
+/* ஏற்றுமதியில் வீடியோ ஃப்ரேம் தயாராகாவிட்டால் கருப்பு விடாமல் முந்தைய நல்ல ஃப்ரேமையே வரைய */
+function snapFrame(m){const el=m.el,vw=el.videoWidth,vh=el.videoHeight;if(!vw)return;
+  if(m._lc&&el._mt!=null&&m._lmt===el._mt)return;
+  const s=Math.min(1,720/Math.max(vw,vh)),w=Math.max(1,Math.round(vw*s)),h=Math.max(1,Math.round(vh*s));
+  let c=m._lc;if(!c||c.width!==w||c.height!==h){c=m._lc=document.createElement("canvas");c.width=w;c.height=h}
+  c.getContext("2d").drawImage(el,0,0,w,h);m._lmt=el._mt}
 /* ---------- ஒலி விளைவுகள் (இயற்றப்பட்டவை; தீர்மானமானவை) ---------- */
 function sfxRender(it,D,SR){
   const n=Math.round(Math.min(D,8)*SR),o=new Float32Array(n);let seed=7;const rnd=()=>(seed=(seed*1664525+1013904223)>>>0)/4294967296*2-1;
@@ -756,7 +785,7 @@ async function exportOne(i,idx,count){
   try{
     let vcfg=null;
     for(const codec of["avc1.640029","avc1.4D0029","avc1.42E029"]){if(vcfg)break;for(const hw of["prefer-hardware","no-preference"]){
-      const c={codec,width:RW,height:RH,bitrate:RW===1080?6e6:3e6,framerate:fps,hardwareAcceleration:hw};
+      const c={codec,width:RW,height:RH,bitrate:RW===1080?9e6:4.5e6,framerate:fps,hardwareAcceleration:hw};
       try{if((await VideoEncoder.isConfigSupported(c)).supported){vcfg=c;break}}catch(e){}}}
     if(!vcfg)throw new Error("இந்தச் சாதனத்தில் H.264 என்கோடர் கிடைக்கவில்லை.");
     let mix=null,acfg=null;
@@ -771,17 +800,18 @@ async function exportOne(i,idx,count){
     if(acfg){aenc=new AudioEncoder({output:(c,m)=>muxer.addAudioChunk(c,m),error:e=>{encErr=e}});aenc.configure(acfg)}
     const ex=document.createElement("canvas");ex.width=RW;ex.height=RH;const ectx=ex.getContext("2d",{alpha:false});
     const ML=media[i]||[];let aPos=0;const CH=4096,t0=performance.now();
+    ML.forEach(m=>{m._pb=false;m._lc=null;m._lmt=undefined});
     const pushAudio=()=>{const n=Math.min(CH,mix.L.length-aPos),d=new Float32Array(n*2);
       d.set(mix.L.subarray(aPos,aPos+n),0);d.set(mix.R.subarray(aPos,aPos+n),n);
       const ad=new AudioData({format:"f32-planar",sampleRate:SR,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(aPos/SR*1e6),data:d});
       aenc.encode(ad);ad.close();aPos+=n};
     for(let f=0;f<total;f++){
       if(xCancel)throw new Error("cancel");if(encErr)throw encErr;
-      const t=f/fps;await syncVideos(ML,t);draw(it,t);ectx.drawImage(cv,0,0,RW,RH);
+      const t=f/fps;await syncVideos(ML,t,fps);draw(it,t);ectx.drawImage(cv,0,0,RW,RH);
       const fr=new VideoFrame(ex,{timestamp:Math.round(f*1e6/fps),duration:Math.round(1e6/fps)});
       venc.encode(fr,{keyFrame:f%(fps*2)===0});fr.close();
       while(aenc&&aPos<mix.L.length&&aPos/SR<=t+.3)pushAudio();
-      while(venc.encodeQueueSize>8)await yieldNow();
+      if(venc.encodeQueueSize>8){ML.forEach(m=>{if(m.type==="v")m.el.pause()});while(venc.encodeQueueSize>8)await yieldNow()}
       if(f%10===0){const pc=(idx+f/total)/count*100,el=(performance.now()-t0)/1000,left=f>20?el/f*(total-f):0;
         $("#xProg").style.width=pc.toFixed(1)+"%";
         xMsg((count>1?"வீடியோ "+(idx+1)+"/"+count+" · ":"")+"பிரேம் "+f+" / "+total+" ("+(f/total*100).toFixed(0)+"%)"+(left?" · மீதம் சுமார் "+(left>90?Math.ceil(left/60)+" நிமிடம்":Math.ceil(left)+" வினாடி"):""));
@@ -789,7 +819,7 @@ async function exportOne(i,idx,count){
     await venc.flush();if(aenc){while(aPos<mix.L.length)pushAudio();await aenc.flush()}
     muxer.finalize();
     return{blob:new Blob([muxer.target.buffer],{type:"video/mp4"}),ext:"mp4",note}
-  }finally{try{if(venc&&venc.state!=="closed")venc.close()}catch(e){}try{if(aenc&&aenc.state!=="closed")aenc.close()}catch(e){}}
+  }finally{(media[i]||[]).forEach(m=>{if(m.type==="v"){try{m.el.pause()}catch(e){}m._pb=false;m.el.playbackRate=1}});try{if(venc&&venc.state!=="closed")venc.close()}catch(e){}try{if(aenc&&aenc.state!=="closed")aenc.close()}catch(e){}}
 }
 function addResult(o,i){
   const name="theekkathir-"+(i+1)+"-"+(items[i].date||today())+".mp4",row=document.createElement("div");
