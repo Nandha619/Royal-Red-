@@ -78,6 +78,7 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
   <label>செய்தி ஸ்கிரிப்ட் (*சொல்* = சிவப்பு; நீளமானால் 3 கட்டமாக தோன்றி, மீண்டும் மீண்டும் சுழலும்)<textarea data-k="script" rows="6"></textarea></label><small id="pgInfo"></small>
   <label>டிக்கர் (| கொண்டு பிரிக்கவும்)<input data-k="ticker"></label>
   <label>🎬 வீடியோ புரோமோ எழுத்து (இந்தச் செய்திக்கு; காலியாக விட்டால் இயல்புநிலை வரும்; பல வார்த்தைகளை | கொண்டு பிரிக்கவும்)<input data-k="promo" placeholder="BREAKING NEWS | JUST IN | NEWS UPDATE"></label>
+  <label>⏱ புரோமோ வரும் நேரங்கள் (வினாடி அல்லது நிமிடம்:வினாடி; காற்புள்ளியால் பிரிக்கவும், எ.கா: 10, 25, 1:05; காலியாக விட்டால் இடைவெளி முறை)<input data-k="promoAt" placeholder="10, 25, 1:05" inputmode="text"></label><small id="promoAtInfo"></small>
   <div class="row">
     <label>வீடியோக்கள் / படங்கள் (ஒன்றுக்கு மேல் தேர்வு செய்யலாம்)<input type="file" id="fMedia" accept="video/*,image/*" multiple><small id="mInfo"></small></label>
     <label style="flex:0 0 150px">BREAKING<input type="checkbox" data-k="breaking" style="width:28px;height:28px"></label>
@@ -384,13 +385,20 @@ function FRAMEFX(it,t,fx,fy,fw,fh){
    ஒவ்வொரு G.prEvery வினாடிக்கும் (30, 60, 90…) வீடியோ கட்டத்திற்குள் வெடித்து வந்து, G.prDur வினாடி தெரிந்து மறையும்.
    வீடியோ பின்னால் தொடர்ந்து ஓடும். நிறங்கள்: RED / YEL (தீம் மாற்றினால் தானாக மாறும்). */
 function promoWords(it){const raw=(it.promo&&it.promo.trim())?it.promo:(G.prDef==null?"BREAKING NEWS":G.prDef);return raw.split("|").map(s=>s.trim()).filter(Boolean)}
+/* புரோமோ நேரங்கள்: நீங்கள் கொடுத்த நேரங்கள் (promoAt) இருந்தால் அவை மட்டும்; இல்லையெனில் G.prEvery இடைவெளி */
+function promoTimes(it){
+  const raw=(it.promoAt||"").trim();if(!raw)return null;const out=[];
+  raw.split(/[,;\s]+/).forEach(x=>{if(!x)return;let v=null;const m=x.match(/^(\d+):(\d{1,2})$/);if(m)v=+m[1]*60+(+m[2]);else if(/^\d+(\.\d+)?$/.test(x))v=+x;if(v!=null&&isFinite(v)&&v>=0)out.push(v)});
+  return out.length?[...new Set(out)].sort((a,b)=>a-b):null}
 function PROMO(it,t,fx,fy,fw,fh){
   if(STILL||G.prOn===false)return;
   const words=promoWords(it);if(!words.length)return;
-  const E=clamp(+G.prEvery||30,5,90),DU=clamp(+G.prDur||4,2,10),k=Math.floor(t/E);
-  if(k<1)return;const T0=k*E,u=t-T0;
+  const DU=clamp(+G.prDur||4,2,10),tl=promoTimes(it);let T0,k;
+  if(tl){k=-1;for(let i=0;i<tl.length;i++){if(t>=tl[i]&&t<tl[i]+DU){k=i;T0=tl[i];break}}if(k<0)return}
+  else{const E=clamp(+G.prEvery||30,5,90),q=Math.floor(t/E);if(q<1)return;T0=q*E;k=q-1}
+  const u=t-T0;
   if(u>=DU||T0+DU>durOf(it))return;
-  (G.prStyle==="band"?promoBand:promoFull)(words[(k-1)%words.length],u,DU,fx,fy,fw,fh)
+  (G.prStyle==="band"?promoBand:promoFull)(words[k%words.length],u,DU,fx,fy,fw,fh)
 }
 /* பாணி 2: நடுப் பட்டை */
 function promoBand(text,u,DU,fx,fy,fw,fh){
@@ -676,13 +684,22 @@ $("#bAll").onclick=async()=>{setCard(false);if(!okRec()){$("#st").textContent="C
 
 /* ---------- editable watermark ---------- */
 [["gSfx","sfx"],["gTick","tick"],["gSfxP","sfxp"]].forEach(([i,k])=>{$("#"+i).onchange=e=>{G[k]=e.target.checked;save()}});
-function promoFill(){$("#gPrOn").checked=G.prOn!==false;$("#gPrDef").value=G.prDef==null?"BREAKING NEWS":G.prDef;$("#gPrEvery").value=G.prEvery||30;$("#gPrDur").value=G.prDur||4;$("#gPrStyle").value=G.prStyle==="band"?"band":"full"}
+function promoFill(){$("#gPrOn").checked=G.prOn!==false;$("#gPrDef").value=G.prDef==null?"BREAKING NEWS":G.prDef;$("#gPrEvery").value=G.prEvery||30;$("#gPrDur").value=G.prDur||4;promoAtInfo();$("#gPrStyle").value=G.prStyle==="band"?"band":"full"}
 $("#gPrOn").onchange=e=>{G.prOn=e.target.checked;save()};
 $("#gPrStyle").onchange=e=>{G.prStyle=e.target.value;save()};
 $("#gPrDef").oninput=e=>{G.prDef=e.target.value;save()};
 $("#gPrEvery").onchange=e=>{G.prEvery=clamp(+e.target.value||30,5,90);e.target.value=G.prEvery;save()};
 $("#gPrDur").onchange=e=>{G.prDur=clamp(+e.target.value||4,2,10);e.target.value=G.prDur;save()};
-$("#bPrTest").onclick=()=>{const E=clamp(+G.prEvery||30,5,90);if(durOf(items[cur])<E+(+G.prDur||4)){$("#st").textContent="வீடியோ நீளம் "+E+" வினாடிக்கு மேல் இருந்தால்தான் புரோமோ வரும்.";return}G.prOn=true;$("#gPrOn").checked=true;playing=true;$("#bPlay").textContent="⏸ முன்னோட்டம்";startT=performance.now()-(E-.5)*1000;$("#st").textContent="புரோமோ 0.5 வினாடியில் வரும்…"};
+function promoAtInfo(){const el=$("#promoAtInfo");if(!el)return;const it=items[cur],tl=promoTimes(it),D=durOf(it),DU=clamp(+G.prDur||4,2,10);
+  const f=x=>Math.floor(x/60)+":"+String(Math.round(x%60)).padStart(2,"0");
+  if(!tl){el.textContent="காலியாக உள்ளது → ஒவ்வொரு "+clamp(+G.prEvery||30,5,90)+" வினாடிக்கும் தானாக வரும் (வீடியோ நீளம் "+D+" வினாடி).";return}
+  const ok=tl.filter(x=>x+DU<=D),bad=tl.filter(x=>x+DU>D);
+  el.textContent="வரும் நேரங்கள்: "+(ok.map(f).join(", ")||"இல்லை")+(bad.length?" · ⚠ "+bad.map(f).join(", ")+" வீடியோ நீளத்தை ("+D+" வினாடி) தாண்டுவதால் வராது":"")+" · k-வது நேரத்துக்கு k-வது வார்த்தை வரும்."}
+document.querySelectorAll('[data-k="promoAt"]').forEach(e=>e.addEventListener("input",promoAtInfo));
+$("#bPrTest").onclick=()=>{const it=items[cur],tl=promoTimes(it),DU=+G.prDur||4,D=durOf(it);let T;
+  if(tl){T=tl.find(x=>x+DU<=D);if(T==null){$("#st").textContent="கொடுத்த நேரங்கள் வீடியோ நீளத்துக்குள் (" +D+" வினாடி) இல்லை.";return}}
+  else{const E=clamp(+G.prEvery||30,5,90);if(D<E+DU){$("#st").textContent="வீடியோ நீளம் "+E+" வினாடிக்கு மேல் இருந்தால்தான் புரோமோ வரும்; அல்லது 'புரோமோ வரும் நேரங்கள்' பெட்டியில் நேரம் கொடுங்கள்.";return}T=E}
+  G.prOn=true;$("#gPrOn").checked=true;playing=true;$("#bPlay").textContent="⏸ முன்னோட்டம்";startT=performance.now()-Math.max(0,T-.5)*1000;$("#st").textContent="புரோமோ 0.5 வினாடியில் வரும்…"};
 function wmFill(){$("#gWmS").value=G.wmS||56;$("#gWmO").value=G.wmO==null?.4:G.wmO;$("#gWmX").value=G.wmX==null?100:G.wmX;$("#gWmY").value=G.wmY==null?100:G.wmY;$("#gWmC").value=G.wmC||"#ffffff"}
 [["gWmS","wmS",1],["gWmO","wmO",1],["gWmX","wmX",1],["gWmY","wmY",1],["gWmC","wmC",0]].forEach(([i,k,n])=>{$("#"+i).oninput=e=>{G[k]=n?+e.target.value:e.target.value;save()}});
 function WMARK(fx,fy,fw,fh){
