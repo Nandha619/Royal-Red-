@@ -77,6 +77,7 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
   <label>தலைப்பு (வரி 1 கருப்பு, வரி 2 சிவப்பு; *சொல்* = சிவப்பு)<textarea data-k="headline" rows="3"></textarea></label>
   <label>செய்தி ஸ்கிரிப்ட் (*சொல்* = சிவப்பு; நீளமானால் 3 கட்டமாக தோன்றி, மீண்டும் மீண்டும் சுழலும்)<textarea data-k="script" rows="6"></textarea></label><small id="pgInfo"></small>
   <label>டிக்கர் (| கொண்டு பிரிக்கவும்)<input data-k="ticker"></label>
+  <label>⏱ இந்தச் செய்தியின் நீளம் (தொகுப்பு முறையில்; வினாடி)<select data-k="len"><option value="20">20 வினாடி</option><option value="30">30 வினாடி</option><option value="40">40 வினாடி</option><option value="50">50 வினாடி</option><option value="60">60 வினாடி</option></select></label>
   <label>🎬 வீடியோ புரோமோ எழுத்து (இந்தச் செய்திக்கு; காலியாக விட்டால் இயல்புநிலை வரும்; பல வார்த்தைகளை | கொண்டு பிரிக்கவும்)<input data-k="promo" placeholder="BREAKING NEWS | JUST IN | NEWS UPDATE"></label>
   <label>⏱ புரோமோ வரும் நேரங்கள் (வினாடி அல்லது நிமிடம்:வினாடி; காற்புள்ளியால் பிரிக்கவும், எ.கா: 10, 25, 1:05; காலியாக விட்டால் இடைவெளி முறை)<input data-k="promoAt" placeholder="10, 25, 1:05" inputmode="text"></label><small id="promoAtInfo"></small>
   <div class="row" style="align-items:end"><label>முன்னோட்ட நேரம் <b id="pScrubT">0:00</b><input type="range" id="pScrub" min="0" max="90" step="0.1" value="0"></label></div>
@@ -91,6 +92,17 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
     <button class="alt" id="bDel">🗑 நீக்கு</button>
     <button class="alt" id="bDate">📅 இன்றைய தேதி</button>
   </div>
+  <details open>
+    <summary>🎞 தொகுப்பு வீடியோ (Top 10 · ஒரே வீடியோ · அதிகபட்சம் 3 நிமிடம்)</summary>
+    <div class="panel" style="border:0;padding:8px 0 0">
+      <label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gCombo" style="width:auto"> தொகுப்பு முறை: ஒவ்வொரு செய்தியும் தன் நீளம் ஓடி, முடிவில் புரோமோ வரும்; End card கடைசியில் மட்டும்</label>
+      <div class="row"><label>தொடக்க செய்தி எண் (part 2-க்கு 7 போன்ற எண் கொடுக்கவும்)<input id="gFrom" type="number" min="1" max="10"></label></div>
+      <small id="cInfo"></small>
+      <div class="row"><button class="alt" id="bTpl" type="button">⭐ இந்த அமைப்பை இயல்பு அமைப்பாக சேமி</button><button class="alt" id="bTplRst" type="button">↺ இந்தச் செய்தியை இயல்புக்கு மீட்டமை</button></div>
+      <small>புதிய செய்தி சேர்க்கும்போது எழுத்து (தலைப்பு / ஸ்கிரிப்ட்) காலியாகவும், மற்றவை (நீளம், BREAKING, புரோமோ எழுத்து, zoom) இயல்பு அமைப்பிலிருந்தும் தொடங்கும். முதல் செய்தியின் அமைப்பு தானாகவே இயல்பு அமைப்பாகச் சேமிக்கப்பட்டிருக்கும்.</small>
+      <div class="row"><button class="alt" id="bCP" type="button">▶ தொகுப்பு முன்னோட்டம்</button><button class="gold" id="bCombo" type="button">🎞 MP4 உருவாக்கு (தொகுப்பு)</button></div>
+    </div>
+  </details>
   <details open>
     <summary>சேனல் அமைப்பு</summary>
     <div class="panel" style="border:0;padding:8px 0 0">
@@ -154,6 +166,10 @@ const FL=[["gBrk","brk"],["gTk1","tk1"],["gTk2","tk2"],["gEnd","end"],["gThx","t
 let G={name:"தீக்கதிர்",sub:"Mobile TV",dur:90,slide:3,brk:"BREAKING NEWS",tk1:"BREAKING",tk2:"NEWS",end:"ஊடக உலகின் உண்மை போராளி",thx:"நன்றி · தொடர்ந்து இணைந்திருங்கள்",wm:"#Theekathir",ct:"செய்தி & விளம்பர தொடர்புக்கு",ph:"98XXX XXXXX"},items=[blank()],cur=0,media={},logoImg=null;
 try{const s=JSON.parse(localStorage.getItem("tk_studio2")||"null");if(s&&s.items&&s.items.length){G=Object.assign(G,s.G);items=s.items}}catch(e){}
 if(!G.v3){G.dur=90;G.v3=1}if(!G.v4){G.ct="செய்தி & விளம்பர தொடர்புக்கு";G.v4=1}items.forEach(x=>{if(!x.dm)x.date=today()});
+/* முதல் செய்தியின் அமைப்பு தானாகவே "இயல்பு அமைப்பு"-ஆக சேமிக்கப்படும் (G.tpl); புதிய செய்தி எப்போதும் இதிலிருந்தே தொடங்கும் */
+if(!G.tpl){const f=items[0]||{};G.tpl={breaking:f.breaking!==false,promo:f.promo||"",len:+f.len||30}}
+items.forEach(x=>{if(!x.len)x.len=G.tpl.len||30});
+const tplSt=()=>({breaking:G.tpl.breaking,promo:G.tpl.promo,len:G.tpl.len,zoom:1,px:0,py:0});
 const save=()=>{try{localStorage.setItem("tk_studio2",JSON.stringify({G,items}))}catch(e){}};
 function setLogo(u){const im=new Image();im.onload=()=>{logoImg=im};im.src=u}
 try{const l=localStorage.getItem("tk_logo");if(l)setLogo(l)}catch(e){}
@@ -185,7 +201,14 @@ for(let f=50;f>=42;f-=2){const L=run(f),c=Math.floor(TH/(f*1.45));if(L.length<=c
 if(sl.length>cap){for(sf=50;sf>=30;sf-=2){sl=run(sf);cap=Math.floor(TH/(sf*1.45));if(sl.length<=cap*3)break}}
 const np=Math.max(1,Math.min(3,Math.ceil(sl.length/cap)));return{sf,sl,gp:sf*1.45,np,per:Math.max(1,Math.ceil(sl.length/np))}}
 function scriptFull(txt){let sf=50,sl=[];for(;sf>=24;sf-=2){sl=[];(txt||"").split("\n").forEach(par=>{if(par.trim())wrap(tok(par),TW,`700 ${sf}px ${FONT}`).forEach(l=>sl.push(l))});if(sl.length*sf*1.45<=TH)break}return{sf,sl,gp:sf*1.45}}
-const EC=3.8;const durOf=it=>Math.min(180,Math.max(G.dur,2+scriptPages(it.script).np*6+EC+.4));
+const EC=3.8;
+/* ---------- தொகுப்பு முறை (G.combo): ஒவ்வொரு செய்தியும் தன் நீளம் (30 / 50 வி) ஓடி, கடைசியில் புரோமோ; End card கடைசிச் செய்திக்கு மட்டும் ---------- */
+const _sm=new WeakMap();
+const segLen=it=>{const k=(it.script||"")+"|"+(+it.len||30);let c=_sm.get(it);if(!c||c.k!==k){c={k,v:Math.max(+it.len||30,2+scriptPages(it.script).np*6+.4)};_sm.set(it,c)}return c.v};
+/* G.cFrom-ஆம் செய்தியிலிருந்து தொடங்கி, 180 வினாடிக்குள் (End card உட்பட) எத்தனை செய்தி அடங்கும் என்று கணக்கிடும் */
+const comboRange=()=>{const a=clamp((+G.cFrom||1)-1,0,items.length-1);let b=a,body=segLen(items[a]);for(let k=a+1;k<items.length;k++){const n=body+segLen(items[k]);if(n+EC>180)break;body=n;b=k}return{a,b,tot:Math.min(180,body+EC)}};
+const lastSeg=it=>items[comboRange().b]===it;
+const durOf=it=>G.combo?Math.min(180,segLen(it)+(lastSeg(it)?EC:0)):Math.min(180,Math.max(G.dur,2+scriptPages(it.script).np*6+EC+.4));
 function draw(it,t){
   const D=durOf(it),a=(s,d)=>ease((t-s)/d),C=(s)=>{ctx.textAlign=s?"center":"left"};
   ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.textBaseline="alphabetic";ctx.textAlign="left";ctx.shadowBlur=0;
@@ -245,7 +268,7 @@ function draw(it,t){
 
   if(t<.7){const q=ease(t/.7),x=-W+q*W*2.2;ctx.fillStyle=YEL;ctx.fillRect(x,0,W*.5,H);ctx.fillStyle=GOLD;ctx.fillRect(x+W*.5,0,16,H)}
   /* end card */
-  ENDCARD(it,t,D);
+  if(!G.combo||lastSeg(it))ENDCARD(it,t,D);
 }
 
 
@@ -397,6 +420,8 @@ function PROMO(it,t,fx,fy,fw,fh){
   if(STILL||G.prOn===false)return;
   const words=promoWords(it);if(!words.length)return;
   const DU=clamp(+G.prDur||4,2,10),tl=promoTimes(it);let T0,k;
+  /* தொகுப்பு முறை: புரோமோ எப்போதும் இந்தச் செய்தியின் கடைசியில் (கடைசிச் செய்தியில் End card-க்கு முன்) */
+  if(G.combo){const D=durOf(it),S0=D-DU-(lastSeg(it)?EC:0),u=t-S0;if(S0<0||u<0||u>=DU)return;(G.prStyle==="band"?promoBand:promoFull)(words[Math.max(0,items.indexOf(it))%words.length],u,DU,fx,fy,fw,fh);return}
   if(tl){k=-1;for(let i=0;i<tl.length;i++){if(t>=tl[i]&&t<tl[i]+DU){k=i;T0=tl[i];break}}if(k<0)return}
   else{const E=clamp(+G.prEvery||30,5,180),q=Math.floor(t/E);if(q<1)return;T0=q*E;k=q-1}
   const u=t-T0;
@@ -577,13 +602,14 @@ let startT=performance.now(),rec=false,playing=true;
 const VIEW=document.documentElement.classList.contains("m-view");
 function loop(now){if(window._exp){requestAnimationFrame(loop);return}if(cardMode&&items[cur].card){STILL=true;try{draw(items[cur].card,4)}catch(e){console.error(e)}requestAnimationFrame(loop);return}STILL=false;let t=Math.max(0,(now-startT)/1000);const DD=durOf(items[cur]);
 /* காட்சிப் பக்கம்: ஒரு செய்தி முடிந்ததும் அடுத்த செய்திக்குத் தானாகச் செல்லும் */
+if(window._cp&&!rec&&t>=DD){const R=comboRange();sel(cur>=R.b||cur<R.a?R.a:cur+1);requestAnimationFrame(loop);return}
 if(VIEW&&!rec&&items.length>1&&t>=DD){sel((cur+1)%items.length);requestAnimationFrame(loop);return}
 t=rec?Math.min(t,DD):playing?t%DD:(window._scrub!=null?window._scrub:4);syncScrub(t,DD);if(playing&&!rec){if(cur!==_sc||t<_st-.5)sfxPreview(items[cur]);_sc=cur;_st=t}try{draw(items[cur],t)}catch(e){console.error(e)}requestAnimationFrame(loop)}
 (async()=>{try{await document.fonts.load("800 40px 'Noto Sans Tamil'","தமிழ்");await document.fonts.load("700 40px 'Noto Sans Tamil'","தமிழ்")}catch(e){}requestAnimationFrame(loop)})();
 
 /* ---------- UI ---------- */
 function tabs(){["#tabs","#ctabs"].forEach(q=>{const t=$(q);t.innerHTML="";items.forEach((_,i)=>{const b=document.createElement("button");b.textContent=i+1;b.className=i===cur?"on":"";b.onclick=()=>sel(i);t.appendChild(b)})})}
-function fill(){document.querySelectorAll("[data-k]").forEach(e=>{const v=items[cur][e.dataset.k];if(e.type==="checkbox")e.checked=!!v;else e.value=v==null?e.defaultValue:v});$("#gName").value=G.name;$("#gDur").value=G.dur;$("#gSub").value=G.sub;$("#gSl").value=G.slide;FL.forEach(([i,k])=>{$("#"+i).value=G[k]});wmFill();promoFill();$("#gSfx").checked=G.sfx!==false;$("#gTick").checked=!!G.tick;$("#gSfxP").checked=!!G.sfxp;fillCard()}
+function fill(){document.querySelectorAll("[data-k]").forEach(e=>{const v=items[cur][e.dataset.k];if(e.type==="checkbox")e.checked=!!v;else e.value=v==null?e.defaultValue:v});$("#gName").value=G.name;$("#gDur").value=G.dur;$("#gSub").value=G.sub;$("#gSl").value=G.slide;FL.forEach(([i,k])=>{$("#"+i).value=G[k]});wmFill();promoFill();comboFill();$("#gSfx").checked=G.sfx!==false;$("#gTick").checked=!!G.tick;$("#gSfxP").checked=!!G.sfxp;fillCard()}
 function sel(i){cur=i;window._scrub=null;if(cardMode)getCard(items[i]);startT=performance.now();tabs();fill();playMedia()}
 function playMedia(){Object.values(media).forEach(L=>L.forEach(m=>{m.el._on=false;if(m.type==="v"){m.el.pause();m.el.playbackRate=1;m._pb=false}}))}
 document.querySelectorAll("[data-k]").forEach(e=>e.addEventListener("input",()=>{items[cur][e.dataset.k]=e.type==="checkbox"?e.checked:e.type==="range"?+e.value:e.value;if(e.dataset.k==="date")items[cur].dm=true;save()}));
@@ -601,10 +627,10 @@ $("#fMedia").onchange=e=>{const k=cur;[...e.target.files].forEach(f=>addMedia(k,
 if(window.MediaStore)MediaStore.get("tv:media").then(o=>{if(!o)return;Object.keys(o).forEach(k=>(o[k]||[]).forEach(f=>addMedia(+k,f)))});
 $("#bClr").onclick=()=>{(media[cur]||[]).forEach(m=>{if(m.type==="v")m.el.pause()});delete media[cur];persistMedia()};
 $("#bPlay").onclick=()=>{playing=!playing;$("#bPlay").textContent=playing?"⏸ முன்னோட்டம்":"▶ முன்னோட்டம்";startT=performance.now()-(playing&&window._scrub!=null?window._scrub*1000:0);window._scrub=null};
-$("#bAdd").onclick=()=>{if(items.length>=10){$("#st").textContent="அதிகபட்சம் 10 செய்திகள்.";return}items.push({...blank(),headline:"",loc:"",script:"",ticker:""});save();sel(items.length-1)};
+$("#bAdd").onclick=()=>{if(items.length>=10){$("#st").textContent="அதிகபட்சம் 10 செய்திகள்.";return}items.push({...blank(),headline:"",loc:"",script:"",ticker:"",...tplSt()});save();sel(items.length-1)};
 $("#bDel").onclick=()=>{if(items.length<2)return;items.splice(cur,1);const m={};Object.keys(media).forEach(k=>{k=+k;if(k<cur)m[k]=media[k];else if(k>cur)m[k-1]=media[k]});media=m;persistMedia();save();sel(Math.min(cur,items.length-1))};
 $("#bDate").onclick=()=>{items.forEach(x=>{x.date=today();x.dm=false});save();fill();$("#st").textContent="✔ அனைத்து செய்திகளுக்கும் இன்றைய தேதி அமைக்கப்பட்டது."};
-$("#bImp").onclick=()=>{const L=$("#bulk").value.split("\n").map(s=>s.trim()).filter(Boolean).slice(0,10);if(!L.length)return;items=L.map(l=>{const p=l.split("|").map(s=>s.trim());return{headline:p[0]||"",loc:p[1]||"",date:today(),script:(p[2]||"").split(";").map(s=>s.trim()).join("\n"),ticker:p[3]||plain(p[0]),breaking:true}});media={};save();sel(0);$("#st").textContent=items.length+" செய்திகள் ஏற்றப்பட்டன. ஒவ்வொன்றிற்கும் வீடியோ சேர்க்கலாம்."};
+$("#bImp").onclick=()=>{const L=$("#bulk").value.split("\n").map(s=>s.trim()).filter(Boolean).slice(0,10);if(!L.length)return;items=L.map(l=>{const p=l.split("|").map(s=>s.trim());return{headline:p[0]||"",loc:p[1]||"",date:today(),script:(p[2]||"").split(";").map(s=>s.trim()).join("\n"),ticker:p[3]||plain(p[0]),...tplSt()}});media={};save();sel(0);$("#st").textContent=items.length+" செய்திகள் ஏற்றப்பட்டன. ஒவ்வொன்றிற்கும் வீடியோ சேர்க்கலாம்."};
 
 /* ---------- export ---------- */
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -623,7 +649,7 @@ async function record(i){
     return{blob:new Blob(ch,{type:mt||"video/webm"}),ext:mt.includes("mp4")?"mp4":"webm"}
   }finally{rec=false;try{wl&&wl.release()}catch(e){}}
 }
-const lock=v=>["#bOne","#bAll"].forEach(s=>$(s).disabled=v);
+const lock=v=>["#bOne","#bAll","#bCombo"].forEach(s=>$(s).disabled=v);
 const okRec=()=>window.MediaRecorder&&cv.captureStream;
 const inFrame=e=>{const r=cv.getBoundingClientRect(),y=(e.clientY-r.top)*H/r.height;return y>=VY&&y<=VY+VH};
 function syncAdj(){const it=items[cur],c=it.card;document.querySelectorAll("[type=range][data-k]").forEach(e=>e.value=it[e.dataset.k]==null?e.defaultValue:it[e.dataset.k]);if(c)document.querySelectorAll("[type=range][data-c]").forEach(e=>e.value=c[e.dataset.c]==null?e.defaultValue:c[e.dataset.c]);save()}
@@ -916,8 +942,8 @@ async function exportOne(i,idx,count){
     return{blob:new Blob([muxer.target.buffer],{type:"video/mp4"}),ext:"mp4",note}
   }finally{(media[i]||[]).forEach(m=>{if(m.type==="v"){try{m.el.pause()}catch(e){}m._pb=false;m.el.playbackRate=1}});try{if(venc&&venc.state!=="closed")venc.close()}catch(e){}try{if(aenc&&aenc.state!=="closed")aenc.close()}catch(e){}}
 }
-function addResult(o,i){
-  const name="theekkathir-"+(i+1)+"-"+(items[i].date||today())+".mp4",row=document.createElement("div");
+function addResult(o,i,nm){
+  const name=nm||"theekkathir-"+(i+1)+"-"+(items[i].date||today())+".mp4",row=document.createElement("div");
   row.style.cssText="display:grid;gap:8px;padding:10px;border:1px solid var(--line);border-radius:12px";
   const v=document.createElement("video");v.src=URL.createObjectURL(o.blob);v.controls=true;v.playsInline=true;v.style.cssText="width:min(100%,240px);border-radius:10px;background:#000";
   const b=document.createElement("button");b.textContent="MP4 சேமி · "+name+" ("+(o.blob.size/1048576).toFixed(1)+" MB)";
@@ -941,6 +967,86 @@ async function runExport(list){
 $("#bOne").onclick=()=>runExport([cur]);
 $("#bAll").onclick=()=>runExport(items.map((_,i)=>i));
 $("#xCancel").onclick=()=>{xCancel=true};
+
+/* ---------- தொகுப்பு வீடியோ: பல செய்திகள் → ஒரே MP4 (≤180 வினாடி) ---------- */
+function comboFill(){$("#gCombo").checked=!!G.combo;$("#gFrom").value=G.cFrom||1;comboInfo()}
+function comboInfo(){const el=$("#cInfo");if(!el)return;const R=comboRange(),n=items.length,f=x=>Math.floor(x/60)+":"+String(Math.round(x%60)).padStart(2,"0");
+  el.textContent="இந்த வீடியோவில்: செய்தி "+(R.a+1)+(R.b>R.a?" – "+(R.b+1):"")+" · மொத்தம் "+f(R.tot)+" ("+Math.round(R.tot)+" வினாடி / 180)"+(R.b<n-1?" · மீதி செய்திகள் அடுத்த part-ல்: தொடக்க எண் "+(R.b+2)+" என்று கொடுக்கவும்.":" · எல்லா செய்திகளும் அடங்கும்.")}
+$("#gCombo").onchange=e=>{G.combo=e.target.checked;save();comboInfo()};
+$("#gFrom").onchange=e=>{G.cFrom=clamp(Math.round(+e.target.value||1),1,Math.max(1,items.length));e.target.value=G.cFrom;save();comboInfo()};
+$("#bTpl").onclick=()=>{const it=items[cur];G.tpl={breaking:!!it.breaking,promo:it.promo||"",len:+it.len||30};save();xMsg("✔ இந்த அமைப்பு (நீளம் "+G.tpl.len+" வி, BREAKING "+(G.tpl.breaking?"ஆம்":"இல்லை")+") இயல்பு அமைப்பாகச் சேமிக்கப்பட்டது.")};
+$("#bTplRst").onclick=()=>{Object.assign(items[cur],tplSt());save();fill();syncAdj();xMsg("✔ இந்தச் செய்தியின் அமைப்பு இயல்புக்கு மாற்றப்பட்டது (எழுத்து மாறவில்லை).")};
+$("#bCP").onclick=()=>{
+  if(window._cp){window._cp=false;$("#bCP").textContent="▶ தொகுப்பு முன்னோட்டம்";return}
+  G.combo=true;$("#gCombo").checked=true;save();comboInfo();
+  window._cp=true;$("#bCP").textContent="⏹ முன்னோட்டத்தை நிறுத்து";playing=true;$("#bPlay").textContent="⏸ முன்னோட்டம்";sel(comboRange().a)};
+setInterval(comboInfo,700);
+async function exportCombo(){
+  setCard(false);window._cp=false;$("#bCP").textContent="▶ தொகுப்பு முன்னோட்டம்";
+  if(!("VideoEncoder"in window)||!window.Mp4Muxer){xMsg("இந்த உலாவியில் MP4 ஏற்றுமதி இயலாது. Chrome அல்லது Edge பயன்படுத்துங்கள்.",1);return}
+  G.combo=true;$("#gCombo").checked=true;save();
+  const R=comboRange(),segs=[];let D=0;
+  for(let k=R.a;k<=R.b;k++){const d=durOf(items[k]);segs.push({i:k,off:D,D:d});D+=d}
+  const fps=clamp(+$("#xFps").value||24,15,30),RW=$("#xRes").value==="1080"?1080:720,RH=RW===1080?1920:1280,total=Math.round(D*fps),SR=44100;
+  xCancel=false;lock(true);$("#xCancel").hidden=false;outList.innerHTML="";$("#xProg").style.width="0%";
+  let wl=null;try{wl=await navigator.wakeLock.request("screen")}catch(e){}
+  let venc=null,aenc=null,note="",ok=false;window._exp=true;
+  const stopVid=i=>(media[i]||[]).forEach(m=>{if(m.type==="v"){try{m.el.pause()}catch(e){}m._pb=false;m.el.playbackRate=1}});
+  try{
+    let vcfg=null;
+    for(const codec of["avc1.640029","avc1.4D0029","avc1.42E029"]){if(vcfg)break;for(const hw of["prefer-hardware","no-preference"]){
+      const c={codec,width:RW,height:RH,bitrate:Math.round((RW===1080?9e6:4.5e6)*Math.max(.45,Math.min(1,100/D))),framerate:fps,hardwareAcceleration:hw};
+      try{if((await VideoEncoder.isConfigSupported(c)).supported){vcfg=c;break}}catch(e){}}}
+    if(!vcfg)throw new Error("இந்தச் சாதனத்தில் H.264 என்கோடர் கிடைக்கவில்லை.");
+    let mix=null,acfg=null;
+    if("AudioEncoder"in window){
+      xMsg("ஒலியைத் தயாரிக்கிறேன்…");
+      const len=Math.round(D*SR),M={L:new Float32Array(len),R:new Float32Array(len)};let any=false;
+      for(const s of segs){const part=addSfx(await buildAudio(s.i,s.D,SR),items[s.i],s.D,SR);if(!part)continue;any=true;const o=Math.round(s.off*SR);
+        for(let p=0;p<part.L.length&&o+p<len;p++){M.L[o+p]=clamp(M.L[o+p]+part.L[p],-1,1);M.R[o+p]=clamp(M.R[o+p]+part.R[p],-1,1)}}
+      if(any){mix=M;const ac={codec:"mp4a.40.2",sampleRate:SR,numberOfChannels:2,bitrate:128000};
+        try{if((await AudioEncoder.isConfigSupported(ac)).supported)acfg=ac}catch(e){}
+        if(!acfg){mix=null;note=" (இந்த உலாவியில் AAC ஒலி என்கோடர் இல்லாததால் ஒலி சேர்க்கப்படவில்லை)"}}}
+    const mo={target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:"avc",width:RW,height:RH,frameRate:fps},fastStart:"in-memory",firstTimestampBehavior:"offset"};
+    if(acfg)mo.audio={codec:"aac",numberOfChannels:2,sampleRate:SR};
+    const muxer=new Mp4Muxer.Muxer(mo);let encErr=null;
+    venc=new VideoEncoder({output:(c,m)=>muxer.addVideoChunk(c,m),error:e=>{encErr=e}});venc.configure(vcfg);
+    if(acfg){aenc=new AudioEncoder({output:(c,m)=>muxer.addAudioChunk(c,m),error:e=>{encErr=e}});aenc.configure(acfg)}
+    const ex=document.createElement("canvas");ex.width=RW;ex.height=RH;const ectx=ex.getContext("2d",{alpha:false});
+    let aPos=0,si=-1;const CH=4096,t0=performance.now();
+    const pushAudio=()=>{const n=Math.min(CH,mix.L.length-aPos),d=new Float32Array(n*2);
+      d.set(mix.L.subarray(aPos,aPos+n),0);d.set(mix.R.subarray(aPos,aPos+n),n);
+      const ad=new AudioData({format:"f32-planar",sampleRate:SR,numberOfFrames:n,numberOfChannels:2,timestamp:Math.round(aPos/SR*1e6),data:d});
+      aenc.encode(ad);ad.close();aPos+=n};
+    for(let f=0;f<total;f++){
+      if(xCancel)throw new Error("cancel");if(encErr)throw encErr;
+      const t=f/fps;let k=segs.findIndex(s=>t<s.off+s.D);if(k<0)k=segs.length-1;
+      const s=segs[k],it=items[s.i];
+      if(k!==si){if(si>=0)stopVid(segs[si].i);si=k;cur=s.i;(media[s.i]||[]).forEach(m=>{m._pb=false;m._lc=null;m._lmt=undefined})}
+      const lt=Math.min(t-s.off,s.D);
+      await syncVideos(media[s.i]||[],lt,fps);draw(it,lt);ectx.drawImage(cv,0,0,RW,RH);
+      const fr=new VideoFrame(ex,{timestamp:Math.round(f*1e6/fps),duration:Math.round(1e6/fps)});
+      venc.encode(fr,{keyFrame:f%(fps*2)===0});fr.close();
+      while(aenc&&aPos<mix.L.length&&aPos/SR<=t+.3)pushAudio();
+      if(venc.encodeQueueSize>8){segs.forEach(g=>stopVid(g.i));while(venc.encodeQueueSize>8)await yieldNow()}
+      if(f%10===0){const pc=f/total*100,el=(performance.now()-t0)/1000,left=f>20?el/f*(total-f):0;
+        $("#xProg").style.width=pc.toFixed(1)+"%";
+        xMsg("தொகுப்பு · செய்தி "+(s.i+1)+" · பிரேம் "+f+" / "+total+" ("+pc.toFixed(0)+"%)"+(left?" · மீதம் சுமார் "+(left>90?Math.ceil(left/60)+" நிமிடம்":Math.ceil(left)+" வினாடி"):""));
+        await yieldNow()}}
+    await venc.flush();if(aenc){while(aPos<mix.L.length)pushAudio();await aenc.flush()}
+    muxer.finalize();
+    const o={blob:new Blob([muxer.target.buffer],{type:"video/mp4"}),ext:"mp4"};
+    addResult(o,R.a,"theekkathir-top-"+(R.a+1)+"-"+(R.b+1)+"-"+(items[R.a].date||today())+".mp4");ok=true;
+    $("#xProg").style.width="100%";
+    xMsg("முடிந்தது — செய்தி "+(R.a+1)+"–"+(R.b+1)+" ("+Math.round(D)+" வினாடி). கீழே பார்த்து “MP4 சேமி” அழுத்தவும்."+(R.b<items.length-1?" மீதி செய்திகளுக்கு 'தொடக்க செய்தி எண்' = "+(R.b+2)+" கொடுத்து மீண்டும் உருவாக்கவும்.":"")+note)
+  }catch(e){
+    if(e&&e.message==="cancel")xMsg("ஏற்றுமதி நிறுத்தப்பட்டது.");else xMsg("ஏற்றுமதி தோல்வி: "+errTxt(e),1);
+    $("#xProg").style.width="0%"
+  }finally{
+    segs.forEach(g=>stopVid(g.i));try{if(venc&&venc.state!=="closed")venc.close()}catch(e){}try{if(aenc&&aenc.state!=="closed")aenc.close()}catch(e){}
+    window._exp=false;lock(false);$("#xCancel").hidden=true;try{wl&&wl.release()}catch(e){}sel(R.a);startT=performance.now()}
+}
+$("#bCombo").onclick=exportCombo;
 </script>
 
 <script>
