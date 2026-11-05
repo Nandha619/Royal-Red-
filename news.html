@@ -175,7 +175,7 @@ const GG=(a,b)=>{const g=ctx.createLinearGradient(a,0,b,0);g.addColorStop(0,_sh(
 const RG=(a,b)=>{const g=ctx.createLinearGradient(a,0,b,0);g.addColorStop(0,_sh(YEL,-.15));g.addColorStop(.5,YEL);g.addColorStop(1,_sh(YEL,-.08));return g};
 function poly(p){ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath()}
 function cal(x,y,s,c){ctx.strokeStyle=c;ctx.lineWidth=s*.08;ctx.beginPath();ctx.roundRect(x-s/2,y-s/2,s,s,s*.12);ctx.stroke();ctx.fillStyle=c;ctx.fillRect(x-s/2,y-s/2,s,s*.26);for(let i=0;i<3;i++)for(let j=0;j<3;j++)ctx.fillRect(x-s*.32+i*s*.25,y-s*.05+j*s*.2,s*.14,s*.1)}
-function logo(cx,cy,r){ctx.save();if(logoImg){ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.clip();ctx.drawImage(logoImg,cx-r,cy-r,2*r,2*r)}else{let g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,YEL);g.addColorStop(1,_sh(YEL,-.25));ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.fill();for(let i=0;i<11;i++){const a=Math.PI+(i+.5)/11*Math.PI,a0=a-.07,a1=a+.07;ctx.fillStyle=i%2?RED:YEL;ctx.beginPath();ctx.moveTo(cx+Math.cos(a0)*r*.4,cy+r*.3+Math.sin(a0)*r*.4);ctx.lineTo(cx+Math.cos(a)*r*.92,cy+r*.3+Math.sin(a)*r*.92);ctx.lineTo(cx+Math.cos(a1)*r*.4,cy+r*.3+Math.sin(a1)*r*.4);ctx.fill()}ctx.fillStyle=RED;ctx.beginPath();ctx.arc(cx,cy+r*.3,r*.34,Math.PI,0);ctx.fill();ctx.fillStyle=_sh(YEL,-.35);ctx.fillRect(cx-r,cy+r*.3,2*r,r)}ctx.restore();ctx.strokeStyle=YEL;ctx.lineWidth=7;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke()}
+function logo(cx,cy,r,cl){ctx.save();if(logoImg){ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.clip();ctx.drawImage(logoImg,cx-r,cy-r,2*r,2*r)}else{let g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,YEL);g.addColorStop(1,_sh(YEL,-.25));ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.fill();for(let i=0;i<11;i++){const a=Math.PI+(i+.5)/11*Math.PI,a0=a-.07,a1=a+.07;ctx.fillStyle=i%2?RED:YEL;ctx.beginPath();ctx.moveTo(cx+Math.cos(a0)*r*.4,cy+r*.3+Math.sin(a0)*r*.4);ctx.lineTo(cx+Math.cos(a)*r*.92,cy+r*.3+Math.sin(a)*r*.92);ctx.lineTo(cx+Math.cos(a1)*r*.4,cy+r*.3+Math.sin(a1)*r*.4);ctx.fill()}ctx.fillStyle=RED;ctx.beginPath();ctx.arc(cx,cy+r*.3,r*.34,Math.PI,0);ctx.fill();ctx.fillStyle=_sh(YEL,-.35);if(cl){ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.clip();ctx.fillRect(cx-r,cy+r*.3,2*r,r);ctx.restore()}else ctx.fillRect(cx-r,cy+r*.3,2*r,r)}ctx.restore();ctx.strokeStyle=YEL;ctx.lineWidth=7;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke()}
 function scriptPages(txt){const run=f=>{const l=[];(txt||"").split("\n").forEach(par=>{if(par.trim())wrap(tok(par),TW,`700 ${f}px ${FONT}`).forEach(x=>l.push(x))});return l};
 let sf=50,sl=run(50),cap=Math.floor(TH/(50*1.45));
 for(let f=50;f>=42;f-=2){const L=run(f),c=Math.floor(TH/(f*1.45));if(L.length<=c){sf=f;sl=L;cap=c;break}}
@@ -647,17 +647,29 @@ $("#bSave").onclick=()=>{let ok=true;try{localStorage.setItem("tk_studio2",JSON.
 /* ---------- animated end card (logo + text stay together) ---------- */
 function ENDCARD(it,t,D){
   if(t<=D-EC)return;
-  const e=t-(D-EC),q=ease(e/.6),g=ease((e-.15)/.9),ln=ease((e-.8)/.7),tg=ease((e-1.1)/.6),th=ease((e-1.5)/.6),off=logoImg?0:85;
+  const e=t-(D-EC),q=ease(e/.6),g=ease((e-.15)/.9),tg=ease((e-1.0)/.6),th=ease((e-1.4)/.6);
   ctx.save();ctx.globalAlpha=q;ctx.fillStyle=PAGE;ctx.fillRect(0,0,W,H);
-  ctx.save();ctx.translate(W/2,900);ctx.rotate(e*.3);ctx.fillStyle="rgba("+YR+",.12)";for(let i=0;i<10;i++){ctx.rotate(Math.PI/5);poly([[0,0],[1500,-110],[1500,110]]);ctx.fill()}ctx.restore();
-  const rg=ctx.createRadialGradient(W/2,900,0,W/2,900,720);rg.addColorStop(0,"rgba("+YR+",.5)");rg.addColorStop(1,"rgba("+YR+",0)");ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.translate(W/2,H/2);ctx.rotate(e*.3);ctx.fillStyle="rgba("+YR+",.12)";for(let i=0;i<10;i++){ctx.rotate(Math.PI/5);poly([[0,0],[1500,-110],[1500,110]]);ctx.fill()}ctx.restore();
+  const rg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,720);rg.addColorStop(0,"rgba("+YR+",.5)");rg.addColorStop(1,"rgba("+YR+",0)");ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
   for(let i=0;i<16;i++){const px=(i*197)%W,py=H-((e*150+i*131)%H);ctx.fillStyle=`rgba(${YR},${.15+.35*((i%4)/3)})`;ctx.beginPath();ctx.arc(px,py,3+(i%3)*2,0,7);ctx.fill()}
-  ctx.save();ctx.translate(W/2,960+Math.sin(e*2.2)*7);const sc=.55+.45*g;ctx.scale(sc,sc);ctx.globalAlpha=q*g;ctx.textAlign="center";
-  if(logoImg){const s2=Math.min(860/logoImg.width,380/logoImg.height),dw=logoImg.width*s2,dh=logoImg.height*s2;ctx.drawImage(logoImg,-dw/2,-170-dh/2,dw,dh)}
-  else{logo(0,-170,150);ctx.fillStyle=INK;const cs=shrink(G.name,900,120,800);ctx.font=`800 ${cs}px ${FONT}`;ctx.fillText(G.name,0,100)}
-  const lw2=700*ln;ctx.fillStyle=RG(-350,350);ctx.fillRect(-lw2/2,60+off,lw2,6);
-  ctx.globalAlpha=q*g*tg;ctx.fillStyle=RED;ctx.font=`800 ${shrink(G.end,980,72,800)}px ${FONT}`;ctx.fillText(G.end,0,150+off+(1-tg)*30);
-  ctx.globalAlpha=q*g*th;ctx.fillStyle=INK;ctx.font=`700 ${shrink(G.thx,980,38,700)}px ${FONT}`;ctx.fillText(G.thx,0,225+off+(1-th)*24);
+  /* லோகோ + பெயர் + வாசகங்கள்: மொத்த உயரத்தைக் கணக்கிட்டு திரையின் மையத்தில் (கிடைமட்டம் + செங்குத்து) சீரமைப்பு; கோடு இல்லை */
+  const nm=(G.name||"").trim(),en=(G.end||"").trim(),tx=(G.thx||"").trim();
+  let lh,dw=0,dh=0;
+  if(logoImg){const s2=Math.min(860/logoImg.width,380/logoImg.height);dw=logoImg.width*s2;dh=logoImg.height*s2;lh=dh}else lh=2*150+8;
+  const cs=logoImg||!nm?0:shrink(nm,900,120,800),ts=en?shrink(en,980,72,800):0,hs=tx?shrink(tx,980,38,700):0;
+  const rows=[];rows.push({k:"logo",h:lh});
+  if(cs)rows.push({k:"name",h:cs*1.15,gap:28});
+  if(ts)rows.push({k:"end",h:ts*1.2,gap:64});
+  if(hs)rows.push({k:"thx",h:hs*1.3,gap:20});
+  let total=0;rows.forEach((r,i)=>{total+=r.h+(i?r.gap:0)});
+  let y=-total/2;rows.forEach((r,i)=>{if(i)y+=r.gap;r.y=y;y+=r.h});
+  ctx.save();ctx.translate(W/2,H/2+Math.sin(e*2.2)*7);const sc=.55+.45*g;ctx.scale(sc,sc);ctx.textAlign="center";
+  rows.forEach(r=>{
+    if(r.k==="logo"){ctx.globalAlpha=q*g;const cy=r.y+r.h/2;if(logoImg)ctx.drawImage(logoImg,-dw/2,cy-dh/2,dw,dh);else logo(0,cy,150,true)}
+    else if(r.k==="name"){ctx.globalAlpha=q*g;ctx.fillStyle=INK;ctx.font=`800 ${cs}px ${FONT}`;ctx.fillText(nm,0,r.y+cs*.9)}
+    else if(r.k==="end"){ctx.globalAlpha=q*g*tg;ctx.fillStyle=RED;ctx.font=`800 ${ts}px ${FONT}`;ctx.fillText(en,0,r.y+ts*.92+(1-tg)*30)}
+    else{ctx.globalAlpha=q*g*th;ctx.fillStyle=INK;ctx.font=`700 ${hs}px ${FONT}`;ctx.fillText(tx,0,r.y+hs*.95+(1-th)*24)}
+  });
   ctx.restore();ctx.restore();ctx.textAlign="left"
 }
 
