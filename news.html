@@ -122,8 +122,12 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
       <div class="row"><label>End card வாசகம்<input id="gEnd"></label><label>End card நன்றி வரி<input id="gThx"></label></div>
       <div class="row"><label>தொடர்பு தலைப்பு (மேல் வலது)<input id="gCt"></label><label>போன் நம்பர்<input id="gPh"></label></div>
       <label>Watermark எழுத்து (படம் / வீடியோ மேல்)<input id="gWm"></label>
+      <div class="row"><button class="alt" id="bWmEdit" type="button">✋ முன்னோட்டத்தில் இழுத்து அமை</button></div>
+      <small>முன்னோட்டத்தில் watermark-ஐத் தட்டினாலும் தேர்வாகும். இழுத்தால் நகரும்; இரு விரல் pinch / மவுஸ் சக்கரம் / மூலைப் புள்ளியை இழுத்தால் அளவு மாறும்; வெளியே தட்டினால் முடியும்.</small>
+      <details><summary>துல்லிய அமைப்பு (அளவு · இடம் · தெளிவு · நிறம்)</summary>
       <div class="row"><label>அளவு<input type="range" id="gWmS" min="20" max="140" step="2"></label><label>தெளிவு<input type="range" id="gWmO" min="0.1" max="1" step="0.05"></label></div>
       <div class="row"><label>↔ இடம்<input type="range" id="gWmX" min="0" max="100"></label><label>↕ இடம்<input type="range" id="gWmY" min="0" max="100"></label><label>நிறம்<input type="color" id="gWmC" style="padding:2px;height:42px"></label></div>
+      </details>
       <label>லோகோ படம் (ஒருமுறை சேர்த்தால் நினைவில் இருக்கும்)<input type="file" id="fLogo" accept="image/*"></label>
       <div class="row" style="align-items:center;flex-wrap:wrap;gap:14px;margin-top:6px"><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gSfx" style="width:auto"> MP4-ல் ஒலி விளைவுகள் (whoosh / impact)</label><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gTick" style="width:auto"> தட்டச்சு tick ஒலி</label><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gSfxP" style="width:auto"> முன்னோட்டத்திலும் ஒலி</label></div>
       <button class="alt" id="bSave">💾 அமைப்பை சேமி</button>
@@ -186,7 +190,7 @@ function glass(x,y,w,h,r,tint){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,
 function pin(x,y,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y-8,13,Math.PI,0);ctx.lineTo(x,y+16);ctx.closePath();ctx.fill();ctx.fillStyle="#101010";ctx.beginPath();ctx.arc(x,y-8,5,0,7);ctx.fill()}
 function cover(src,sw,sh,x,y,w,h,z,ox,oy){const s=Math.max(w/sw,h/sh)*z,dw=sw*s,dh=sh*s,mx=(dw-w)/2,my=(dh-h)/2;ox=clamp(ox||0,-mx,mx);oy=clamp(oy||0,-my,my);ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.clip();ctx.drawImage(src,x+(w-dw)/2+ox,y+(h-dh)/2+oy,dw,dh);ctx.restore()}
 const plain=s=>(s||"").replace(/\*/g,"");
-let STILL=false,cardMode=false;
+let STILL=false,cardMode=false,wmSel=false,WMB=null;
 const MLF=it=>{const L=media[cur]||[];if(!STILL)return L;const m=L[(it.idx||1)-1];return m?[m]:[]};
 
 /* ---------- main frame (reference layout) ---------- */
@@ -654,8 +658,24 @@ const okRec=()=>window.MediaRecorder&&cv.captureStream;
 const inFrame=e=>{const r=cv.getBoundingClientRect(),y=(e.clientY-r.top)*H/r.height;return y>=VY&&y<=VY+VH};
 function syncAdj(){const it=items[cur],c=it.card;document.querySelectorAll("[type=range][data-k]").forEach(e=>e.value=it[e.dataset.k]==null?e.defaultValue:it[e.dataset.k]);if(c)document.querySelectorAll("[type=range][data-c]").forEach(e=>e.value=c[e.dataset.c]==null?e.defaultValue:c[e.dataset.c]);save()}
 const ptr=new Map();let lastD=0;cv.style.touchAction="none";
-cv.addEventListener("pointerdown",e=>{if(!inFrame(e))return;cv.setPointerCapture(e.pointerId);ptr.set(e.pointerId,[e.clientX,e.clientY]);lastD=0});
+/* ---- Watermark: தட்டித் தேர்ந்து இழுத்து நகர்த்த / pinch, மவுஸ் சக்கரம், மூலைப் புள்ளியால் அளவு மாற்ற ---- */
+const toC=(cx,cy)=>{const r=cv.getBoundingClientRect();return[(cx-r.left)*W/r.width,(cy-r.top)*H/r.height]};
+const wmHit=e=>{if(!WMB||!G.wm||STILL)return 0;const[x,y]=toC(e.clientX,e.clientY),b=WMB;
+ if(wmSel&&Math.hypot(x-(b.x+b.w+10),y-(b.y+b.h+8))<=64)return 2;
+ return(x>=b.x-24&&x<=b.x+b.w+24&&y>=b.y-24&&y<=b.y+b.h+24)?1:0};
+let wmMode=0,wmTap=false,wmR=null;
+function wmBtn(){const b=$("#bWmEdit");if(b)b.textContent=wmSel?"✔ இழுத்து அமைத்தல் முடிந்தது":"✋ முன்னோட்டத்தில் இழுத்து அமை"}
+function wmScale(f){G.wmS=clamp(Math.round((G.wmS||56)*f*10)/10,20,140);wmFill();save()}
+function wmMove(dx,dy){const b=WMB;if(!b)return;if(b.rx>1)G.wmX=clamp((G.wmX==null?100:G.wmX)+dx/b.rx*100,0,100);if(b.ry>1)G.wmY=clamp((G.wmY==null?100:G.wmY)+dy/b.ry*100,0,100);wmFill();save()}
+cv.addEventListener("pointerdown",e=>{if(!inFrame(e))return;cv.setPointerCapture(e.pointerId);ptr.set(e.pointerId,[e.clientX,e.clientY]);lastD=0;
+ if(ptr.size===1){const h=wmHit(e);wmMode=h;wmTap=!!h;if(h===1&&!wmSel){wmSel=true;wmBtn()}
+  if(h===2){const b=WMB,cx=b.x+b.w/2,cy=b.y+b.h/2,p=toC(e.clientX,e.clientY);wmR={s0:G.wmS||56,cx:cx,cy:cy,d0:Math.max(30,Math.hypot(p[0]-cx,p[1]-cy))}}}});
 cv.addEventListener("pointermove",e=>{if(!ptr.has(e.pointerId))return;const it=tgt(),o=ptr.get(e.pointerId),k=W/cv.clientWidth;ptr.set(e.pointerId,[e.clientX,e.clientY]);
+ if(wmSel&&WMB&&(ptr.size===2||wmMode===1||wmMode===2)){
+  if(ptr.size===2){const [a,b]=[...ptr.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(lastD)wmScale(d/lastD);lastD=d}
+  else if(wmMode===1)wmMove((e.clientX-o[0])*k,(e.clientY-o[1])*k);
+  else if(wmR){const p=toC(e.clientX,e.clientY);G.wmS=clamp(Math.round(wmR.s0*Math.hypot(p[0]-wmR.cx,p[1]-wmR.cy)/wmR.d0*10)/10,20,140);wmFill();save()}
+  return}
  if(ptr.size===1){it.px=(it.px||0)+(e.clientX-o[0])*k;it.py=(it.py||0)+(e.clientY-o[1])*k}
  else if(ptr.size===2){const [a,b]=[...ptr.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(lastD)it.zoom=clamp((it.zoom||1)*d/lastD,1,4);lastD=d}
  syncAdj()});
@@ -663,10 +683,10 @@ cv.addEventListener("pointermove",e=>{if(!ptr.has(e.pointerId))return;const it=t
 let tap=null;
 cv.addEventListener("pointerdown",e=>{tap=inFrame(e)&&ptr.size===1?{x:e.clientX,y:e.clientY}:null});
 cv.addEventListener("pointermove",e=>{if(tap&&Math.hypot(e.clientX-tap.x,e.clientY-tap.y)>8)tap=null});
-cv.addEventListener("pointerup",e=>{if(!tap)return;tap=null;const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*W/r.width,y=(e.clientY-r.top)*H/r.height;if(y<VY+12||y>VY+100)return;const it=tgt();
+cv.addEventListener("pointerup",e=>{if(!tap)return;tap=null;if(wmTap){wmTap=false;return}if(wmSel){wmSel=false;wmBtn();return}const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*W/r.width,y=(e.clientY-r.top)*H/r.height;if(y<VY+12||y>VY+100)return;const it=tgt();
  if(x<540){const v=prompt("தேதி (DD-MM-YYYY)",it.date||"");if(v!==null){it.date=v.trim();it.dm=true}}else{const v=prompt("இடம்",it.loc||"");if(v!==null)it.loc=v.trim()}save();fill()});
 $("#dPick").onchange=e=>{const v=e.target.value;if(!v)return;const [y,m,d]=v.split("-");const it=items[cur];it.date=d+"-"+m+"-"+y;it.dm=true;save();fill();e.target.value=""};
-cv.addEventListener("wheel",e=>{if(!inFrame(e))return;e.preventDefault();const it=tgt();it.zoom=clamp((it.zoom||1)*(e.deltaY<0?1.06:.94),1,4);syncAdj()},{passive:false});
+cv.addEventListener("wheel",e=>{if(!inFrame(e))return;e.preventDefault();if(wmSel&&WMB){wmScale(e.deltaY<0?1.06:.94);return}const it=tgt();it.zoom=clamp((it.zoom||1)*(e.deltaY<0?1.06:.94),1,4);syncAdj()},{passive:false});
 $("#bRst").onclick=()=>{Object.assign(items[cur],{zoom:1,px:0,py:0});syncAdj()};
 setInterval(()=>{$("#mInfo").textContent=((media[cur]||[]).length)+" கோப்பு சேர்க்கப்பட்டது";const n=window._pg||1;$("#pgInfo").textContent="கட்டங்கள்: "+n+" · ஒவ்வொன்றும் 6 வினாடி · மொத்த நீளம்: "+Math.round(durOf(items[cur]))+" வினாடி (நீளம் அதிகமானால் கட்டங்கள் மீண்டும் சுழலும்)"},700);
 
@@ -752,11 +772,21 @@ $("#bPrTest").onclick=()=>{const it=items[cur],tl=promoTimes(it),DU=+G.prDur||4,
   G.prOn=true;$("#gPrOn").checked=true;playing=true;$("#bPlay").textContent="⏸ முன்னோட்டம்";startT=performance.now()-Math.max(0,T-.5)*1000;$("#st").textContent="புரோமோ 0.5 வினாடியில் வரும்…"};
 function wmFill(){$("#gWmS").value=G.wmS||56;$("#gWmO").value=G.wmO==null?.4:G.wmO;$("#gWmX").value=G.wmX==null?100:G.wmX;$("#gWmY").value=G.wmY==null?100:G.wmY;$("#gWmC").value=G.wmC||"#ffffff"}
 [["gWmS","wmS",1],["gWmO","wmO",1],["gWmX","wmX",1],["gWmY","wmY",1],["gWmC","wmC",0]].forEach(([i,k,n])=>{$("#"+i).oninput=e=>{G[k]=n?+e.target.value:e.target.value;save()}});
+$("#bWmEdit").onclick=()=>{if(!wmSel&&!G.wm){$("#st").textContent="முதலில் Watermark எழுத்தைக் கொடுக்கவும்.";return}wmSel=!wmSel;wmBtn();if(wmSel)cv.scrollIntoView({block:"nearest",behavior:"smooth"})};
 function WMARK(fx,fy,fw,fh){
-  if(!G.wm)return;const o=G.wmO==null?.4:G.wmO,px=G.wmX==null?100:G.wmX,py=G.wmY==null?100:G.wmY,s=shrink(G.wm,fw-28,G.wmS||56,800);
+  WMB=null;if(!G.wm)return;const o=G.wmO==null?.4:G.wmO,px=G.wmX==null?100:G.wmX,py=G.wmY==null?100:G.wmY,s=shrink(G.wm,fw-28,G.wmS||56,800);
   ctx.save();ctx.beginPath();ctx.rect(fx,fy,fw,fh);ctx.clip();ctx.font=`800 ${s}px ${FONT}`;ctx.textAlign="left";
   const w=ctx.measureText(G.wm).width,x=fx+14+(fw-28-w)*px/100,y=fy+s*.95+10+(fh-s*.95-34)*py/100;
-  ctx.globalAlpha=o;ctx.fillStyle=G.wmC||"#ffffff";ctx.shadowColor="rgba(0,0,0,.45)";ctx.shadowBlur=6;ctx.fillText(G.wm,x,y);ctx.restore();ctx.textAlign="left"
+  ctx.globalAlpha=o;ctx.fillStyle=G.wmC||"#ffffff";ctx.shadowColor="rgba(0,0,0,.45)";ctx.shadowBlur=6;ctx.fillText(G.wm,x,y);ctx.restore();ctx.textAlign="left";
+  /* இழுத்து அமைக்க: பெட்டியின் இடம் நினைவில் (தொடு/மவுஸ் தேர்வுக்கு) */
+  WMB={x:x,y:y-s*.95,w:w,h:s*1.25,rx:fw-28-w,ry:fh-s*.95-34};
+  /* தேர்வு பெட்டி முன்னோட்டத்தில் மட்டும் — MP4 / போட்டோ ஏற்றுமதியில் ஒருபோதும் பதியாது */
+  if(wmSel&&!rec&&!STILL&&!window._exp){
+    ctx.save();ctx.setLineDash([14,10]);ctx.lineWidth=4;ctx.strokeStyle=YEL;ctx.shadowBlur=0;ctx.globalAlpha=1;
+    ctx.strokeRect(WMB.x-10,WMB.y-8,WMB.w+20,WMB.h+16);ctx.setLineDash([]);
+    ctx.fillStyle=YEL;ctx.beginPath();ctx.arc(WMB.x+WMB.w+10,WMB.y+WMB.h+8,22,0,7);ctx.fill();
+    ctx.lineWidth=3;ctx.strokeStyle="#101010";ctx.stroke();ctx.restore()
+  }
 }
 
 /* ---------- recorder that falls back when the phone's encoder gives an empty file ---------- */
