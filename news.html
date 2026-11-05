@@ -45,6 +45,43 @@ html.m-view main{display:block;padding:0;max-width:none;margin:0;height:100%}
 html.m-view #mainPanel,html.m-view #cardPanel{display:none!important}
 html.m-view .stage{position:fixed;inset:0;background:var(--stg,#000);border:0;border-radius:0;padding:0;display:block;cursor:pointer}
 html.m-view canvas{position:absolute;inset:0;width:100%;height:100%;max-height:none;aspect-ratio:auto;object-fit:contain;border-radius:0;background:var(--stg,#000);pointer-events:none}
+/* ---- வீடியோ எடிட்டர் அமைப்பு: முக்கியம் / தொட்டால் துணை செட்டிங் / ஒருமுறை ---- */
+.ess{display:grid;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;border-inline-start:5px solid var(--gold)}
+.ess>h3{margin:0;font-size:15px;font-weight:800}
+details.sub{border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden}
+details.sub>summary{list-style:none;display:flex;align-items:center;gap:8px;min-height:50px;padding:0 14px;font-weight:800;cursor:pointer;flex-wrap:wrap}
+details.sub>summary::-webkit-details-marker,details.in>summary::-webkit-details-marker{display:none}
+details.sub>summary::after{content:"›";margin-inline-start:auto;font-size:24px;line-height:1;color:var(--mut);transition:transform .15s}
+details.sub[open]>summary::after{transform:rotate(90deg)}
+details.sub>summary small{font-weight:600}
+details.sub>.subb,details.in>.subb{display:grid;gap:12px;padding:0 14px 14px}
+details.in{border:1px dashed var(--line);border-radius:10px}
+details.in>summary{padding:10px 12px;font-size:14px}
+details.in>.subb{padding:0 12px 12px}
+details.sub.once{opacity:.85}
+@media(prefers-reduced-motion:reduce){details.sub>summary::after{transition:none}}
+#tl{display:grid;gap:8px;padding:8px 2px 2px;color:#fff}
+html.m-view #tl{display:none}
+.tl-row{display:flex;gap:8px;align-items:center}
+.tl-sp{flex:1}
+#tlT{font:800 13px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums}
+#tl button{padding:7px 12px;font-size:13px;min-height:34px}
+#tl small{color:#9a9a9a;font-size:11px;line-height:1.4}
+#tlAll{display:flex;gap:3px;height:30px}
+.tl-blk{position:relative;flex:1 1 0;min-width:22px;padding:0;border-radius:6px;background:#2a2a2a;color:#ddd;border:1px solid #444;font-size:12px;overflow:hidden}
+.tl-blk.on{background:var(--red);color:var(--on,#fff);border-color:var(--gold)}
+.tl-blk.off{opacity:.35}
+.tl-blk i{position:absolute;bottom:0;width:3px;height:9px;background:var(--gold)}
+#tlTrack{position:relative;height:48px;border-radius:8px;background:#1b1b1b;border:1px solid #444;touch-action:none;cursor:pointer;overflow:hidden}
+.tl-pin{position:absolute;top:5px;height:38px;min-width:34px;max-width:60%;padding:0 6px;border-radius:7px;background:var(--gold);color:#101010;font:800 11px/38px system-ui,"Noto Sans Tamil",sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:grab;touch-action:none;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+.tl-pin.ghost{background:rgba(255,255,255,.16);color:#fff;border:1px dashed #bbb;cursor:pointer;line-height:36px}
+.tl-pin.on{outline:2px solid #fff}
+.tl-pin.bad{background:#7a2b2b;color:#fff}
+#tlHead{position:absolute;top:0;bottom:0;width:2px;background:#fff;pointer-events:none;z-index:2}
+#tlPop{display:grid;gap:8px;background:#161616;border:1px solid var(--gold);border-radius:10px;padding:10px}
+#tlPop[hidden]{display:none}
+.tl-pr{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tl-pr label{color:#bbb;font-size:12px}
 #vInfo{display:none}
 html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);transform:translateX(-50%);z-index:5;background:rgba(0,0,0,.62);color:#fff;font:800 12px "Noto Sans Tamil",sans-serif;padding:3px 12px;border-radius:99px;pointer-events:none}
 </style>
@@ -53,11 +90,20 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
 </head>
 <body>
 <main>
-<div class="stage"><canvas id="cv" width="1080" height="1920"></canvas></div>
+<div class="stage"><canvas id="cv" width="1080" height="1920"></canvas>
+<div id="tl">
+  <div class="tl-row"><button id="tlPlay" type="button" class="alt">▶</button><span id="tlT">0:00 / 0:30</span><span class="tl-sp"></span><button id="tlAdd" type="button">＋ புரோமோ</button></div>
+  <div id="tlAll" aria-label="எல்லாச் செய்திகள்"></div>
+  <div id="tlTrack" aria-label="நேரக்கோடு"><div id="tlHead"></div></div>
+  <small class="tl-lg">தங்கம் = நீங்கள் வைத்த புரோமோ (இழுத்து நகர்த்தலாம்; தட்டினால் நேரம் / சொல்) · வெள்ளை = தானியங்கி (தட்டினால் நீங்களே நகர்த்தலாம்) · கோட்டில் தொட்டால் அந்த நேரத்துக்குச் செல்லும்</small>
+  <div id="tlPop" hidden>
+    <div class="tl-pr"><label>⏱ நேரம் (வினாடி அல்லது நிமி:வினாடி)<input id="tpT" inputmode="decimal"></label><label>🏷 இந்தப் புள்ளியின் சொல் (காலியாக = முக்கிய சொல்)<input id="tpW"></label></div>
+    <div class="tl-row"><button id="tpGo" type="button" class="alt">▶ பார்</button><button id="tpDel" type="button" class="alt">🗑 நீக்கு</button><span class="tl-sp"></span><button id="tpOk" type="button">✔ முடிந்தது</button></div>
+  </div>
+</div></div>
 <div id="vInfo"></div>
 <div class="panel" id="mainPanel">
   <h2>தீக்கதிர் – செய்தி ஸ்டுடியோ</h2>
-  <div id="appThemes"></div>
   <div class="row">
     <button id="bPlay" class="alt">முன்னோட்டம்</button>
     <button id="bOne">MP4 உருவாக்கு (இந்த செய்தி)</button>
@@ -65,36 +111,55 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
     <button id="bCard" style="flex:1 1 100%">நியூஸ் கார்டு (போட்டோ)</button>
   </div>
   <div id="st">தயார். 1080×1920 · 30 FPS</div><small id="net"></small>
-  <div class="row">
-    <label>தரம்<select id="xRes"><option value="1080" selected>1080 × 1920 (HD, பரிந்துரை)</option><option value="720">720 × 1280 (சிறிய கோப்பு, விரைவு)</option></select></label>
-    <label>உருவாக்கும் வேகம்<select id="xFps"><option value="20">விரைவு (20 fps)</option><option value="24">சமநிலை (24 fps)</option><option value="30" selected>மென்மையாக (30 fps, பரிந்துரை)</option></select></label>
-  </div>
   <div class="bar" aria-hidden="true"><div id="xProg"></div></div>
   <div class="row"><button id="xCancel" class="gold" hidden>நிறுத்து</button></div>
+  <section class="ess" id="essBox">
+    <h3>📝 தினசரி — முக்கியமானவை மட்டும்</h3>
   <div class="tabs" id="tabs"></div>
-  <div class="row" style="align-items:end"><label>📍 இடம்<input data-k="loc"></label><label>📅 தேதி (DD-MM-YYYY)<input data-k="date"></label><label style="flex:0 0 130px">தேதி தேர்வு<input type="date" id="dPick"></label></div>
-  <small>முன்னோட்டத்தில் படத்தின் மேலே உள்ள பட்டையில் தேதி / இடத்தை தட்டினாலும் நேரடியாக மாற்றலாம்.</small>
-  <label>தலைப்பு (வரி 1 கருப்பு, வரி 2 சிவப்பு; *சொல்* = சிவப்பு)<textarea data-k="headline" rows="3"></textarea></label>
-  <label>செய்தி ஸ்கிரிப்ட் (*சொல்* = சிவப்பு; நீளமானால் 3 கட்டமாக தோன்றி, மீண்டும் மீண்டும் சுழலும்)<textarea data-k="script" rows="6"></textarea></label><small id="pgInfo"></small>
-  <label>டிக்கர் (| கொண்டு பிரிக்கவும்)<input data-k="ticker"></label>
-  <label>⏱ இந்தச் செய்தியின் நீளம் (தொகுப்பு முறையில்; வினாடி)<select data-k="len"><option value="20">20 வினாடி</option><option value="30">30 வினாடி</option><option value="40">40 வினாடி</option><option value="50">50 வினாடி</option><option value="60">60 வினாடி</option></select></label>
-  <label>🎬 வீடியோ புரோமோ எழுத்து (இந்தச் செய்திக்கு; காலியாக விட்டால் இயல்புநிலை வரும்; பல வார்த்தைகளை | கொண்டு பிரிக்கவும்)<input data-k="promo" placeholder="BREAKING NEWS | JUST IN | NEWS UPDATE"></label>
-  <label>⏱ புரோமோ வரும் நேரங்கள் (வினாடி அல்லது நிமிடம்:வினாடி; காற்புள்ளியால் பிரிக்கவும், எ.கா: 10, 25, 1:05; காலியாக விட்டால் இடைவெளி முறை)<input data-k="promoAt" placeholder="10, 25, 1:05" inputmode="text"></label><small id="promoAtInfo"></small>
-  <div class="row" style="align-items:end"><label>முன்னோட்ட நேரம் <b id="pScrubT">0:00</b><input type="range" id="pScrub" min="0" max="90" step="0.1" value="0"></label></div>
-  <div class="row"><button class="alt" id="bPrAdd" type="button">＋ இந்த நேரத்தில் புரோமோ சேர்</button><button class="alt" id="bPrClr" type="button">✖ நேரங்களை அழி</button></div>
-  <div class="row">
-    <label>வீடியோக்கள் / படங்கள் (ஒன்றுக்கு மேல் தேர்வு செய்யலாம்)<input type="file" id="fMedia" accept="video/*,image/*" multiple><small id="mInfo"></small></label>
-    <label style="flex:0 0 150px">BREAKING<input type="checkbox" data-k="breaking" style="width:28px;height:28px"></label>
-  </div>
-  <div class="panel" style="border:0;padding:0"><label>🔍 Zoom (பெரிதாக்கு)<input type="range" data-k="zoom" min="1" max="4" step="0.01" value="1"></label><div class="row"><label>↔ இடது–வலது<input type="range" data-k="px" min="-540" max="540" step="2" value="0"></label><label>↕ மேல்–கீழ்<input type="range" data-k="py" min="-600" max="600" step="2" value="0"></label></div><div class="row"><button class="alt" id="bRst">Zoom மீட்டமை</button><button class="alt" id="bClr">🗑 படங்களை அழி</button></div><small>முன்னோட்டத்தில் footage மேல் விரலால் இழுத்தால் நகரும்; இரு விரலால் zoom செய்யலாம்.</small></div>
   <div class="row">
     <button class="alt" id="bAdd">＋ புதிய செய்தி</button>
     <button class="alt" id="bDel">🗑 நீக்கு</button>
     <button class="alt" id="bDate">📅 இன்றைய தேதி</button>
   </div>
-  <details open>
-    <summary>🎞 தொகுப்பு வீடியோ (Top 10 · ஒரே வீடியோ · அதிகபட்சம் 3 நிமிடம்)</summary>
-    <div class="panel" style="border:0;padding:8px 0 0">
+  <div class="row" style="align-items:end"><label>📍 இடம்<input data-k="loc"></label><label>📅 தேதி (DD-MM-YYYY)<input data-k="date"></label><label style="flex:0 0 130px">தேதி தேர்வு<input type="date" id="dPick"></label></div>
+  <small>முன்னோட்டத்தில் படத்தின் மேலே உள்ள பட்டையில் தேதி / இடத்தை தட்டினாலும் நேரடியாக மாற்றலாம்.</small>
+  <label>தலைப்பு (வரி 1 கருப்பு, வரி 2 சிவப்பு; *சொல்* = சிவப்பு)<textarea data-k="headline" rows="3"></textarea></label>
+  <label>செய்தி ஸ்கிரிப்ட் (*சொல்* = சிவப்பு; நீளமானால் 3 கட்டமாக தோன்றி, மீண்டும் மீண்டும் சுழலும்)<textarea data-k="script" rows="6"></textarea></label><small id="pgInfo"></small>
+  <label>டிக்கர் (| கொண்டு பிரிக்கவும்)<input data-k="ticker"></label>
+  <div class="row">
+    <label>வீடியோக்கள் / படங்கள் (ஒன்றுக்கு மேல் தேர்வு செய்யலாம்)<input type="file" id="fMedia" accept="video/*,image/*" multiple><small id="mInfo"></small></label>
+    <label style="flex:0 0 150px">BREAKING<input type="checkbox" data-k="breaking" style="width:28px;height:28px"></label>
+  </div>
+  <label>⏱ இந்தச் செய்தியின் நீளம் (தொகுப்பு முறையில்; வினாடி)<select data-k="len"><option value="20">20 வினாடி</option><option value="30">30 வினாடி</option><option value="40">40 வினாடி</option><option value="50">50 வினாடி</option><option value="60">60 வினாடி</option></select></label>
+    <label>🏷 முக்கிய சொல் (BREAKING NEWS / JUST IN / முக்கிய செய்தி…) — இங்கே மாற்றினால் புரோமோ, டிக்கர் பேட்ஜ், BREAKING பட்டை எல்லாவற்றிலும் மாறும்<input id="gLabel" placeholder="BREAKING NEWS"></label>
+  </section>
+  <details class="sub" id="subPromo">
+    <summary>🎬 புரோமோ <small>தொட்டால் துணை செட்டிங்</small></summary>
+    <div class="subb">
+      <div class="row" style="align-items:center;flex-wrap:wrap;gap:14px"><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gPrOn" style="width:auto"> 🎬 வீடியோ மேல் புரோமோ அனிமேஷன்</label></div>
+<div class="row"><label>புரோமோ பாணி<select id="gPrStyle"><option value="full">முழுக் கட்டம் (சேனல் இடைவேளை)</option><option value="band">நடுப் பட்டை</option></select></label><label>எத்தனை வினாடி தெரியும்<input id="gPrDur" type="number" min="2" max="10"></label></div>
+<small>📍 வீடியோ முன்னோட்டத்தின் கீழே உள்ள நேரக்கோட்டில் புரோமோ தேவையான இடத்தில் “＋ புரோமோ” அழுத்துங்கள். அது அந்த நேரத்தில் பாப்-அப் ஆக வரும்; தங்க நிறப் பட்டையை இழுத்து நகர்த்தலாம், தட்டினால் நேரம் / சொல்லை மாற்றலாம்.</small>
+<details class="in"><summary>⌨ எண்ணாகவும் வார்த்தையாகவும் அமைக்க (மேம்பட்டது)</summary><div class="subb">
+  <label>🎬 வீடியோ புரோமோ எழுத்து (இந்தச் செய்திக்கு; காலியாக விட்டால் இயல்புநிலை வரும்; பல வார்த்தைகளை | கொண்டு பிரிக்கவும்)<input data-k="promo" placeholder="BREAKING NEWS | JUST IN | NEWS UPDATE"></label>
+  <label>⏱ புரோமோ வரும் நேரங்கள் (வினாடி அல்லது நிமிடம்:வினாடி; காற்புள்ளியால் பிரிக்கவும், எ.கா: 10, 25, 1:05; காலியாக விட்டால் இடைவெளி முறை)<input data-k="promoAt" placeholder="10, 25, 1:05" inputmode="text"></label><small id="promoAtInfo"></small>
+  <div class="row" style="align-items:end"><label>முன்னோட்ட நேரம் <b id="pScrubT">0:00</b><input type="range" id="pScrub" min="0" max="90" step="0.1" value="0"></label></div>
+  <div class="row"><button class="alt" id="bPrAdd" type="button">＋ இந்த நேரத்தில் புரோமோ சேர்</button><button class="alt" id="bPrClr" type="button">✖ நேரங்களை அழி</button></div>
+<div class="row"><label>எத்தனை வினாடிக்கு ஒருமுறை<input id="gPrEvery" type="number" min="5" max="180"></label></div>
+      <div class="row"><button class="alt" id="bPrTest" type="button">▶ புரோமோவைச் சோதி</button></div>
+</div></details>
+    </div>
+  </details>
+  <details class="sub" id="subZoom">
+    <summary>🔍 Footage Zoom / நகர்த்து <small>இழுத்து அமை</small></summary>
+    <div class="subb">
+<small>முன்னோட்டத்தில் footage மேல் <b>விரலால் அல்லது மவுஸ் பட்டனால் இழுத்தால்</b> நகரும்; <b>இரு விரல் pinch / மவுஸ் சக்கரத்தால்</b> zoom ஆகும்.</small>
+<div class="row"><button class="alt" id="bRst">Zoom மீட்டமை</button><button class="alt" id="bClr">🗑 படங்களை அழி</button></div>
+<details class="in"><summary>துல்லிய அமைப்பு (ஸ்லைடர்)</summary><div class="subb"><label>🔍 Zoom (பெரிதாக்கு)<input type="range" data-k="zoom" min="1" max="4" step="0.01" value="1"></label><div class="row"><label>↔ இடது–வலது<input type="range" data-k="px" min="-540" max="540" step="2" value="0"></label><label>↕ மேல்–கீழ்<input type="range" data-k="py" min="-600" max="600" step="2" value="0"></label></div></div></details>
+    </div>
+  </details>
+  <details class="sub" id="subCombo">
+    <summary>🎞 தொகுப்பு வீடியோ — Top 10 <small>ஒரே வீடியோ · அதிகபட்சம் 3 நிமிடம்</small></summary>
+    <div class="subb">
       <label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gCombo" style="width:auto"> தொகுப்பு முறை: ஒவ்வொரு செய்தியும் தன் நீளம் ஓடி, முடிவில் புரோமோ வரும்; End card கடைசியில் மட்டும்</label>
       <div class="row"><label>தொடக்க செய்தி எண் (part 2-க்கு 7 போன்ற எண் கொடுக்கவும்)<input id="gFrom" type="number" min="1" max="10"></label></div>
       <small id="cInfo"></small>
@@ -103,24 +168,9 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
       <div class="row"><button class="alt" id="bCP" type="button">▶ தொகுப்பு முன்னோட்டம்</button><button class="gold" id="bCombo" type="button">🎞 MP4 உருவாக்கு (தொகுப்பு)</button></div>
     </div>
   </details>
-  <details open>
-    <summary>சேனல் அமைப்பு</summary>
-    <div class="panel" style="border:0;padding:8px 0 0">
-      <div class="row">
-        <label>சேனல் பெயர்<input id="gName"></label>
-        <label>வீடியோ நீளம் (வினாடி; அதிகபட்சம் 180 = 3 நிமிடம்)<input id="gDur" type="number" min="6" max="180"></label>
-      </div><small>3 நிமிட (180) வீடியோவுக்கு ரெண்டர் நேரம் அதிகமாகும்; கோப்பு அளவு அதிகமாகாமல் இருக்க 100 வினாடிக்கு மேல் பிட்ரேட் தானாகக் குறைக்கப்படும் (தரம் HD-ஆகவே இருக்கும்). ரெண்டர் முடியும் வரை இந்தத் தாவலைத் திறந்தே வைக்கவும்.</small>
-      <div class="row"><label>துணை தலைப்பு<input id="gSub"></label>
-        <label>ஒரு படம் / வினாடி<input id="gSl" type="number" min="1" max="15"></label>
-      </div>
-      <div class="row"><label>BREAKING எழுத்து<input id="gBrk"></label></div>
-      <div class="row" style="align-items:center;flex-wrap:wrap;gap:14px"><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gPrOn" style="width:auto"> 🎬 வீடியோ மேல் புரோமோ அனிமேஷன்</label></div>
-      <div class="row"><label>இயல்புநிலை புரோமோ எழுத்து<input id="gPrDef" placeholder="BREAKING NEWS"></label><label>புரோமோ பாணி<select id="gPrStyle"><option value="full">முழுக் கட்டம் (சேனல் இடைவேளை)</option><option value="band">நடுப் பட்டை</option></select></label></div>
-      <div class="row"><label>எத்தனை வினாடிக்கு ஒருமுறை<input id="gPrEvery" type="number" min="5" max="180"></label><label>எத்தனை வினாடி தெரியும்<input id="gPrDur" type="number" min="2" max="10"></label></div>
-      <div class="row"><button class="alt" id="bPrTest" type="button">▶ புரோமோவைச் சோதி</button></div>
-      <div class="row"><label>டிக்கர் பேட்ஜ் வரி 1<input id="gTk1"></label><label>டிக்கர் பேட்ஜ் வரி 2<input id="gTk2"></label></div>
-      <div class="row"><label>End card வாசகம்<input id="gEnd"></label><label>End card நன்றி வரி<input id="gThx"></label></div>
-      <div class="row"><label>தொடர்பு தலைப்பு (மேல் வலது)<input id="gCt"></label><label>போன் நம்பர்<input id="gPh"></label></div>
+  <details class="sub" id="subWm">
+    <summary>💧 Watermark <small>இழுத்து அமை</small></summary>
+    <div class="subb">
       <label>Watermark எழுத்து (படம் / வீடியோ மேல்)<input id="gWm"></label>
       <div class="row"><button class="alt" id="bWmEdit" type="button">✋ முன்னோட்டத்தில் இழுத்து அமை</button></div>
       <small>முன்னோட்டத்தில் watermark-ஐத் தட்டினாலும் தேர்வாகும். இழுத்தால் நகரும்; இரு விரல் pinch / மவுஸ் சக்கரம் / மூலைப் புள்ளியை இழுத்தால் அளவு மாறும்; வெளியே தட்டினால் முடியும்.</small>
@@ -128,17 +178,50 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
       <div class="row"><label>அளவு<input type="range" id="gWmS" min="20" max="140" step="2"></label><label>தெளிவு<input type="range" id="gWmO" min="0.1" max="1" step="0.05"></label></div>
       <div class="row"><label>↔ இடம்<input type="range" id="gWmX" min="0" max="100"></label><label>↕ இடம்<input type="range" id="gWmY" min="0" max="100"></label><label>நிறம்<input type="color" id="gWmC" style="padding:2px;height:42px"></label></div>
       </details>
-      <label>லோகோ படம் (ஒருமுறை சேர்த்தால் நினைவில் இருக்கும்)<input type="file" id="fLogo" accept="image/*"></label>
-      <div class="row" style="align-items:center;flex-wrap:wrap;gap:14px;margin-top:6px"><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gSfx" style="width:auto"> MP4-ல் ஒலி விளைவுகள் (whoosh / impact)</label><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gTick" style="width:auto"> தட்டச்சு tick ஒலி</label><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gSfxP" style="width:auto"> முன்னோட்டத்திலும் ஒலி</label></div>
-      <button class="alt" id="bSave">💾 அமைப்பை சேமி</button>
     </div>
   </details>
-    <details open>
-    <summary>10 செய்திகள் வரி வடிவில் ஒட்டு</summary>
-    <div class="panel" style="border:0;padding:8px 0 0">
+  <details class="sub" id="subOut">
+    <summary>🎥 தரம் · 🔊 ஒலி <small>தேவைப்படும்போது</small></summary>
+    <div class="subb">
+<div class="row"><button class="alt" id="qHD" type="button">HD · 1080 · 30</button><button class="alt" id="qMid" type="button">சமநிலை · 1080 · 24</button><button class="alt" id="qFast" type="button">விரைவு · 720 · 20</button></div>
+  <div class="row">
+    <label>தரம்<select id="xRes"><option value="1080" selected>1080 × 1920 (HD, பரிந்துரை)</option><option value="720">720 × 1280 (சிறிய கோப்பு, விரைவு)</option></select></label>
+    <label>உருவாக்கும் வேகம்<select id="xFps"><option value="20">விரைவு (20 fps)</option><option value="24">சமநிலை (24 fps)</option><option value="30" selected>மென்மையாக (30 fps, பரிந்துரை)</option></select></label>
+  </div>
+<small>🔊 ஒலி</small>
+      <div class="row" style="align-items:center;flex-wrap:wrap;gap:14px;margin-top:6px"><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gSfx" style="width:auto"> MP4-ல் ஒலி விளைவுகள் (whoosh / impact)</label><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gTick" style="width:auto"> தட்டச்சு tick ஒலி</label><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gSfxP" style="width:auto"> முன்னோட்டத்திலும் ஒலி</label></div>
+    </div>
+  </details>
+  <details class="sub" id="subTheme">
+    <summary>🎨 தீம் <small>முழு ஆப் நிறம்</small></summary>
+    <div class="subb">
+<div id="appThemes"></div>
+    </div>
+  </details>
+  <details class="sub" id="subBulk">
+    <summary>📋 10 செய்திகளை ஒட்டு <small>எப்போதாவது</small></summary>
+    <div class="subb">
       <small>ஒரு வரி = ஒரு செய்தி:<br>தலைப்பு | இடம் | வரி1 ; வரி2 ; வரி3 | டிக்கர்</small>
       <textarea id="bulk" rows="6" placeholder="சென்னையில் *கனமழை* | சென்னை | வரி 1 ; வரி 2 ; வரி 3 | டிக்கர் செய்தி"></textarea>
       <button class="alt" id="bImp">இறக்குமதி செய்</button>
+    </div>
+  </details>
+  <details class="sub once" id="subOnce">
+    <summary>⚙ அடிப்படை அமைப்பு <small>ஒருமுறை மட்டும் — மறைந்திருக்கும்</small></summary>
+    <div class="subb">
+      <div class="row">
+        <label>சேனல் பெயர்<input id="gName"></label>
+        <label>வீடியோ நீளம் (வினாடி; அதிகபட்சம் 180 = 3 நிமிடம்)<input id="gDur" type="number" min="6" max="180"></label>
+      </div><small>3 நிமிட (180) வீடியோவுக்கு ரெண்டர் நேரம் அதிகமாகும்; கோப்பு அளவு அதிகமாகாமல் இருக்க 100 வினாடிக்கு மேல் பிட்ரேட் தானாகக் குறைக்கப்படும் (தரம் HD-ஆகவே இருக்கும்). ரெண்டர் முடியும் வரை இந்தத் தாவலைத் திறந்தே வைக்கவும்.</small>
+      <div class="row"><label>துணை தலைப்பு<input id="gSub"></label>
+        <label>ஒரு படம் / வினாடி<input id="gSl" type="number" min="1" max="15"></label>
+      </div>
+<div class="row"><label>BREAKING எழுத்து<input id="gBrk"></label><label>இயல்புநிலை புரோமோ எழுத்து<input id="gPrDef" placeholder="BREAKING NEWS"></label></div>
+      <div class="row"><label>டிக்கர் பேட்ஜ் வரி 1<input id="gTk1"></label><label>டிக்கர் பேட்ஜ் வரி 2<input id="gTk2"></label></div>
+      <div class="row"><label>End card வாசகம்<input id="gEnd"></label><label>End card நன்றி வரி<input id="gThx"></label></div>
+      <div class="row"><label>தொடர்பு தலைப்பு (மேல் வலது)<input id="gCt"></label><label>போன் நம்பர்<input id="gPh"></label></div>
+      <label>லோகோ படம் (ஒருமுறை சேர்த்தால் நினைவில் இருக்கும்)<input type="file" id="fLogo" accept="image/*"></label>
+<button class="alt" id="bSave">💾 அமைப்பை சேமி</button>
     </div>
   </details>
   <small>குறிப்பு: MP4 உருவாக்கும் போது இந்தத் தாவலைத் திறந்தே வைக்கவும். முடிந்ததும் வீடியோவைப் பார்த்து “MP4 சேமி” அழுத்தவும். ஒலி footage வீடியோவிலிருந்து சேரும்.</small>
@@ -154,8 +237,9 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
   <label>செய்தி ஸ்கிரிப்ட் (முழு எழுத்தும் கார்டில் தெரியும்)<textarea data-c="script" rows="7"></textarea></label>
   <label>டிக்கர் (| கொண்டு பிரிக்கவும்)<input data-c="ticker"></label>
   <div class="row"><label style="flex:0 0 130px">BREAKING<input type="checkbox" data-c="breaking" style="width:28px;height:28px"></label><label>படம் எண் (இந்த செய்தியின் கோப்பு)<input type="number" data-c="idx" min="1" value="1"></label></div>
+  <details class="in"><summary>🔍 Zoom — துல்லிய அமைப்பு (படத்தை இழுத்தும் pinch செய்தும் அமைக்கலாம்)</summary><div class="subb">
   <label>🔍 Zoom<input type="range" data-c="zoom" min="1" max="4" step="0.01" value="1"></label>
-  <div class="row"><label>↔<input type="range" data-c="px" min="-540" max="540" step="2" value="0"></label><label>↕<input type="range" data-c="py" min="-600" max="600" step="2" value="0"></label></div>
+  <div class="row"><label>↔<input type="range" data-c="px" min="-540" max="540" step="2" value="0"></label><label>↕<input type="range" data-c="py" min="-600" max="600" step="2" value="0"></label></div></div></details>
   <div class="row"><button class="alt" id="cRst">Zoom மீட்டமை</button><button class="alt" id="cSync">↻ வீடியோ செய்தியிலிருந்து எடு</button><button class="alt" id="cBack">🎬 வீடியோ முறைக்கு</button></div>
   <small>படம்/வீடியோவை முதலில் வீடியோ முறையில் சேர்க்கவும்; கார்டில் விரலால் இழுத்து நகர்த்தலாம், தேதி / இடத்தை தட்டி மாற்றலாம்.</small>
 </div>
@@ -414,7 +498,7 @@ function FRAMEFX(it,t,fx,fy,fw,fh){
 /* ---------- வீடியோ மேல் புரோமோ அனிமேஷன் (திரை முன்னோட்டம் + MP4 ரெண்டர் இரண்டிலும் ஒரே குறியீடு) ----------
    ஒவ்வொரு G.prEvery வினாடிக்கும் (30, 60, 90…) வீடியோ கட்டத்திற்குள் வெடித்து வந்து, G.prDur வினாடி தெரிந்து மறையும்.
    வீடியோ பின்னால் தொடர்ந்து ஓடும். நிறங்கள்: RED / YEL (தீம் மாற்றினால் தானாக மாறும்). */
-function promoWords(it){const raw=(it.promo&&it.promo.trim())?it.promo:(G.prDef==null?"BREAKING NEWS":G.prDef);return raw.split("|").map(s=>s.trim()).filter(Boolean)}
+function promoWords(it){const lab=G.prDef==null?"BREAKING NEWS":G.prDef,raw=(it.promo&&it.promo.trim())?it.promo:lab;return raw.split("|").map(s=>s.trim()).map(s=>s==="@"?lab:s).filter(Boolean)}
 /* புரோமோ நேரங்கள்: நீங்கள் கொடுத்த நேரங்கள் (promoAt) இருந்தால் அவை மட்டும்; இல்லையெனில் G.prEvery இடைவெளி */
 function promoTimes(it){
   const raw=(it.promoAt||"").trim();if(!raw)return null;const out=[];
@@ -425,11 +509,11 @@ function PROMO(it,t,fx,fy,fw,fh){
   const words=promoWords(it);if(!words.length)return;
   const DU=clamp(+G.prDur||4,2,10),tl=promoTimes(it);let T0,k;
   /* தொகுப்பு முறை: புரோமோ எப்போதும் இந்தச் செய்தியின் கடைசியில் (கடைசிச் செய்தியில் End card-க்கு முன்) */
-  if(G.combo){const D=durOf(it),S0=D-DU-(lastSeg(it)?EC:0),u=t-S0;if(S0<0||u<0||u>=DU)return;(G.prStyle==="band"?promoBand:promoFull)(words[Math.max(0,items.indexOf(it))%words.length],u,DU,fx,fy,fw,fh);return}
+  if(G.combo&&!tl){const D=durOf(it),S0=D-DU-(lastSeg(it)?EC:0),u=t-S0;if(S0<0||u<0||u>=DU)return;(G.prStyle==="band"?promoBand:promoFull)(words[Math.max(0,items.indexOf(it))%words.length],u,DU,fx,fy,fw,fh);return}
   if(tl){k=-1;for(let i=0;i<tl.length;i++){if(t>=tl[i]&&t<tl[i]+DU){k=i;T0=tl[i];break}}if(k<0)return}
   else{const E=clamp(+G.prEvery||30,5,180),q=Math.floor(t/E);if(q<1)return;T0=q*E;k=q-1}
   const u=t-T0;
-  if(u>=DU||T0+DU>durOf(it))return;
+  if(u>=DU||T0+DU>durOf(it)-(G.combo&&lastSeg(it)?EC:0))return;
   (G.prStyle==="band"?promoBand:promoFull)(words[k%words.length],u,DU,fx,fy,fw,fh)
 }
 /* பாணி 2: நடுப் பட்டை */
@@ -613,7 +697,7 @@ t=rec?Math.min(t,DD):playing?t%DD:(window._scrub!=null?window._scrub:4);syncScru
 
 /* ---------- UI ---------- */
 function tabs(){["#tabs","#ctabs"].forEach(q=>{const t=$(q);t.innerHTML="";items.forEach((_,i)=>{const b=document.createElement("button");b.textContent=i+1;b.className=i===cur?"on":"";b.onclick=()=>sel(i);t.appendChild(b)})})}
-function fill(){document.querySelectorAll("[data-k]").forEach(e=>{const v=items[cur][e.dataset.k];if(e.type==="checkbox")e.checked=!!v;else e.value=v==null?e.defaultValue:v});$("#gName").value=G.name;$("#gDur").value=G.dur;$("#gSub").value=G.sub;$("#gSl").value=G.slide;FL.forEach(([i,k])=>{$("#"+i).value=G[k]});wmFill();promoFill();comboFill();$("#gSfx").checked=G.sfx!==false;$("#gTick").checked=!!G.tick;$("#gSfxP").checked=!!G.sfxp;fillCard()}
+function fill(){document.querySelectorAll("[data-k]").forEach(e=>{const v=items[cur][e.dataset.k];if(e.type==="checkbox")e.checked=!!v;else e.value=v==null?e.defaultValue:v});$("#gName").value=G.name;$("#gDur").value=G.dur;$("#gSub").value=G.sub;$("#gSl").value=G.slide;FL.forEach(([i,k])=>{$("#"+i).value=G[k]});wmFill();promoFill();comboFill();window.labelFill&&window.labelFill();$("#gSfx").checked=G.sfx!==false;$("#gTick").checked=!!G.tick;$("#gSfxP").checked=!!G.sfxp;fillCard()}
 function sel(i){cur=i;window._scrub=null;if(cardMode)getCard(items[i]);startT=performance.now();tabs();fill();playMedia()}
 function playMedia(){Object.values(media).forEach(L=>L.forEach(m=>{m.el._on=false;if(m.type==="v"){m.el.pause();m.el.playbackRate=1;m._pb=false}}))}
 document.querySelectorAll("[data-k]").forEach(e=>e.addEventListener("input",()=>{items[cur][e.dataset.k]=e.type==="checkbox"?e.checked:e.type==="range"?+e.value:e.value;if(e.dataset.k==="date")items[cur].dm=true;save()}));
@@ -1102,6 +1186,113 @@ if(VIEW){
   st.addEventListener("click",e=>{if(items.length<2)return;const x=e.clientX/innerWidth;sel(x<.33?(cur-1+items.length)%items.length:(cur+1)%items.length)});
   setInterval(()=>{vi.textContent=items.length>1?(cur+1)+" / "+items.length:""},400);
 }
+</script>
+<script>
+/* ---------- வீடியோ எடிட்டர்: நேரக்கோடு + புரோமோ புள்ளிகள் + ஒரே "முக்கிய சொல்" ---------- */
+(function(){
+"use strict";
+/* ===== ஒரே முக்கிய சொல்: BREAKING பட்டை + இயல்பு புரோமோ + டிக்கர் பேட்ஜ் (2 வரி) எல்லாம் ஒன்றாக மாறும் ===== */
+const labelVal=()=>G.label!=null?G.label:(G.brk||"BREAKING NEWS");
+window.labelFill=function(){const e=$("#gLabel");if(e&&document.activeElement!==e)e.value=labelVal()};
+function labelApply(v){
+  const ws=v.trim().split(/\s+/).filter(Boolean);
+  G.label=v;G.brk=v;G.prDef=v;G.tk1=ws[0]||"";G.tk2=ws.slice(1).join(" ");
+  [["gBrk","brk"],["gTk1","tk1"],["gTk2","tk2"]].forEach(([i,k])=>{const e=$("#"+i);if(e)e.value=G[k]});
+  const pd=$("#gPrDef");if(pd)pd.value=G.prDef;
+  save()}
+$("#gLabel").oninput=e=>{if(e.target.value.trim())labelApply(e.target.value)};
+$("#gLabel").onchange=e=>{if(!e.target.value.trim())e.target.value=labelVal();else labelApply(e.target.value)};
+/* தனித்தனி மாற்றம் (மேம்பட்டது) செய்தால் முக்கிய சொல் பெட்டியும் அதைப் பிரதிபலிக்கும் */
+["gBrk"].forEach(i=>{const e=$("#"+i);if(e)e.addEventListener("input",()=>{G.label=e.value;labelFill()})});
+
+/* ===== தரம் முன்னமைவுகள் ===== */
+const preset=(res,fps)=>{const a=$("#xRes"),b=$("#xFps");a.value=res;b.value=fps;[a,b].forEach(x=>x.dispatchEvent(new Event("change")));$("#st").textContent="✔ தரம்: "+res+" × "+(res==="1080"?1920:1280)+" · "+fps+" fps"};
+$("#qHD").onclick=()=>preset("1080","30");$("#qMid").onclick=()=>preset("1080","24");$("#qFast").onclick=()=>preset("720","20");
+
+/* ===== நேரக்கோடு ===== */
+const trk=$("#tlTrack"),head=$("#tlHead"),all=$("#tlAll"),pop=$("#tlPop"),tT=$("#tlT");
+const fmt=x=>Math.floor(x/60)+":"+String(Math.floor(x%60)).padStart(2,"0");
+const r1=x=>Math.round(x*10)/10;
+const parseT=v=>{v=String(v||"").trim();const m=v.match(/^(\d+):(\d{1,2}(?:\.\d+)?)$/);if(m)return +m[1]*60+(+m[2]);const n=parseFloat(v);return isFinite(n)&&n>=0?n:null};
+const DU=()=>clamp(+G.prDur||4,2,10);
+const Dmax=it=>durOf(it)-(G.combo&&lastSeg(it)?EC:0);
+const tokens=it=>(it.promo||"").trim()?it.promo.split("|").map(x=>x.trim()):[];
+const pins=it=>{const ts=promoTimes(it)||[],tk=tokens(it);return ts.map((t,k)=>({t,w:tk.length?(tk[k%tk.length]||"@"):"@"}))};
+function defaults(it){const D=Math.max(0,durOf(it)),du=DU();
+  if(G.combo){const S0=D-du-(lastSeg(it)?EC:0);return S0>=0?[S0]:[]}
+  const E=clamp(+G.prEvery||30,5,180),o=[];for(let q=1;q*E+du<=D;q++)o.push(q*E);return o}
+function setPins(it,P){
+  P=P.slice().sort((a,b)=>a.t-b.t);const seen=new Set();
+  P=P.filter(p=>{const k=r1(p.t);if(seen.has(k))return false;seen.add(k);p.t=k;return true});
+  it.promoAt=P.map(p=>Number.isInteger(p.t)?String(p.t):p.t.toFixed(1)).join(", ");
+  if(P.length){const anyW=P.some(p=>p.w&&p.w!=="@"),hadW=tokens(it).some(w=>w&&w!=="@");
+    it.promo=(anyW||hadW)?P.map(p=>p.w||"@").join(" | "):""}
+  save();
+  const a=document.querySelector('[data-k="promoAt"]');if(a)a.value=it.promoAt;
+  const b=document.querySelector('[data-k="promo"]');if(b)b.value=it.promo||"";
+  if(typeof promoAtInfo==="function")promoAtInfo()}
+let selT=null,drag=null,sig="";
+const labelText=w=>(w&&w!=="@")?w:(G.prDef==null?"BREAKING NEWS":G.prDef);
+function signature(){const it=items[cur];
+  return [cur,G.combo?1:0,G.cFrom,G.prDur,G.prEvery,G.prDef,G.prOn,it.promoAt,it.promo,Math.round(durOf(it)*10),selT,items.map(x=>(+x.len||30)+"|"+(x.promoAt||"")+"|"+((x.script||"").length)).join(";")].join("~")}
+function render(force){
+  const sg=signature();if(!force&&sg===sig)return;sig=sg;
+  const it=items[cur],D=Math.max(1,durOf(it)),du=DU(),P=pins(it),ghost=!P.length,list=ghost?defaults(it).map(t=>({t,w:"@"})):P;
+  trk.querySelectorAll(".tl-pin").forEach(e=>e.remove());
+  list.forEach((p,k)=>{const e=document.createElement("div");
+    e.className="tl-pin"+(ghost?" ghost":"")+(!ghost&&selT!=null&&Math.abs(p.t-selT)<.05?" on":"")+(p.t+du>Dmax(it)+.01?" bad":"");
+    e.style.left=(p.t/D*100)+"%";e.style.width="max("+(du/D*100)+"%,34px)";e.dataset.k=k;e.title=fmt(p.t);
+    e.textContent=labelText(p.w)||"●";trk.insertBefore(e,head)});
+  /* எல்லாச் செய்திகளின் மேலோட்டம் */
+  const R=G.combo?comboRange():null;all.innerHTML="";
+  items.forEach((x,i)=>{const b=document.createElement("button");b.type="button";
+    b.className="tl-blk"+(i===cur?" on":"")+(R&&(i<R.a||i>R.b)?" off":"");b.style.flexGrow=Math.max(6,durOf(x));b.textContent=i+1;
+    const Dx=Math.max(1,durOf(x));(promoTimes(x)||defaults(x)).forEach(t=>{const m=document.createElement("i");m.style.left=Math.min(97,t/Dx*100)+"%";b.appendChild(m)});
+    b.onclick=()=>sel(i);all.appendChild(b)});
+  /* பாப்-அப் எடிட்டர் */
+  const k=selT==null?-1:P.findIndex(p=>Math.abs(p.t-selT)<.05);
+  if(k<0){pop.hidden=true}else{pop.hidden=false;if(document.activeElement!==$("#tpT"))$("#tpT").value=fmt1(P[k].t);if(document.activeElement!==$("#tpW")){$("#tpW").value=(P[k].w&&P[k].w!=="@")?P[k].w:"";$("#tpW").placeholder=labelText("@")}}
+}
+function fmt1(x){const m=Math.floor(x/60),s=r1(x-m*60);return m?m+":"+(s<10?"0":"")+s:String(s)}
+const timeAt=e=>{const r=trk.getBoundingClientRect(),D=Math.max(1,durOf(items[cur]));return clamp((e.clientX-r.left)/r.width,0,1)*D};
+function seek(v){window._scrub=v;playing=false;$("#bPlay").textContent="▶ முன்னோட்டம்";startT=performance.now()-v*1000;const sc=document.getElementById("pScrub");if(sc)sc.value=v}
+function playFrom(T){window._cp=false;window._scrub=null;playing=true;$("#bPlay").textContent="⏸ முன்னோட்டம்";startT=performance.now()-Math.max(0,T)*1000}
+function idx(P){return selT==null?-1:P.findIndex(p=>Math.abs(p.t-selT)<.05)}
+trk.addEventListener("pointerdown",e=>{
+  const pin=e.target.closest(".tl-pin");try{trk.setPointerCapture(e.pointerId)}catch(x){}
+  if(pin&&!pin.classList.contains("ghost")){const P=pins(items[cur]),k=+pin.dataset.k;drag={k,p:P[k],P,moved:false,x0:e.clientX,off:timeAt(e)-P[k].t}}
+  else if(pin){drag={ghost:true,k:+pin.dataset.k,x0:e.clientX}}
+  else{drag={scrub:true};seek(timeAt(e))}});
+trk.addEventListener("pointermove",e=>{if(!drag)return;
+  if(drag.scrub){seek(timeAt(e));return}
+  if(Math.abs(e.clientX-drag.x0)>4)drag.moved=true;if(!drag.moved||drag.ghost)return;
+  const it=items[cur],t=clamp(timeAt(e)-drag.off,0,Math.max(0,Dmax(it)-DU()));
+  drag.p.t=r1(t);selT=drag.p.t;setPins(it,drag.P);selT=drag.p.t;render(true)});
+const endDrag=e=>{if(!drag)return;const d=drag;drag=null;if(d.scrub)return;const it=items[cur];
+  if(d.ghost){const dl=defaults(it);if(!dl.length)return;setPins(it,dl.map(t=>({t:r1(t),w:"@"})));selT=r1(dl[d.k]);render(true);playFrom(selT-.6);return}
+  selT=d.p.t;render(true);playFrom(selT-.6)};
+trk.addEventListener("pointerup",endDrag);trk.addEventListener("pointercancel",()=>{drag=null});
+$("#tlAdd").onclick=()=>{const it=items[cur];if(Dmax(it)<DU()){$("#st").textContent="இந்தச் செய்தியின் நீளம் புரோமோவுக்குப் போதாது — நீளத்தை அதிகரிக்கவும்.";return}
+  const t=r1(clamp(window._pt||0,0,Math.max(0,Dmax(it)-DU()))),P=pins(it);P.push({t,w:"@"});setPins(it,P);selT=t;render(true);playFrom(t-.6);
+  $("#st").textContent="✔ "+fmt(t)+" நேரத்தில் புரோமோ வைக்கப்பட்டது — அது பாப்-அப் ஆவதைப் பாருங்கள்."};
+$("#tlPlay").onclick=()=>$("#bPlay").click();
+$("#tpT").onchange=e=>{const it=items[cur],P=pins(it),k=idx(P);if(k<0)return;const v=parseT(e.target.value);if(v==null){render(true);return}
+  P[k].t=r1(clamp(v,0,Math.max(0,Dmax(it)-DU())));selT=P[k].t;setPins(it,P);selT=P[k].t;render(true);playFrom(selT-.6)};
+$("#tpW").oninput=e=>{const it=items[cur],P=pins(it),k=idx(P);if(k<0)return;P[k].w=e.target.value.trim()||"@";setPins(it,P);sig=""};
+$("#tpGo").onclick=()=>{if(selT!=null)playFrom(selT-.6)};
+$("#tpDel").onclick=()=>{const it=items[cur],P=pins(it),k=idx(P);if(k<0)return;P.splice(k,1);
+  if(P.length)setPins(it,P);else{it.promoAt="";save();const a=document.querySelector('[data-k="promoAt"]');if(a)a.value="";if(typeof promoAtInfo==="function")promoAtInfo()}
+  selT=null;render(true)};
+$("#tpOk").onclick=()=>{selT=null;render(true)};
+/* எடிட்டர் மேலே இருக்கும்போது செய்தி மாறினால் பாப்-அப் மூடும் */
+let lastCur=-1;
+(function loop(){const it=items[cur];if(cur!==lastCur){lastCur=cur;selT=null}
+  const D=Math.max(1,durOf(it)),t=clamp(window._pt||0,0,D);head.style.left=(t/D*100)+"%";
+  tT.textContent=fmt(t)+" / "+fmt(D)+(G.combo?"  ·  தொகுப்பு "+fmt(comboRange().tot)+" / 3:00":"");
+  $("#tlPlay").textContent=playing?"⏸":"▶";
+  render(false);requestAnimationFrame(loop)})();
+render(true);window.labelFill();
+})();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.js"></script>
 <script src="theme.js"></script>

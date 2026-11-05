@@ -79,9 +79,7 @@ html,body{margin:0}
   <section class="st-pane" id="p-shelf" role="tabpanel">
     <nav class="st-subtabs" id="subtabs" role="tablist" aria-label="Book Shelf பிரிவுகள்"></nav>
     <div class="st-sub" id="s-books"></div>
-    <div class="st-sub" id="s-articles"><div class="st-native"></div></div>
-    <div class="st-sub" id="s-shopping"><div class="st-native"></div></div>
-    <div class="st-sub" id="s-events"><div class="st-native"></div></div>
+    <div class="st-sub" id="s-posts"><div class="st-native"></div></div>
   </section>
 
   <!-- ===== பகிர்: ஒரே இடத்தில் எழுதி இணையதளம் + Meta + WhatsApp ===== -->
@@ -123,18 +121,20 @@ html,body{margin:0}
 
   /* ---------- தாவல்கள் ---------- */
   var TABS = ['epaper', 'tv', 'shelf', 'share', 'theme'];
-  var SUBS = ['books', 'articles', 'shopping', 'events'];          /* Book Shelf பிரிவுகள் — அனைத்தும் ஒரே பக்கத்தில் */
-  var SUBVIEW = { books: 'books', articles: 'article', shopping: 'shopping', events: 'events' };
-  var SUBDEF = { books: ['📚', 'Books'], articles: ['📝', 'Articles'], shopping: ['🛒', 'Shopping'], events: ['🎪', 'Events'] };
+  var SUBS = ['books', 'posts'];          /* Book Shelf பிரிவுகள் — அனைத்தும் ஒரே பக்கத்தில் */
+  var SUBVIEW = { books: 'books', posts: 'article' };
+  var SUBDEF = { books: ['📚', 'Books'], posts: ['📥', 'பதிவுகள்'] };
+  var OLDSUB = { articles: 'article', shopping: 'shopping', events: 'events' };   /* பழைய இணைப்புகள் → ஒருங்கிணைந்த பெட்டி */
+  var pendingN = 0;
   var VIEW_OF = { epaper: 'paper', tv: 'tv', shelf: 'books', share: 'paper', theme: 'paper' };
   var SRC = { tv: 'news.html?mode=settings' };
-  var cur = '', sub = 'books';
+  var cur = '', sub = 'books', wantKind = null;
   function tabNames() { try { return JSON.parse(ls.get('np_tabs') || '{}') || {}; } catch (e) { return {}; } }
   function buildSubtabs() {
     var nm = tabNames(), box = $('#subtabs'); box.innerHTML = '';
     SUBS.forEach(function (k) {
       var b = document.createElement('button'); b.type = 'button'; b.dataset.s = k; b.setAttribute('role', 'tab');
-      b.textContent = SUBDEF[k][0] + ' ' + (k === 'books' ? 'Books' : (nm[SUBVIEW[k]] || SUBDEF[k][1]));
+      b.textContent = SUBDEF[k][0] + ' ' + SUBDEF[k][1] + (k === 'posts' && pendingN ? ' (' + pendingN + ')' : '');
       b.setAttribute('aria-selected', k === sub ? 'true' : 'false'); box.appendChild(b);
     });
   }
@@ -150,13 +150,15 @@ html,body{margin:0}
       var f = document.createElement('iframe'); f.title = 'books'; f.src = 'book.html?mode=settings';
       f.allow = 'camera;microphone;fullscreen;autoplay;clipboard-write;display-capture'; $('#s-books').appendChild(f);
     }
-    if (sub !== 'books' && window.ArticleAdmin) ArticleAdmin.mount($('#s-' + sub + ' .st-native'), SUBVIEW[sub]);
+    if (sub === 'posts' && window.ArticleAdmin) ArticleAdmin.mountAll($('#s-posts .st-native'), wantKind);
+    wantKind = null;
     $('#back').href = 'index.html#' + SUBVIEW[sub];
     fitFrames();
   }
   function openTab(id, push) {
+    if (OLDSUB[id]) { wantKind = OLDSUB[id]; id = 'shelf'; sub = 'posts'; }
     if (SUBS.indexOf(id) >= 0) { var want = id; id = 'shelf'; sub = want; }
-    if (id === 'sections') { id = 'shelf'; sub = 'shopping'; }
+    if (id === 'sections') { wantKind = 'shopping'; id = 'shelf'; sub = 'posts'; }
     if (TABS.indexOf(id) < 0) id = 'epaper';
     cur = id;
     [].forEach.call(document.querySelectorAll('.st-tab'), function (b) { b.setAttribute('aria-selected', b.dataset.t === id ? 'true' : 'false'); });
@@ -176,6 +178,13 @@ html,body{margin:0}
   }
   $('#tabs').addEventListener('click', function (e) { var b = e.target.closest('.st-tab'); if (b) { if (b.dataset.t === 'shelf') sub = sub || 'books'; openTab(b.dataset.t); } });
   $('#subtabs').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { openSub(b.dataset.s); try { history.replaceState(null, '', '#' + b.dataset.s); } catch (x) {} window.scrollTo(0, 0); } });
+  /* காத்திருப்பு எண்ணிக்கை: "📚 Book Shelf" தாவலிலும் "📥 பதிவுகள்" துணைத் தாவலிலும் */
+  function badge() {
+    var t = document.querySelector('.st-tab[data-t="shelf"]');
+    if (t) t.textContent = '📚 Book Shelf' + (pendingN ? ' (' + pendingN + ')' : '');
+    if ($('#subtabs').children.length) buildSubtabs();
+  }
+  if (window.ArticleAdmin && ArticleAdmin.watchPending) ArticleAdmin.watchPending(function (n) { pendingN = n; badge(); });
   addEventListener('resize', fitFrames);
   addEventListener('hashchange', function () { openTab(location.hash.slice(1), false); });
 
