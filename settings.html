@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ta">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -12,10 +12,10 @@ html,body{margin:0}
 .st-page{min-height:100vh}
 .st-pane > .st-native{animation:stIn .25s ease}
 @keyframes stIn{from{opacity:0;transform:translateY(6px)}}
-.st-empty{color:var(--s-mut);font-size:14px;text-align:center;padding:6px 0}
-.st-subtabs{display:flex;gap:6px;padding:10px 12px;overflow-x:auto;scrollbar-width:none;background:var(--s-card);border-bottom:1px solid var(--s-line);position:sticky;top:0;z-index:5}
+.st-empty{color:var(--s-mut);font-size:12px;text-align:center;padding:6px 0}
+.st-subtabs{display:flex;gap:6px;padding:6px 10px;overflow-x:auto;scrollbar-width:none;background:var(--s-card);border-bottom:1px solid var(--s-line);position:sticky;top:0;z-index:5}
 .st-subtabs::-webkit-scrollbar{display:none}
-.st-subtabs button{flex:none;min-height:32px;padding:0 11px;border-radius:99px;border:1.5px solid var(--s-line);background:var(--s-field);color:var(--s-fg);font:700 12.5px system-ui,"Noto Sans Tamil",sans-serif;cursor:pointer}
+.st-subtabs button{flex:none;min-height:30px;padding:0 12px;border-radius:var(--s-r);border:1px solid var(--s-line);background:transparent;color:var(--s-fg);font:600 12px system-ui,sans-serif;cursor:pointer}
 .st-subtabs button[aria-selected=true]{background:var(--s-acc);color:var(--s-on);border-color:var(--s-acc)}
 .st-sub{display:none}.st-sub.on{display:block}
 .st-sub > iframe{display:block;width:100%;border:0;background:var(--s-bg)}
@@ -23,6 +23,7 @@ html,body{margin:0}
 </style>
 </head>
 <body class="st-page">
+
 <header class="st-top" id="top">
   <div class="st-head">
     <a class="st-back" id="back" href="index.html">← Back</a>
@@ -37,105 +38,159 @@ html,body{margin:0}
     <button class="st-tab" role="tab" data-t="theme" type="button">🎨 Theme</button>
   </nav>
 </header>
+
 <main class="st-body">
+
+  <!-- ===== E-Paper ===== -->
   <section class="st-pane" id="p-epaper" role="tabpanel">
     <div class="st-native">
       <div class="sc">
-        <h2>📰 Today’s edition (PDF)</h2>
+        <h2>📰 Today's issue (PDF)</h2>
         <div class="st-kv"><span>Current file</span><b id="pdfName">—</b></div>
         <div class="st-kv"><span>Size</span><b id="pdfSize">—</b></div>
-        <input type="file" id="pdfFile" accept="application/pdf" hidden>
-        <div class="st-actions">
-          <button type="button" class="sb" id="pdfPick">Choose / change PDF</button>
-          <button type="button" class="sb ghost" id="pdfDel">Remove PDF</button>
+        <input type="file" id="pdfFile" accept="application/pdf,.pdf" hidden>
+        <div class="st-row">
+          <button type="button" id="pdfPick">Choose / replace PDF</button>
+          <button type="button" class="warn" id="pdfDel">Remove PDF</button>
         </div>
-        <p class="st-hint">PDF added here appears as the flipbook E-Paper on the home page.</p>
-        <div class="st-actions"><a class="sb" id="pdfDl" href="#">⬇ Download</a></div>
-        <label class="st-lab">Date used in file name</label>
-        <input type="date" id="dlDate">
-        <div class="st-actions"><button type="button" class="sb ghost" id="dlToday">Use today’s date</button></div>
-        <p class="st-hint">Leave empty to use today’s date automatically. File name: Theekkathir-DD-MM-YYYY.pdf</p>
-        <label class="st-lab">🔊 Page-turn sound</label>
-        <label class="st-check"><input type="checkbox" id="sndChk"> Paper sound when turning pages</label>
+        <p class="note">The PDF added here shows on the front page as a flip-through E-Paper.</p>
+      </div>
+      <div class="sc">
+        <h2>⬇ Download</h2>
+        <label>Date in the file name
+          <input type="date" id="dlDate">
+        </label>
+        <div class="st-row">
+          <button type="button" class="alt" id="dlToday">Use today's date</button>
+        </div>
+        <p class="note">If left empty, the current date is used each day. File name: Theekkathir-DD-MM-YYYY.pdf</p>
+      </div>
+      <div class="sc">
+        <h2>🔊 Page-flip sound</h2>
+        <label class="toggle"><span>Paper sound when turning a page</span><input type="checkbox" id="sndChk"></label>
       </div>
     </div>
   </section>
-  <section class="st-pane" id="p-tv" role="tabpanel">
-    <div class="st-subtabs" role="tablist">
-      <button type="button" data-sub="tv-edit" aria-selected="true">Edit</button>
-      <button type="button" data-sub="tv-view">Preview</button>
-    </div>
-    <div class="st-sub on" id="tv-edit"><iframe title="Mobile TV editor" src="news.html?mode=settings"></iframe></div>
-    <div class="st-sub" id="tv-view"><iframe title="Mobile TV preview" src="news.html?mode=view"></iframe></div>
-  </section>
+
+  <!-- ===== Mobile TV (news.html?mode=settings) ===== -->
+  <section class="st-pane" id="p-tv" role="tabpanel"></section>
+
+  <!-- ===== Book Shelf: Books · Articles · Shopping · Events (ஒரே வடிவமைப்பில் துணைத் தாவல்கள்) ===== -->
   <section class="st-pane" id="p-shelf" role="tabpanel">
-    <div class="st-subtabs" role="tablist">
-      <button type="button" data-sub="books" aria-selected="true">Books</button>
-      <button type="button" data-sub="shopping">Shopping</button>
-      <button type="button" data-sub="events">Events</button>
-    </div>
-    <div class="st-sub on" id="books"><iframe title="Book shelf" src="bookshelf.html"></iframe></div>
-    <div class="st-sub" id="shopping"><iframe title="Shopping" src="articles.html?section=shopping"></iframe></div>
-    <div class="st-sub" id="events"><iframe title="Events" src="articles.html?section=events"></iframe></div>
+    <nav class="st-subtabs" id="subtabs" role="tablist" aria-label="Book Shelf sections"></nav>
+    <div class="st-sub" id="s-books"></div>
+    <div class="st-sub" id="s-posts"><div class="st-native"></div></div>
   </section>
+
+  <!-- ===== பகிர்: ஒரே இடத்தில் எழுதி இணையதளம் + Meta + WhatsApp ===== -->
   <section class="st-pane" id="p-share" role="tabpanel">
-    <div class="st-native"><div class="sc" id="shareRoot"></div></div>
+    <div class="st-native" id="shareBox"></div>
   </section>
+
+  <!-- ===== தோற்றம் ===== -->
   <section class="st-pane" id="p-theme" role="tabpanel">
     <div class="st-native">
       <div class="sc">
         <h2>🎨 App theme</h2>
-        <p class="st-hint">One choice applies the same colors to E-Paper, Mobile TV, Book Shelf, and all settings pages.</p>
         <div id="themes"></div>
+        <p class="note">One choice sets the colours of E-Paper, Mobile TV and Book Shelf (the Settings screens keep the dark editor look).</p>
       </div>
     </div>
   </section>
+
 </main>
+<div class="st-toast" id="toast" role="status" aria-live="polite"></div>
+
 <script src="theme.js"></script>
-<script src="share-hub.js"></script>
 <script src="owner-gate.js"></script>
+<script src="articles-config.js"></script>
+<script src="article-store.js"></script>
+<script src="articles-admin.js"></script>
+<script src="share-hub.js"></script>
 <script>
 (function () {
+  'use strict';
   var $ = function (s) { return document.querySelector(s); };
-  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
   var ls = {
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
     set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
     del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
   };
-  function toast(m) {
-    var t = document.createElement('div');
-    t.className = 'st-toast'; t.textContent = m;
-    document.body.appendChild(t);
-    setTimeout(function () { t.remove(); }, 2200);
+  var toastT = 0;
+  function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 2400); }
+
+  /* ---------- தாவல்கள் ---------- */
+  var TABS = ['epaper', 'tv', 'shelf', 'share', 'theme'];
+  var SUBS = ['books', 'posts'];          /* Book Shelf பிரிவுகள் — அனைத்தும் ஒரே பக்கத்தில் */
+  var SUBVIEW = { books: 'books', posts: 'article' };
+  var SUBDEF = { books: ['📚', 'Books'], posts: ['📥', 'Posts'] };
+  var OLDSUB = { articles: 'article', shopping: 'shopping', events: 'events' };   /* பழைய இணைப்புகள் → ஒருங்கிணைந்த பெட்டி */
+  var pendingN = 0;
+  var VIEW_OF = { epaper: 'paper', tv: 'tv', shelf: 'books', share: 'paper', theme: 'paper' };
+  var SRC = { tv: 'news.html?mode=settings' };
+  var cur = '', sub = 'books', wantKind = null;
+  function tabNames() { try { return JSON.parse(ls.get('np_tabs') || '{}') || {}; } catch (e) { return {}; } }
+  function buildSubtabs() {
+    var nm = tabNames(), box = $('#subtabs'); box.innerHTML = '';
+    SUBS.forEach(function (k) {
+      var b = document.createElement('button'); b.type = 'button'; b.dataset.s = k; b.setAttribute('role', 'tab');
+      b.textContent = SUBDEF[k][0] + ' ' + SUBDEF[k][1] + (k === 'posts' && pendingN ? ' (' + pendingN + ')' : '');
+      b.setAttribute('aria-selected', k === sub ? 'true' : 'false'); box.appendChild(b);
+    });
+  }
+  function fitFrames() {
+    var h = Math.max(240, innerHeight - $('#top').offsetHeight - ($('#subtabs').offsetHeight || 0));
+    [].forEach.call(document.querySelectorAll('.st-pane > iframe, .st-sub > iframe'), function (f) { f.style.height = h + 'px'; });
+  }
+  function openSub(k) {
+    sub = SUBS.indexOf(k) >= 0 ? k : 'books';
+    SUBS.forEach(function (t) { $('#s-' + t).classList.toggle('on', t === sub); });
+    buildSubtabs();
+    if (sub === 'books' && !$('#s-books > iframe')) {
+      var f = document.createElement('iframe'); f.title = 'books'; f.src = 'book.html?mode=settings';
+      f.allow = 'camera;microphone;fullscreen;autoplay;clipboard-write;display-capture'; $('#s-books').appendChild(f);
+    }
+    if (sub === 'posts' && window.ArticleAdmin) ArticleAdmin.mountAll($('#s-posts .st-native'), wantKind);
+    wantKind = null;
+    $('#back').href = 'index.html#' + SUBVIEW[sub];
+    fitFrames();
   }
   function openTab(id, push) {
-    $$('.st-tab').forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-t') === id ? 'true' : 'false'); });
-    $$('.st-pane').forEach(function (p) { p.classList.toggle('on', p.id === 'p-' + id); });
-    if (push !== false) try { history.replaceState(null, '', '#' + id); } catch (e) {}
+    if (OLDSUB[id]) { wantKind = OLDSUB[id]; id = 'shelf'; sub = 'posts'; }
+    if (SUBS.indexOf(id) >= 0) { var want = id; id = 'shelf'; sub = want; }
+    if (id === 'sections') { wantKind = 'shopping'; id = 'shelf'; sub = 'posts'; }
+    if (TABS.indexOf(id) < 0) id = 'epaper';
+    cur = id;
+    [].forEach.call(document.querySelectorAll('.st-tab'), function (b) { b.setAttribute('aria-selected', b.dataset.t === id ? 'true' : 'false'); });
+    TABS.forEach(function (t) { $('#p-' + t).classList.toggle('on', t === id); });
+    if (SRC[id] && !$('#p-' + id + ' > iframe')) {
+      var f = document.createElement('iframe');
+      f.title = id; f.src = SRC[id];
+      f.allow = 'camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';
+      $('#p-' + id).appendChild(f);
+    }
+    $('#back').href = 'index.html#' + VIEW_OF[id];
+    if (id === 'shelf') openSub(sub);
+    try { if (push !== false) history.replaceState(null, '', '#' + (id === 'shelf' ? sub : id)); } catch (e) {}
+    fitFrames(); window.scrollTo(0, 0);
+    if (id === 'epaper') loadPdfInfo();
+    if (id === 'share' && window.ShareHub) ShareHub.mount($('#shareBox'));
   }
-  $$('.st-tab').forEach(function (b) {
-    b.addEventListener('click', function () { openTab(b.getAttribute('data-t')); });
-  });
-  $$('.st-subtabs').forEach(function (bar) {
-    bar.addEventListener('click', function (e) {
-      var btn = e.target.closest('button[data-sub]');
-      if (!btn) return;
-      var id = btn.getAttribute('data-sub');
-      bar.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-selected', x === btn ? 'true' : 'false'); });
-      var pane = bar.parentElement;
-      pane.querySelectorAll('.st-sub').forEach(function (s) { s.classList.toggle('on', s.id === id); });
-    });
-  });
-  function idb() {
-    return new Promise(function (res, rej) {
-      var r = indexedDB.open('np_store', 1);
-      r.onupgradeneeded = function () { r.result.createObjectStore('kv'); };
-      r.onsuccess = function () { res(r.result); };
-      r.onerror = rej;
-    });
+  $('#tabs').addEventListener('click', function (e) { var b = e.target.closest('.st-tab'); if (b) { if (b.dataset.t === 'shelf') sub = sub || 'books'; openTab(b.dataset.t); } });
+  $('#subtabs').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { openSub(b.dataset.s); try { history.replaceState(null, '', '#' + b.dataset.s); } catch (x) {} window.scrollTo(0, 0); } });
+  /* காத்திருப்பு எண்ணிக்கை: "📚 Book Shelf" தாவலிலும் "📥 Posts" துணைத் தாவலிலும் */
+  function badge() {
+    var t = document.querySelector('.st-tab[data-t="shelf"]');
+    if (t) t.textContent = '📚 Book Shelf' + (pendingN ? ' (' + pendingN + ')' : '');
+    if ($('#subtabs').children.length) buildSubtabs();
   }
-  function dbSet(k, v) { return idb().then(function (d) { return new Promise(function (res) { var t = d.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = res; t.onerror = res; }); }).catch(function () {}); }
+  if (window.ArticleAdmin && ArticleAdmin.watchPending) ArticleAdmin.watchPending(function (n) { pendingN = n; badge(); });
+  addEventListener('resize', fitFrames);
+  addEventListener('hashchange', function () { openTab(location.hash.slice(1), false); });
+
+  /* ---------- E-Paper: PDF (IndexedDB 'epaper' — முதல் பக்கம் அதையே படிக்கும்) ---------- */
+  var idb = function () { return new Promise(function (res, rej) { var r = indexedDB.open('epaper', 1); r.onupgradeneeded = function () { r.result.createObjectStore('kv'); }; r.onsuccess = function () { res(r.result); }; r.onerror = function () { rej(r.error); }; }); };
+  function dbSet(k, v) { return idb().then(function (d) { return new Promise(function (res, rej) { var t = d.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = res; t.onerror = function () { rej(t.error); }; }); }); }
   function dbGet(k) { return idb().then(function (d) { return new Promise(function (res) { var q = d.transaction('kv').objectStore('kv').get(k); q.onsuccess = function () { res(q.result); }; q.onerror = function () { res(null); }; }); }).catch(function () { return null; }); }
   function dbDel(k) { return idb().then(function (d) { return new Promise(function (res) { var t = d.transaction('kv', 'readwrite'); t.objectStore('kv').delete(k); t.oncomplete = res; t.onerror = res; }); }).catch(function () {}); }
   function loadPdfInfo() {
@@ -148,103 +203,29 @@ html,body{margin:0}
   $('#pdfFile').onchange = function (e) {
     var f = e.target.files[0]; e.target.value = '';
     if (!f) return;
-    if (!/pdf/i.test(f.type + f.name)) { toast('Please choose a PDF file only'); return; }
+    if (!/pdf/i.test(f.type + f.name)) { toast('Choose a PDF file only'); return; }
     f.arrayBuffer().then(function (buf) { return dbSet('pdf', { name: f.name, buf: buf }).then(function () { return dbSet('pg', 0); }); })
-      .then(function () { loadPdfInfo(); toast('✔ PDF added — visible on the home page'); })
-      .catch(function () { toast('⚠ Could not save PDF'); });
+      .then(function () { loadPdfInfo(); toast('✔ PDF added — shows on the front page'); })
+      .catch(function () { toast('⚠ Could not save the PDF'); });
   };
   $('#pdfDel').onclick = function () {
     dbDel('pdf').then(function () { return dbDel('pg'); }).then(function () { loadPdfInfo(); toast('PDF removed'); });
   };
+
+  /* ---------- E-Paper: தேதி, ஒலி ---------- */
   $('#dlDate').value = ls.get('np_dldate') || '';
   $('#dlDate').onchange = function (e) { if (e.target.value) ls.set('np_dldate', e.target.value); else ls.del('np_dldate'); toast('✔ Saved'); };
-  $('#dlToday').onclick = function () { $('#dlDate').value = ''; ls.del('np_dldate'); toast('✔ Will use today’s date'); };
+  $('#dlToday').onclick = function () { $('#dlDate').value = ''; ls.del('np_dldate'); toast('✔ Today\'s date will be used'); };
   $('#sndChk').checked = ls.get('np_sound') !== '0';
   $('#sndChk').onchange = function (e) { ls.set('np_sound', e.target.checked ? '1' : '0'); toast('✔ Saved'); };
+
+  /* ---------- தோற்றம் ---------- */
   if (window.AppTheme) AppTheme.mount('#themes');
+
+  /* ---------- பிற பகுதிகள் (முன்பு Shelf மெனுவில் இருந்தவை) ---------- */
+  var SECS = [['shopping', 'Shopping'], ['events', 'Events']];
+  var names = {}; try { names = JSON.parse(ls.get('np_tabs') || '{}') || {}; } catch (e) { names = {}; }
   openTab((location.hash || '').slice(1) || 'epaper', false);
-  loadPdfInfo();
-})();
-</script>
-<script>
-/* Inject English UI helpers + audio + clock into Mobile TV iframe (news.html) */
-(function () {
-  function enhance(doc, win) {
-    if (!doc || !doc.body || doc.documentElement.getAttribute('data-en-ui')) return;
-    doc.documentElement.setAttribute('data-en-ui', '1');
-    var st = doc.createElement('style');
-    st.textContent = 'body{font-size:13.5px!important}button{padding:8px 10px!important;min-height:36px!important;font-size:12.5px!important}label{font-size:12px!important}.panel{padding:10px!important;gap:8px!important}#tlT{font:800 15px/1.2 system-ui,sans-serif!important;color:#FFC800!important}#vInfo{display:block!important;position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px)+10px);transform:translateX(-50%);z-index:5;background:rgba(0,0,0,.72);color:#FFC800;font:800 13px/1.2 system-ui,sans-serif;padding:5px 14px;border-radius:99px;pointer-events:none;font-variant-numeric:tabular-nums}#liveClock{font:800 14px system-ui,sans-serif;color:#D71920;font-variant-numeric:tabular-nums}';
-    doc.head.appendChild(st);
-    var play = doc.getElementById('bPlay');
-    if (play && !doc.getElementById('gAud')) {
-      var row = doc.createElement('div');
-      row.className = 'row';
-      row.style.cssText = 'align-items:center;gap:10px;flex-wrap:wrap';
-      row.innerHTML = '<label style="display:flex;flex-direction:row;align-items:center;gap:6px;flex:0 0 auto;color:inherit"><input type="checkbox" id="gAud" style="width:18px;height:18px;min-height:0" checked> Preview audio</label><span id="liveClock">0:00 / 0:30</span>';
-      play.parentElement && play.parentElement.insertAdjacentElement('afterend', row);
-    }
-    try {
-      var G = win.G || (win.G = {});
-      if (G.aud == null) G.aud = true;
-      var ga = doc.getElementById('gAud');
-      if (ga) {
-        ga.checked = !!G.aud;
-        ga.onchange = function () {
-          G.aud = !!ga.checked;
-          try { if (typeof win.save === 'function') win.save(); } catch (e) {}
-        };
-      }
-      if (!win._audHook) {
-        win._audHook = true;
-        setInterval(function () {
-          try {
-            var media = win.media, cur = win.cur, rec = win.rec, playing = win.playing, exp = win._exp;
-            if (!media || cur == null) return;
-            var ML = media[cur] || [];
-            ML.forEach(function (m) {
-              if (m.type !== 'v' || !m.el) return;
-              if (m.el._on) {
-                if (rec) m.el.muted = false;
-                else m.el.muted = !(G.aud && playing && !exp);
-              }
-            });
-          } catch (e) {}
-        }, 200);
-      }
-      setInterval(function () {
-        try {
-          var t = win._pt || 0;
-          var durOf = win.durOf, items = win.items, cur = win.cur;
-          if (!durOf || !items) return;
-          var D = Math.max(1, durOf(items[cur]));
-          var fmt = function (x) { return Math.floor(x / 60) + ':' + String(Math.floor(x % 60)).padStart(2, '0'); };
-          var clock = fmt(t) + ' / ' + fmt(D);
-          var lc = doc.getElementById('liveClock');
-          if (lc) lc.textContent = clock;
-          var vi = doc.getElementById('vInfo');
-          if (vi) vi.textContent = clock;
-        } catch (e) {}
-      }, 200);
-    } catch (e) {}
-  }
-  function hookIframe(iframe) {
-    if (!iframe || iframe.getAttribute('data-en-hook')) return;
-    iframe.setAttribute('data-en-hook', '1');
-    var tryEnhance = function () {
-      try {
-        var doc = iframe.contentDocument;
-        var win = iframe.contentWindow;
-        if (doc && doc.readyState === 'complete') enhance(doc, win);
-      } catch (e) {}
-    };
-    iframe.addEventListener('load', function () { setTimeout(tryEnhance, 400); setTimeout(tryEnhance, 1200); });
-    setTimeout(tryEnhance, 800);
-  }
-  function scan() {
-    document.querySelectorAll('iframe[src*="news.html"]').forEach(hookIframe);
-  }
-  scan();
-  setInterval(scan, 2000);
 })();
 </script>
 </body>
