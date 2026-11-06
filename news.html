@@ -130,6 +130,10 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
     <label>Script <small>*word* = red; long text shows in up to 3 pages</small><textarea data-k="script" rows="5"></textarea></label><small id="pgInfo"></small>
     <label>Ticker <small>separate items with |</small><input data-k="ticker"></label>
     <div class="row" style="align-items:center">
+      <label class="chk"><input type="checkbox" data-k="pro"> Play a promo (key word) when this news starts</label>
+    </div>
+    <small>The promo covers the video frame for a few seconds; this news's headline and script continue after it.</small>
+    <div class="row" style="align-items:center">
       <label class="chk"><input type="checkbox" data-k="breaking"> Show the key-word bar on this news</label>
     </div>
     <label>Key word <small>BREAKING NEWS / JUST IN / ... — one place; changes the bar and the ticker badge everywhere</small><input id="gLabel" placeholder="BREAKING NEWS"></label>
@@ -324,6 +328,13 @@ function oneSync(m,t){const el=m.el,tg=m.off+t;if(!isFinite(tg))return;
   const run=(playing||rec)&&window._scrub==null;
   if(run){const d=Math.abs(el.currentTime-tg);if(el.paused||d>.45){if(el.paused||d>.15){try{el.currentTime=tg}catch(e){}}el.play().catch(()=>{if(!el.muted){el.muted=true;el.play().catch(()=>{})}})}}
   else{if(!el.paused)el.pause();if(Math.abs(el.currentTime-tg)>.04){try{el.currentTime=tg}catch(e){}}}}
+/* promo at the start of a news (added with "Add news"): key word shown full-frame / band over the playing video */
+function proLen(it){return Math.max(1,Math.min(clamp(+G.prDur||4,2,10),durOf(it)-.5))}
+function PRO1(it,t,fx,fy,fw,fh){
+  if(STILL||!it.pro||G.prOn===false)return;
+  const D=proLen(it);if(t<0||t>=D)return;
+  const w=((it.promo||"").trim().split("|")[0]||"").trim()||(G.label!=null?G.label:(G.brk||"BREAKING NEWS"));
+  (G.prStyle==="band"?promoBand:promoFull)(w,t,D,fx,fy,fw,fh)}
 function draw(it,t){
   const D=durOf(it),a=(s,d)=>ease((t-s)/d),C=(s)=>{ctx.textAlign=s?"center":"left"};
   ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.textBaseline="alphabetic";ctx.textAlign="left";ctx.shadowBlur=0;
@@ -351,7 +362,7 @@ function draw(it,t){
   const dm=(m,al)=>{ctx.save();ctx.globalAlpha=al;if(m.type==="v"){if(m.el.readyState>=2){cover(m.el,m.el.videoWidth,m.el.videoHeight,fx,fy,fw,fh,uz,it.px,it.py);if(window._exp)snapFrame(m)}else if(window._exp&&m._lc)cover(m._lc,m._lc.width,m._lc.height,fx,fy,fw,fh,uz,it.px,it.py)}else cover(m.el,m.el.naturalWidth,m.el.naturalHeight,fx,fy,fw,fh,uz,it.px,it.py);ctx.restore()};
   if(nM){dm(ML[si],p);if(nM>1&&st2>SL-.5)dm(ML[nx],p*ease((st2-(SL-.5))/.5))}
   else{ctx.save();ctx.fillStyle="#242424";ctx.fillRect(fx,fy,fw,fh);const gg=ctx.createLinearGradient(fx+((t*260)%1500)-400,0,fx+((t*260)%1500),0);gg.addColorStop(0,"rgba(255,255,255,0)");gg.addColorStop(.5,"rgba(255,255,255,.1)");gg.addColorStop(1,"rgba(255,255,255,0)");ctx.fillStyle=gg;ctx.fillRect(fx,fy,fw,fh);ctx.fillStyle="#9a9a9a";ctx.font=`700 44px ${FONT}`;ctx.textAlign="center";ctx.fillText("வீடியோ / படம் இங்கே",W/2,vy+vh/2+14);ctx.restore();ctx.textAlign="left"}
-  WMARK(fx,fy,fw,fh);FRAMEFX(it,t,fx,fy,fw,fh);
+  WMARK(fx,fy,fw,fh);FRAMEFX(it,t,fx,fy,fw,fh);PRO1(it,t,fx,fy,fw,fh);
   if(nM>1){for(let j=0;j<nM;j++){ctx.fillStyle=j===si?GOLD:"rgba(255,255,255,.45)";ctx.beginPath();ctx.arc(vx+vw/2-(nM-1)*14+j*28,vy+vh-30,7,0,7);ctx.fill()}}
   FRAMEBORDER(vx,vy,vw,vh,t,p);
   ctx.restore();
@@ -1280,10 +1291,14 @@ $("#bAdd").onclick=()=>{
   if(items.length>=10){$("#st").textContent="Maximum 10 news.";return}
   const it=items[cur],L=segLen(it),ms=minSeg();
   if(L<ms*2){$("#st").textContent="This news is too short to split — widen it first.";return}
-  const keep=r1(L/2);it.len=keep;
+  let at=window._scrub!=null?window._scrub:(playing?(window._pt||L/2):L/2);
+  at=r1(clamp(at,ms,L-ms));
+  it.len=at;
   shiftMedia(cur+1,1);
-  items.splice(cur+1,0,{...blank(),headline:"",loc:"",script:"",ticker:"",...tplSt(),len:r1(L-keep)});
-  save();sel(cur+1)};
+  items.splice(cur+1,0,{...blank(),headline:"",loc:"",script:"",ticker:"",...tplSt(),len:r1(L-at),pro:true,promo:""});
+  save();sel(cur+1);
+  $("#st").textContent="✔ News "+(cur+1)+" added at "+fmt1(segAt(cur))+" — its promo plays first. Type the title and script below (shown after the promo).";
+  const h=document.querySelector('textarea[data-k="headline"]');if(h){h.scrollIntoView({block:"center",behavior:"smooth"});setTimeout(()=>h.focus({preventScroll:true}),350)}};
 $("#bDel").onclick=()=>{
   if(items.length<2)return;
   const L=segLen(items[cur]),to=cur>0?cur-1:1;items[to].len=r1(segLen(items[to])+L);
@@ -1296,13 +1311,13 @@ $("#nStart").onchange=e=>{if(cur===0){e.target.value="0:00";return}const v=parse
 
 /* ---- timeline ---- */
 const bar=$("#tlBar"),head=$("#tlHead"),tT=$("#tlT");let sig="",drag=null;
-const signature=()=>[cur,Math.round(totalDur()*10),items.map(x=>segLen(x)).join(",")].join("~");
+const signature=()=>[cur,Math.round(totalDur()*10),items.map(x=>segLen(x)+(x.pro?"p":"")).join(",")].join("~");
 function render(force){
   const sg=signature();if(!force&&sg===sig)return;sig=sg;
   const T=totalDur();bar.querySelectorAll(".tl-blk,.tl-h").forEach(e=>e.remove());
   let a=0;items.forEach((x,i)=>{const L=segLen(x),b=document.createElement("div");
     b.className="tl-blk"+(i%2?" alt":"")+(i===cur?" on":"");b.style.left=(a/T*100)+"%";b.style.width=(L/T*100)+"%";
-    b.innerHTML=(i+1)+"<span>"+fmt(a)+"</span>";bar.insertBefore(b,head);
+    b.innerHTML=(i+1)+(x.pro?" ★":"")+"<span>"+fmt(a)+"</span>";bar.insertBefore(b,head);
     if(i>0){const h=document.createElement("div");h.className="tl-h";h.style.left=(a/T*100)+"%";h.dataset.k=i;h.title="Start of news "+(i+1)+" · "+fmt1(a);bar.insertBefore(h,head)}
     a+=L});
   const st=segAt(cur);$("#nTime").textContent="News "+(cur+1)+" of "+items.length+" · "+fmt1(st)+" – "+fmt1(st+segLen(items[cur]))+" ("+r1(segLen(items[cur]))+" s) · total "+fmt(T);
