@@ -1,126 +1,134 @@
-/* ஒரே செட்டிங் தோற்றம் (one settings concept).
-   settings.html, news.html?mode=settings, book.html?mode=settings அனைத்தும் இதையே பயன்படுத்தும்.
-   நிறங்கள் theme.js தரும் --bg --panel --fg --muted --line --field --accent --on --deep ஆகியவற்றிலிருந்து வரும்.
-   அமைப்பு: தலைப்புப் பட்டை → தாவல்கள் → அட்டைகள் (.sc / .panel / .card / details) → புலங்கள் / பொத்தான்கள் */
+/* Settings — "Dark pro-editor" look.
+   Shared by settings.html, news.html?mode=settings and book.html?mode=settings.
+   Fixed dark tokens (the public pages keep their own themes). Small type, small controls. */
 
 html.m-settings, .st-page {
-  --s-bg: var(--bg, #FBF1F1);
-  --s-card: var(--panel, var(--card, #fff));
-  --s-fg: var(--fg, var(--ink, #2B0A0E));
-  --s-mut: var(--muted, var(--mut, #7A5257));
-  --s-line: var(--line, #EBCFD1);
-  --s-field: var(--field, var(--in, #FFF8F8));
-  --s-acc: var(--accent, var(--red, #B3121A));
-  --s-on: var(--on, var(--on-accent, #fff));
-  --s-gold: var(--gold, #E0A823);
-  --s-danger: var(--danger, #B3261E);
+  --s-bg: #0e1013; --s-card: #161920; --s-card2: #1c2029; --s-line: #2a2f3b; --s-field: #10131a;
+  --s-fg: #e7e9ee; --s-mut: #8a93a3; --s-acc: #f2b33d; --s-on: #17120a; --s-gold: #f2b33d;
+  --s-danger: #ef5b5b; --s-ok: #4cc38a; --s-r: 8px;
+  --s-font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Tamil", "Latha", "Nirmala UI", sans-serif;
+  color-scheme: dark;
 }
 
-/* ---------- பக்கம் ---------- */
-html.m-settings, html.m-settings body { height: auto; }
+/* ---------- page ---------- */
+html.m-settings, html.m-settings body { height: auto; background: var(--s-bg); }
 html.m-settings body {
-  margin: 0; padding: 12px 12px 56px; max-width: 760px; margin-inline: auto;
-  background: var(--s-bg); color: var(--s-fg);
-  font: 500 15px/1.55 "Noto Sans Tamil", "Latha", "Nirmala UI", system-ui, sans-serif;
+  margin: 0 auto; padding: 10px 10px 48px; max-width: 720px;
+  color: var(--s-fg); font: 400 13px/1.45 var(--s-font);
   -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
 }
-html.m-settings main, html.m-settings .wrap { max-width: none; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+html.m-settings main, html.m-settings .wrap { max-width: none; margin: 0; padding: 0; display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
 html.m-settings header.top { display: none !important; }
-html.m-settings .shell { display: grid !important; gap: 12px !important; grid-template-columns: minmax(0, 1fr) !important; }
-html.m-settings .side, html.m-settings .panels { display: grid !important; gap: 12px !important; min-width: 0; }
+html.m-settings .shell { display: grid !important; gap: 10px !important; grid-template-columns: minmax(0, 1fr) !important; }
+html.m-settings .side, html.m-settings .panels { display: grid !important; gap: 10px !important; min-width: 0; }
 
-/* ---------- அட்டை ---------- */
+/* ---------- cards ---------- */
 .sc, html.m-settings .panel, html.m-settings .card, html.m-settings details, html.m-settings details.pn {
-  background: var(--s-card); border: 1px solid var(--s-line); border-radius: 16px; color: var(--s-fg);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, .03);
+  background: var(--s-card); border: 1px solid var(--s-line); border-radius: 10px; color: var(--s-fg); box-shadow: none;
 }
-.sc, html.m-settings .panel, html.m-settings .card { padding: 14px !important; display: grid; gap: 12px; min-width: 0; }
-html.m-settings .panel .panel { border: 0 !important; padding: 0 !important; box-shadow: none; background: transparent; }
+.sc, html.m-settings .panel, html.m-settings .card { padding: 12px !important; display: grid; gap: 10px; min-width: 0; }
+html.m-settings .panel .panel { border: 0 !important; padding: 0 !important; background: transparent; }
 html.m-settings details { padding: 0; display: block; }
 html.m-settings details > summary, html.m-settings details.pn > summary {
-  list-style: none; cursor: pointer; padding: 13px 14px !important; display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  font: 800 16px/1.3 "Noto Sans Tamil", system-ui, sans-serif !important; color: var(--s-fg);
+  list-style: none; cursor: pointer; min-height: 40px; padding: 0 12px !important; display: flex; align-items: center; gap: 8px;
+  font: 600 13px/1.3 var(--s-font) !important; color: var(--s-fg);
 }
+html.m-settings details > summary small { font-weight: 400; color: var(--s-mut); font-size: 11px; }
 html.m-settings details > summary::-webkit-details-marker { display: none; }
-html.m-settings details > summary::after { content: "+"; font-size: 22px; line-height: 1; color: var(--s-acc); }
-html.m-settings details[open] > summary::after { content: "\2212"; }
-html.m-settings details > .panel, html.m-settings details > .body { border: 0 !important; box-shadow: none; background: transparent; padding: 0 14px 14px !important; display: grid; gap: 12px; }
+html.m-settings details > summary::after { content: "›"; margin-inline-start: auto; font-size: 20px; line-height: 1; color: var(--s-mut); transition: transform .15s; }
+html.m-settings details[open] > summary::after { content: "›"; transform: rotate(90deg); color: var(--s-acc); }
+html.m-settings details > .panel, html.m-settings details > .body { border: 0 !important; background: transparent; padding: 0 12px 12px !important; display: grid; gap: 10px; }
+html.m-settings details > .subb, html.m-settings details.in > .subb { display: grid; gap: 10px; padding: 0 12px 12px; }
+html.m-settings details.in { background: var(--s-card2); border-color: var(--s-line); border-radius: var(--s-r); }
+html.m-settings details.sub.once { opacity: .8; }
+html.m-settings details[open] { border-color: #3a4152; }
 html.m-settings details.pn { order: 0 !important; }
-html.m-settings h2, .sc h2 { margin: 0; font: 800 17px/1.3 "Noto Sans Tamil", system-ui, sans-serif; color: var(--s-fg); }
-html.m-settings .exp h2 { font-size: 17px; margin: 0; }
+html.m-settings h2, .sc h2 { margin: 0; font: 700 14px/1.3 var(--s-font); color: var(--s-fg); display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+html.m-settings h2 small { font-weight: 400; font-size: 11px; color: var(--s-mut); }
+html.m-settings .exp h2 { font-size: 14px; margin: 0; }
+html.m-settings .ess { background: var(--s-card2); border: 1px solid var(--s-line); border-radius: 10px; padding: 12px; display: grid; gap: 10px; border-inline-start: 3px solid var(--s-acc); }
+html.m-settings .ess > h3 { margin: 0; font: 700 12px/1.2 var(--s-font); color: var(--s-acc); letter-spacing: .06em; text-transform: uppercase; }
 
-/* ---------- புலங்கள் ---------- */
-html.m-settings label, .sc label, .sc .lab { color: var(--s-mut); font-size: 13px; font-weight: 600; }
+/* ---------- fields ---------- */
+html.m-settings label, .sc label, .sc .lab { color: var(--s-mut); font-size: 12px; font-weight: 500; }
 html.m-settings label.f { display: grid; gap: 4px; min-width: 0; }
-html.m-settings label:not(.btn):not(.f) { display: grid; gap: 4px; }
-html.m-settings .checks label:not(.btn):not(.f) { display: flex; gap: 10px; align-items: center; color: var(--s-fg); font-size: 14px; font-weight: 600; }
-html.m-settings .checks input { flex: none; width: 20px; height: 20px; }
+html.m-settings label:not(.btn):not(.f):not(.chk):not(.toggle) { display: grid; gap: 4px; }
+html.m-settings label.chk, html.m-settings .checks label:not(.btn):not(.f) { display: flex; gap: 8px; align-items: center; color: var(--s-fg); font-size: 13px; font-weight: 500; }
+html.m-settings label.chk input, html.m-settings .checks input { flex: none; width: 16px; height: 16px; }
 html.m-settings input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=file]), html.m-settings select, html.m-settings textarea,
 .sc input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=file]), .sc select, .sc textarea {
-  width: 100%; min-width: 0; font: inherit; font-size: 15px; color: var(--s-fg); background: var(--s-field);
-  border: 1px solid var(--s-line); border-radius: 10px; padding: 10px 12px;
+  width: 100%; min-width: 0; font: inherit; font-size: 13px; color: var(--s-fg); background: var(--s-field);
+  border: 1px solid var(--s-line); border-radius: var(--s-r); padding: 7px 10px; min-height: 34px; box-sizing: border-box;
 }
-html.m-settings input[type=file], .sc input[type=file] { width: 100%; font: inherit; font-size: 13px; color: var(--s-mut); }
-html.m-settings input[type=range], .sc input[type=range] { width: 100%; accent-color: var(--s-acc); }
+html.m-settings textarea, .sc textarea { line-height: 1.45; }
+html.m-settings input::placeholder, html.m-settings textarea::placeholder, .sc input::placeholder { color: #566073; }
+html.m-settings input[type=file], .sc input[type=file] { width: 100%; font: inherit; font-size: 12px; color: var(--s-mut); min-height: 0; padding: 4px 0; border: 0; background: transparent; }
+html.m-settings input[type=range], .sc input[type=range] { width: 100%; accent-color: var(--s-acc); height: 24px; }
 html.m-settings input[type=checkbox], .sc input[type=checkbox] { accent-color: var(--s-acc); }
 html.m-settings input:focus-visible, html.m-settings select:focus-visible, html.m-settings textarea:focus-visible, html.m-settings button:focus-visible,
-html.m-settings summary:focus-visible, .sc input:focus-visible, .sc select:focus-visible, .sc textarea:focus-visible, .sc button:focus-visible { outline: 3px solid var(--s-acc); outline-offset: 2px; }
-html.m-settings small, html.m-settings .hint, html.m-settings .msg, .sc small, .sc .note { color: var(--s-mut); font-size: 13px; }
-html.m-settings .row { display: flex; gap: 10px; flex-wrap: wrap; }
-html.m-settings .row > * { flex: 1 1 150px; min-width: 0; }
-html.m-settings .grid2 { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+html.m-settings summary:focus-visible, .sc input:focus-visible, .sc select:focus-visible, .sc textarea:focus-visible, .sc button:focus-visible { outline: 2px solid var(--s-acc); outline-offset: 1px; }
+html.m-settings input:focus, html.m-settings select:focus, html.m-settings textarea:focus { border-color: var(--s-acc); }
+html.m-settings small, html.m-settings .hint, html.m-settings .msg, .sc small, .sc .note { color: var(--s-mut); font-size: 11px; line-height: 1.4; }
+html.m-settings label small { font-weight: 400; }
+html.m-settings .row { display: flex; gap: 8px; flex-wrap: wrap; }
+html.m-settings .row > * { flex: 1 1 130px; min-width: 0; }
+html.m-settings .grid2 { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+html.m-settings #st { color: var(--s-acc); font-size: 12px; min-height: 18px; }
 
-/* ---------- பொத்தான்கள் ---------- */
+/* ---------- buttons ---------- */
 html.m-settings button, html.m-settings .btn, .sc button, .sc .btn, .st-btn {
-  font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; border-radius: 11px; padding: 10px 14px; min-height: 42px;
-  border: 1px solid var(--s-acc); background: var(--s-acc); color: var(--s-on);
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-align: center;
+  font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: var(--s-r); padding: 0 12px; min-height: 32px;
+  border: 1px solid var(--s-line); background: var(--s-card2); color: var(--s-fg);
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-align: center; line-height: 1.2;
 }
-html.m-settings button.alt, html.m-settings .btn:not(.primary), html.m-settings button.gold, .sc button.alt, .st-btn.alt {
-  background: var(--s-field); color: var(--s-fg); border-color: var(--s-line);
-}
-html.m-settings button.gold { background: var(--deep, var(--s-acc)); color: #fff; border-color: transparent; }
-html.m-settings .btn.primary { background: var(--s-acc); color: var(--s-on); border-color: var(--s-acc); }
-html.m-settings .btn.warn, html.m-settings button.warn, .sc button.warn, .st-btn.warn { color: var(--s-danger); background: var(--s-field); border-color: var(--s-line); }
-html.m-settings .btn.small { min-height: 34px; padding: 5px 10px; font-size: 13px; }
-html.m-settings button:disabled, html.m-settings .btn[disabled], .sc button:disabled { opacity: .5; cursor: not-allowed; }
-html.m-settings .tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
-html.m-settings .tabs button { flex: 0 0 auto; min-width: 42px; padding: 7px 12px; min-height: 38px; background: var(--s-field); color: var(--s-fg); border-color: var(--s-line); }
-html.m-settings .tabs button.on { background: var(--s-acc); color: var(--s-on); border-color: var(--s-acc); }
-html.m-settings .bar { height: 10px; border-radius: 99px; background: var(--s-line); overflow: hidden; }
+html.m-settings button:hover, html.m-settings .btn:hover, .sc button:hover { border-color: #465066; }
+html.m-settings button.gold, html.m-settings .btn.primary, .sc .btn.primary, .st-btn.primary { background: var(--s-acc); color: var(--s-on); border-color: var(--s-acc); }
+html.m-settings button.alt, html.m-settings .btn:not(.primary), .sc button.alt, .st-btn.alt { background: transparent; color: var(--s-fg); border-color: var(--s-line); }
+html.m-settings .btn.warn, html.m-settings button.warn, .sc button.warn, .st-btn.warn { color: var(--s-danger); background: transparent; border-color: #5a2a2e; }
+html.m-settings .btn.small { min-height: 28px; padding: 0 9px; font-size: 11px; }
+html.m-settings button:disabled, html.m-settings .btn[disabled], .sc button:disabled { opacity: .45; cursor: not-allowed; }
+html.m-settings .tabs { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+html.m-settings .tabs button { flex: 0 0 auto; min-width: 34px; min-height: 30px; padding: 0 10px; background: transparent; color: var(--s-mut); border: 0; border-bottom: 2px solid transparent; border-radius: 0; font-weight: 700; }
+html.m-settings .tabs button.on { color: var(--s-acc); border-bottom-color: var(--s-acc); background: transparent; }
+html.m-settings .bar { height: 6px; border-radius: 99px; background: var(--s-line); overflow: hidden; }
 html.m-settings .bar > div { height: 100%; background: var(--s-acc); }
 
-/* ---------- முன்னோட்டம் (சிறிய) ---------- */
-html.m-settings .stage { position: static !important; background: var(--s-card); border: 1px solid var(--s-line); border-radius: 16px; padding: 12px; display: grid; gap: 10px; justify-items: center; }
-html.m-settings .stage canvas { width: min(100%, 220px); max-height: none; border-radius: 10px; }
-html.m-settings .phone { width: min(100%, 220px) !important; border-radius: 16px; box-shadow: 0 6px 18px rgba(0, 0, 0, .2); }
+/* ---------- preview (small) ---------- */
+html.m-settings .stage { position: static !important; background: var(--s-card); border: 1px solid var(--s-line); border-radius: 10px; padding: 10px; display: grid; gap: 8px; justify-items: center; }
+html.m-settings .stage canvas { width: min(100%, 220px); max-height: none; border-radius: 8px; }
+html.m-settings .phone { width: min(100%, 220px) !important; border-radius: 12px; box-shadow: 0 6px 18px rgba(0, 0, 0, .5); }
 html.m-settings .player, html.m-settings .row2 { width: min(100%, 320px); }
 html.m-settings .exp video { width: min(100%, 220px); }
 html.m-settings .exp { order: 0 !important; }
-html.m-settings #appThemes, html.m-settings .at-row { display: none !important; }
+html.m-settings #tl { width: min(100%, 420px); }
 
-/* ---------- settings.html தலைப்புப் பட்டை + தாவல்கள் ---------- */
-.st-page { margin: 0; background: var(--s-bg); color: var(--s-fg); font: 500 15px/1.55 "Noto Sans Tamil", "Latha", "Nirmala UI", system-ui, sans-serif; }
-.st-top { position: sticky; top: 0; z-index: 20; padding-top: env(safe-area-inset-top, 0px); background: linear-gradient(180deg, var(--s-acc), var(--deep, var(--s-acc))); color: var(--s-on); }
-.st-head { display: flex; align-items: center; gap: 10px; padding: 8px 10px 6px; }
-.st-head h1 { margin: 0; font: 800 18px/1.2 "Noto Sans Tamil", system-ui, sans-serif; flex: 1; min-width: 0; }
-.st-back { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border-radius: 99px; border: 1px solid rgba(255, 255, 255, .55); background: rgba(0, 0, 0, .2); color: #fff; font: 800 14px "Noto Sans Tamil", system-ui, sans-serif; text-decoration: none; cursor: pointer; }
-.st-tabs { display: flex; gap: 6px; padding: 0 10px 10px; overflow-x: auto; scrollbar-width: none; }
+/* ---------- settings.html header + tabs ---------- */
+.st-page { margin: 0; background: var(--s-bg); color: var(--s-fg); font: 400 13px/1.45 var(--s-font); }
+.st-top { position: sticky; top: 0; z-index: 20; padding-top: env(safe-area-inset-top, 0px); background: #11141a; border-bottom: 1px solid var(--s-line); color: var(--s-fg); }
+.st-head { display: flex; align-items: center; gap: 8px; padding: 8px 10px 4px; }
+.st-head h1 { margin: 0; font: 700 14px/1.2 var(--s-font); flex: 1; min-width: 0; letter-spacing: .02em; }
+.st-back { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 12px; border-radius: var(--s-r); border: 1px solid var(--s-line); background: transparent; color: var(--s-fg); font: 600 12px var(--s-font); text-decoration: none; cursor: pointer; }
+.st-tabs { display: flex; gap: 2px; padding: 0 8px; overflow-x: auto; scrollbar-width: none; }
 .st-tabs::-webkit-scrollbar { display: none; }
-.st-tab { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border-radius: 12px; border: 0; background: rgba(0, 0, 0, .22); color: #fff; font: 800 13px "Noto Sans Tamil", system-ui, sans-serif; cursor: pointer; }
-.st-tab[aria-selected=true] { background: #fff; color: var(--s-acc); }
+.st-tab { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: var(--s-mut); font: 600 12px var(--s-font); cursor: pointer; }
+.st-tab[aria-selected=true] { color: var(--s-acc); border-bottom-color: var(--s-acc); background: transparent; }
 .st-body { position: relative; }
 .st-pane { display: none; }
 .st-pane.on { display: block; }
 .st-pane > iframe { display: block; width: 100%; border: 0; background: var(--s-bg); }
-.st-native { max-width: 760px; margin: 0 auto; padding: 12px 12px 56px; display: grid; gap: 12px; }
-.st-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.st-row > * { flex: 1 1 150px; min-width: 0; }
-.st-kv { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
-.st-kv b { color: var(--s-fg); text-align: right; overflow-wrap: anywhere; }
+.st-native { max-width: 720px; margin: 0 auto; padding: 10px 10px 48px; display: grid; gap: 10px; }
+.st-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.st-row > * { flex: 1 1 130px; min-width: 0; }
+.st-kv { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
+.st-kv b { color: var(--s-fg); text-align: right; overflow-wrap: anywhere; font-weight: 600; }
 .st-kv span { color: var(--s-mut); }
-.st-toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 18px); transform: translateX(-50%); z-index: 60; background: var(--s-fg); color: var(--s-bg); padding: 10px 18px; border-radius: 99px; font-weight: 700; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s; }
+.st-toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); transform: translateX(-50%); z-index: 60; background: var(--s-fg); color: var(--s-bg); padding: 8px 14px; border-radius: var(--s-r); font-weight: 600; font-size: 12px; opacity: 0; pointer-events: none; transition: opacity .25s; }
 .st-toast.on { opacity: 1; }
-.sc .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--s-fg); font-size: 15px; font-weight: 600; }
-.sc .toggle input { width: 22px; height: 22px; flex: none; }
-.sc textarea.big { min-height: 150px; resize: vertical; }
+.sc h2 { font-size: 14px; }
+.sc .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--s-fg); font-size: 13px; font-weight: 500; }
+.sc .toggle input { width: 18px; height: 18px; flex: none; }
+.sc textarea.big { min-height: 130px; resize: vertical; }
+.st-page .sc, .st-page .st-native .card { background: var(--s-card); border-color: var(--s-line); }
+.st-empty { color: var(--s-mut); text-align: center; padding: 18px 8px; font-size: 12px; }
+
+html.m-settings [hidden], .sc [hidden], .st-page [hidden] { display: none !important; }

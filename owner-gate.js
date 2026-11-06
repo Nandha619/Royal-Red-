@@ -1,4 +1,4 @@
-/* உரிமையாளர் உள்நுழைவு — index.html (app) மற்றும் settings.html இரண்டிலும் பகிரப்படும்.
+/* Owner sign-in — index.html (app) மற்றும் settings.html இரண்டிலும் பகிரப்படும்.
    இது ஒரு வசதிக்கான பூட்டு மட்டுமே (tamper-proof DRM அல்ல).
    ஒரே tab-ல் app ↔ settings மாறும்போது மீண்டும் கேட்காது; பக்கத்தை reload செய்தால் / புதிய tab-ல் கேட்கும். */
 (function () {
@@ -26,17 +26,17 @@
     '<section id="ownerCard">' +
     '<div id="ownerLogo">தீ</div>' +
     '<h1 id="ownerTitle">NEWS STUDIO</h1>' +
-    '<p class="sub" id="ownerSubtitle">உரிமையாளர் உள்நுழைவு</p>' +
+    '<p class="sub" id="ownerSubtitle">Owner sign-in</p>' +
     '<form id="ownerForm" autocomplete="on">' +
-    '<label>பயனர்பெயர்<input id="ownerUser" name="username" autocomplete="username" required maxlength="50" placeholder="உங்கள் பயனர்பெயர்"></label>' +
-    '<label>கடவுச்சொல்<input id="ownerPass" name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="குறைந்தது 8 எழுத்துகள்"></label>' +
-    '<label id="ownerConfirmWrap" hidden>கடவுச்சொல்லை மீண்டும் உள்ளிடவும்<input id="ownerConfirm" type="password" autocomplete="new-password" minlength="8" placeholder="உறுதிப்படுத்தவும்"></label>' +
-    '<button id="ownerSubmit" type="submit">உள்நுழை</button>' +
+    '<label>Username<input id="ownerUser" name="username" autocomplete="username" required maxlength="50" placeholder="Your username"></label>' +
+    '<label>Password<input id="ownerPass" name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="At least 8 characters"></label>' +
+    '<label id="ownerConfirmWrap" hidden>Re-enter password<input id="ownerConfirm" type="password" autocomplete="new-password" minlength="8" placeholder="Confirm"></label>' +
+    '<button id="ownerSubmit" type="submit">Sign in</button>' +
     '<div id="ownerMsg" role="status" aria-live="polite"></div>' +
     '</form>' +
-    '<p class="hint" id="ownerHint">இந்தச் சாதனத்தில் மட்டுமே உள்நுழைவு விவரங்கள் சேமிக்கப்படும். கடவுச்சொல்லை மறந்தால் தரவு இழப்பைத் தவிர்க்க முன்கூட்டியே backup வைத்திருங்கள்.</p>' +
+    '<p class="hint" id="ownerHint">Sign-in details are stored on this device only. Keep a backup in advance so you do not lose data if you forget the password.</p>' +
     '</section></div>' +
-    '<button id="ownerLockBtn" type="button" hidden title="பூட்டு / வெளியேறு" aria-label="பூட்டு / வெளியேறு">🔒</button>';
+    '<button id="ownerLockBtn" type="button" hidden title="Lock / sign out" aria-label="Lock / sign out">🔒</button>';
 
   function boot() {
     var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
@@ -53,38 +53,38 @@
     var bytesToHex = function (b) { return Array.from(new Uint8Array(b)).map(function (x) { return x.toString(16).padStart(2, '0'); }).join(''); };
     var hexToBytes = function (h) { return new Uint8Array((h.match(/.{1,2}/g) || []).map(function (x) { return parseInt(x, 16); })); };
     async function digest(password, salt) {
-      if (!crypto.subtle) throw new Error('இந்த WebView பாதுகாப்பான கடவுச்சொல் சரிபார்ப்பை ஆதரிக்கவில்லை. Android System WebView-ஐ புதுப்பிக்கவும்.');
+      if (!crypto.subtle) throw new Error('This WebView does not support secure password checks. Update Android System WebView.');
       var enc = new TextEncoder(), key = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
       return bytesToHex(await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: hexToBytes(salt), iterations: 210000, hash: 'SHA-256' }, key, 256));
     }
     function show() {
       setup = !read(); gate.hidden = false; lock.hidden = true; confirmWrap.hidden = !setup;
-      subtitle.textContent = setup ? 'முதல் முறை — உரிமையாளர் கணக்கை உருவாக்கவும்' : 'உரிமையாளர் உள்நுழைவு';
-      submit.textContent = setup ? 'கணக்கை உருவாக்கி திறக்கவும்' : 'உள்நுழை';
-      hint.textContent = setup ? 'பயனர்பெயர் மற்றும் குறைந்தது 8 எழுத்துகளுள்ள வலுவான கடவுச்சொல்லை அமைக்கவும். இவை இந்தச் சாதனத்தில் சேமிக்கப்படும்.' : 'தனிப்பட்ட பயன்பாட்டிற்கான உள்நுழைவு. கடவுச்சொல்லை யாருடனும் பகிர வேண்டாம்.';
+      subtitle.textContent = setup ? 'First time — create the owner account' : 'Owner sign-in';
+      submit.textContent = setup ? 'Create account and unlock' : 'Sign in';
+      hint.textContent = setup ? 'Set a username and a strong password of at least 8 characters. They are stored on this device.' : 'Sign-in for private use. Do not share the password with anyone.';
       msg.textContent = ''; pass.value = ''; confirm.value = ''; setTimeout(function () { user.focus(); }, 100);
     }
     function unlock() { gate.hidden = true; lock.hidden = false; try { sessionStorage.setItem(SESS, '1'); localStorage.setItem('np_admin_device', '1'); } catch (e) {} }
     form.addEventListener('submit', async function (e) {
       e.preventDefault(); msg.textContent = '';
-      if (Date.now() < nextTry) { msg.textContent = 'சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.'; return; }
+      if (Date.now() < nextTry) { msg.textContent = 'Please try again in a moment.'; return; }
       var u = user.value.trim(), p = pass.value;
-      if (!u || p.length < 8) { msg.textContent = 'பயனர்பெயரை உள்ளிட்டு, குறைந்தது 8 எழுத்துகள் கொண்ட கடவுச்சொல்லைப் பயன்படுத்தவும்.'; return; }
+      if (!u || p.length < 8) { msg.textContent = 'Enter a username and a password of at least 8 characters.'; return; }
       submit.disabled = true;
       try {
         if (setup) {
-          if (p !== confirm.value) { msg.textContent = 'இரண்டு கடவுச்சொற்களும் ஒன்றாக இல்லை.'; return; }
+          if (p !== confirm.value) { msg.textContent = 'The two passwords do not match.'; return; }
           var salt = bytesToHex(crypto.getRandomValues(new Uint8Array(16))), hash = await digest(p, salt);
           localStorage.setItem(KEY, JSON.stringify({ username: u, salt: salt, hash: hash, version: 1 })); unlock();
         } else {
           var rec = read();
           if (!rec || u !== rec.username || await digest(p, rec.salt) !== rec.hash) {
             failures++; if (failures >= 5) { nextTry = Date.now() + 30000; failures = 0; }
-            msg.textContent = 'பயனர்பெயர் அல்லது கடவுச்சொல் சரியில்லை.'; return;
+            msg.textContent = 'Wrong username or password.'; return;
           }
           failures = 0; unlock();
         }
-      } catch (err) { msg.textContent = 'பிழை: ' + (err.message || 'உள்நுழைவு செயல்படவில்லை'); if (setup) localStorage.removeItem(KEY); }
+      } catch (err) { msg.textContent = 'Error: ' + (err.message || 'Sign-in failed'); if (setup) localStorage.removeItem(KEY); }
       finally { submit.disabled = false; }
     });
     if (slotEl) { slotEl.appendChild(lock); lock.classList.add('slotted'); }

@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>(function(){var m=new URLSearchParams(location.search).get('mode')||'';document.documentElement.classList.add('m-'+(m||'full'));if(m==='settings'){var l=document.createElement('link');l.rel='stylesheet';l.href='settings.css';document.head.appendChild(l)}})();</script><script src="media-store.js"></script></head><body>
-<title>புத்தக வீடியோ ஸ்டுடியோ</title>
+<title>Book Video Studio</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400..800&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Thambi+2:wght@500..800&display=swap">
@@ -120,169 +120,169 @@ html.m-view .phone{width:min(100%,400px,calc((100vh - 76px)*9/16))!important}
 
 <div class="wrap">
   <header class="top">
-    <h1>புத்தக வீடியோ ஸ்டுடியோ</h1>
-    <p>புத்தக அறிமுகம், புத்தகத் திருவிழா விளம்பரம் ஆகியவற்றுக்கான 9:16 வீடியோ. எல்லா எழுத்துகள், படங்கள், நிறங்களையும் மாற்றி, MP4 ஆகப் பதிவிறக்குங்கள்.</p>
+    <h1>Book Video Studio</h1>
+    <p>9:16 video for book intros and book-fair promos. Edit all text, images and colours, then download as MP4.</p>
   </header>
 
   <div class="shell">
-    <section class="stage" aria-label="முன்னோட்டம்">
+    <section class="stage" aria-label="Preview">
       <div class="phone" id="phone">
         <canvas id="cv" width="720" height="1280"></canvas>
-        <div class="safe t" id="safeT" hidden>WhatsApp மேல் பட்டை</div>
-        <div class="safe b" id="safeB" hidden>பதில் பட்டை</div>
+        <div class="safe t" id="safeT" hidden>WhatsApp top bar</div>
+        <div class="safe b" id="safeB" hidden>Reply bar</div>
       </div>
       <div class="player">
-        <button class="btn primary small" id="play" type="button" aria-label="இயக்கு">இயக்கு</button>
-        <input type="range" id="seek" min="0" max="90" step="0.1" value="3.2" aria-label="நேரம்">
+        <button class="btn primary small" id="play" type="button" aria-label="Play">Play</button>
+        <input type="range" id="seek" min="0" max="90" step="0.1" value="3.2" aria-label="Time">
         <span class="tl" id="tl">0:03 / 1:30</span>
       </div>
       <div class="row2">
-        <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="safeChk"> பாதுகாப்பு மண்டலம் காட்டு</label>
-        <button class="btn small" id="restart" type="button">முதலிலிருந்து</button>
+        <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="safeChk"> Show safe zones</label>
+        <button class="btn small" id="restart" type="button">Restart</button>
       </div>
-      <p class="hint" style="width:min(100%,400px);margin:0 auto">முன்னோட்டத்தில் ஒலி இல்லை. பேசுபவர் வீடியோவின் ஒலி MP4 ஏற்றுமதியில் சேரும்.</p>
+      <p class="hint" style="width:min(100%,400px);margin:0 auto">No sound in the preview. The speaker video's sound is included in the MP4.</p>
     </section>
 
     <div class="side">
-      <section class="card exp" aria-label="MP4 ஏற்றுமதி">
-        <h2>MP4 ஏற்றுமதி</h2>
+      <section class="card exp" aria-label="MP4 export">
+        <h2>MP4 export</h2>
         <div class="grid2" style="margin-top:8px">
-          <label class="f"><span>தரம்</span>
+          <label class="f"><span>Quality</span>
             <select id="res" data-p="res">
-              <option value="720">720 × 1280 (பரிந்துரை, சிறிய கோப்பு)</option>
-              <option value="1080">1080 × 1920 (அதிக தெளிவு, நீண்ட நேரம்)</option>
+              <option value="720">720 × 1280 (recommended, small file)</option>
+              <option value="1080">1080 × 1920 (sharper, slower)</option>
             </select>
           </label>
-          <label class="f"><span>வீடியோ நீளம் (எவ்வளவு நேரம் சேமிக்க வேண்டும்)</span>
+          <label class="f"><span>Video length</span>
             <select id="dur" data-p="dur">
-              <option value="15">15 வினாடி</option><option value="20">20 வினாடி</option><option value="30">30 வினாடி</option><option value="45">45 வினாடி</option><option value="60">1 நிமிடம்</option><option value="90">1½ நிமிடம் (90 வினாடி)</option><option value="120">2 நிமிடம்</option><option value="180">3 நிமிடம்</option><option value="240">4 நிமிடம்</option><option value="300">5 நிமிடம்</option>
+              <option value="15">15 s</option><option value="20">20 s</option><option value="30">30 s</option><option value="45">45 s</option><option value="60">1 min</option><option value="90">1½ min (90 s)</option><option value="120">2 min</option><option value="180">3 min</option><option value="240">4 min</option><option value="300">5 min</option>
             </select>
           </label>
-          <label class="f"><span>உருவாக்கும் வேகம்</span>
+          <label class="f"><span>Render speed</span>
             <select id="fps" data-p="fps">
-              <option value="20">மிக வேகம் (20 fps)</option><option value="24">வேகம் (24 fps, பரிந்துரை)</option><option value="30">மென்மையாக (30 fps, மெதுவு)</option>
+              <option value="20">Fastest (20 fps)</option><option value="24">Fast (24 fps, recommended)</option><option value="30">Smooth (30 fps, slower)</option>
             </select>
           </label>
           <div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap">
-            <button class="btn primary" id="exportBtn" type="button">MP4 உருவாக்கு</button>
-            <button class="btn warn" id="cancelBtn" type="button" hidden>நிறுத்து</button>
+            <button class="btn primary" id="exportBtn" type="button">Render MP4</button>
+            <button class="btn warn" id="cancelBtn" type="button" hidden>Cancel</button>
           </div>
         </div>
         <div class="bar" style="margin-top:12px" aria-hidden="true"><div id="prog"></div></div>
-        <p class="msg" id="expMsg" role="status" aria-live="polite">தயார். உருவாக்கும் போது இந்தத் தாவலைத் திறந்தே வைத்திருங்கள். 720p-க்கு சில நிமிடங்கள் ஆகலாம்.</p>
+        <p class="msg" id="expMsg" role="status" aria-live="polite">Ready. Keep this tab open while rendering. 720p can take a few minutes.</p>
         <div id="result" hidden style="display:grid;gap:10px">
           <video id="outVid" controls playsinline></video>
           <div class="up">
-            <button class="btn primary" id="saveBtn" type="button">MP4 சேமி</button>
+            <button class="btn primary" id="saveBtn" type="button">Save MP4</button>
             <span class="st" id="sizeTxt"></span>
           </div>
         </div>
       </section>
 
-      <div class="panels"><details class="pn" open style="order:-1"><summary>கட்டாயம் தேவையானவை</summary><div class="body"><p class="hint">தேர்ந்தெடுத்தவை மட்டுமே வீடியோவில் வரும்; மீதமுள்ள இடத்தை பேசுபவர் எடுத்துக்கொள்வார்.</p><div class="checks"><label><input type="checkbox" data-p="show.speakerTag"> பேசுபவர் பெயர் பட்டை</label><label><input type="checkbox" data-p="show.logo"> லோகோ</label><label><input type="checkbox" data-p="show.orgName"> நிறுவனப் பெயர்</label><label><input type="checkbox" data-p="show.title"> புத்தகத் தலைப்பு</label><label><input type="checkbox" data-p="show.cover"> முன் அட்டை</label><label><input type="checkbox" data-p="show.back"> பின் அட்டை</label><label><input type="checkbox" data-p="show.author"> எழுத்தாளர்</label><label><input type="checkbox" data-p="show.publisher"> பதிப்பகம்</label><label><input type="checkbox" data-p="show.genre"> புத்தக வகை</label><label><input type="checkbox" data-p="show.price"> விலை</label><label><input type="checkbox" data-p="show.discount"> தள்ளுபடி % (பெரியது)</label><label><input type="checkbox" data-p="show.contact"> தொடர்புப் பட்டை</label><label><input type="checkbox" data-p="show.qr"> QR (தேவைப்பட்டால் மட்டும்)</label><label><input type="checkbox" data-p="show.cta"> அழைப்பு வரி</label><label><input type="checkbox" data-p="show.dots"> முன்னேற்றப் புள்ளிகள்</label></div><span class="lab">தேவைப்பட்டால் மட்டும்</span><div class="checks"><label><input type="checkbox" data-p="show.festival"> திருவிழா பெயர்</label><label><input type="checkbox" data-p="show.date"> தேதி</label><label><input type="checkbox" data-p="show.place"> இடம்</label><label><input type="checkbox" data-p="show.stall"> அரங்க எண்</label></div></div></details>
+      <div class="panels"><details class="pn" open style="order:-1"><summary>What shows in the video</summary><div class="body"><p class="hint">Only ticked items appear; the speaker takes the remaining space.</p><div class="checks"><label><input type="checkbox" data-p="show.speakerTag"> Speaker name bar</label><label><input type="checkbox" data-p="show.logo"> Logo</label><label><input type="checkbox" data-p="show.orgName"> Company name</label><label><input type="checkbox" data-p="show.title"> Book title</label><label><input type="checkbox" data-p="show.cover"> Front cover</label><label><input type="checkbox" data-p="show.back"> Back cover</label><label><input type="checkbox" data-p="show.author"> Author</label><label><input type="checkbox" data-p="show.publisher"> Publisher</label><label><input type="checkbox" data-p="show.genre"> Genre</label><label><input type="checkbox" data-p="show.price"> Price</label><label><input type="checkbox" data-p="show.discount"> Discount % (large)</label><label><input type="checkbox" data-p="show.contact"> Contact bar</label><label><input type="checkbox" data-p="show.qr"> QR (only if needed)</label><label><input type="checkbox" data-p="show.cta"> Call-to-action line</label><label><input type="checkbox" data-p="show.dots"> Progress dots</label></div><span class="lab">Only if needed</span><div class="checks"><label><input type="checkbox" data-p="show.festival"> Festival name</label><label><input type="checkbox" data-p="show.date"> Date</label><label><input type="checkbox" data-p="show.place"> Place</label><label><input type="checkbox" data-p="show.stall"> Stall no.</label></div></div></details>
         <details class="pn" open>
-          <summary>பொதுத் தகவல்</summary>
+          <summary>General info</summary>
           <div class="body">
             <div class="up">
               <div class="thumb" id="logoThumb"></div>
-              <label class="btn small" for="logoFile">PNG லோகோ பதிவேற்று</label>
+              <label class="btn small" for="logoFile">Upload PNG logo</label>
               <input type="file" id="logoFile" data-file="logo" accept="image/*" hidden>
-              <button class="btn small warn" type="button" data-act="rmlogo">லோகோவை நீக்கு</button>
-              <label class="f" style="flex:1 1 100%"><span>PNG லோகோ அளவு (உயரம்)</span><input type="range" data-p="logoSize" min="90" max="240" step="10"></label>
-              <span class="st" id="logoSt">PNG லோகோ இல்லை — நிறுவனப் பெயர் எழுத்தாக வரும்</span>
+              <button class="btn small warn" type="button" data-act="rmlogo">Remove logo</button>
+              <label class="f" style="flex:1 1 100%"><span>PNG logo size (height)</span><input type="range" data-p="logoSize" min="90" max="240" step="10"></label>
+              <span class="st" id="logoSt">No PNG logo — company name shows as text</span>
             </div>
             <div class="grid2">
-              <label class="f"><span>நிறுவனம் / பதிப்பகம் பெயர்</span><input type="text" id="f-org" data-p="org"></label>
-              <label class="f"><span>திருவிழா பெயர்</span><input type="text" id="f-fest" data-p="fest"></label>
-              <label class="f"><span>தேதி</span><input type="text" id="f-date" data-p="date"></label>
-              <label class="f"><span>இடம்</span><input type="text" id="f-place" data-p="place"></label>
-              <label class="f"><span>அரங்க எண் (Stall No.)</span><input type="text" id="f-stall" data-p="stall"></label>
-              <label class="f"><span>அழைப்பு வரி</span><input type="text" id="f-cta" data-p="cta"></label>
+              <label class="f"><span>Company / publisher name</span><input type="text" id="f-org" data-p="org"></label>
+              <label class="f"><span>Festival name</span><input type="text" id="f-fest" data-p="fest"></label>
+              <label class="f"><span>Date</span><input type="text" id="f-date" data-p="date"></label>
+              <label class="f"><span>Place</span><input type="text" id="f-place" data-p="place"></label>
+              <label class="f"><span>Stall no.</span><input type="text" id="f-stall" data-p="stall"></label>
+              <label class="f"><span>Call-to-action line</span><input type="text" id="f-cta" data-p="cta"></label>
             </div>
             
           </div>
         </details>
 
         <details class="pn" open>
-          <summary>பேசுபவர்</summary>
+          <summary>Speaker</summary>
           <div class="body">
             <div class="up">
               <div class="thumb" id="spThumb"></div>
-              <label class="btn small" for="spFile">வீடியோ / படம் பதிவேற்று</label>
+              <label class="btn small" for="spFile">Upload video / image</label>
               <input type="file" id="spFile" data-file="speaker" accept="video/*,image/*" hidden>
-              <button class="btn small warn" type="button" data-act="rmspeaker">நீக்கு</button>
-              <span class="st" id="spSt">இன்னும் பதிவேற்றப்படவில்லை</span>
+              <button class="btn small warn" type="button" data-act="rmspeaker">Remove</button>
+              <span class="st" id="spSt">Nothing uploaded yet</span>
             </div>
             <div class="grid2">
-              <label class="f"><span>பேசுபவர் பெயர்</span><input type="text" id="f-spName" data-p="spName"></label>
-              <label class="f"><span>பதவி / அறிமுகம்</span><input type="text" id="f-spRole" data-p="spRole"></label>
+              <label class="f"><span>Speaker name</span><input type="text" id="f-spName" data-p="spName"></label>
+              <label class="f"><span>Role / intro</span><input type="text" id="f-spRole" data-p="spRole"></label>
             </div>
             
-            <p class="hint">வீடியோ தேர்ந்தெடுத்த நீளத்தை விடக் குறைவாக இருந்தால் மீண்டும் மீண்டும் ஓடும், ஒலியும் அதனுடன் சேர்ந்து ஓடும்.</p>
+            <p class="hint">If the video is shorter than the chosen length it loops, and its sound loops with it.</p>
           </div>
         </details>
 
         <details class="pn" open>
-          <summary>புத்தகங்கள்</summary>
+          <summary>Books</summary>
           <div class="body">
             <p class="hint" id="slotHint"></p>
             <div id="books" style="display:grid;gap:12px"></div>
-            <div class="up"><button class="btn primary" type="button" data-act="addbook" id="addBook">புத்தகம் சேர்</button></div>
+            <div class="up"><button class="btn primary" type="button" data-act="addbook" id="addBook">Add book</button></div>
             
           </div>
         </details>
 
         <details class="pn">
-          <summary>தொடர்பு மற்றும் QR</summary>
+          <summary>Contact &amp; QR</summary>
           <div class="body">
             <div class="grid2">
-              <label class="f"><span>வாட்ஸ்அப் எண்</span><input type="text" id="f-wa" data-p="wa" inputmode="tel"></label>
-              <label class="f"><span>இணையதளம்</span><input type="text" id="f-web" data-p="web"></label>
-              <label class="f"><span>இன்ஸ்டாகிராம் ID</span><input type="text" id="f-ig" data-p="ig"></label>
-              <label class="f"><span>QR இணைப்பு (காலியாக இருந்தால் வாட்ஸ்அப் எண்)</span><input type="text" id="f-qr" data-p="qr"></label>
+              <label class="f"><span>WhatsApp number</span><input type="text" id="f-wa" data-p="wa" inputmode="tel"></label>
+              <label class="f"><span>Website</span><input type="text" id="f-web" data-p="web"></label>
+              <label class="f"><span>Instagram ID</span><input type="text" id="f-ig" data-p="ig"></label>
+              <label class="f"><span>QR link (WhatsApp number if empty)</span><input type="text" id="f-qr" data-p="qr"></label>
             </div>
             
           </div>
         </details>
 
         <details class="pn" open style="order:-2">
-          <summary>தீம் / வடிவமைப்பு</summary>
+          <summary>Theme / design</summary>
           <div class="body">
-            <span class="lab">ஆப் தீம் (முழு ஆப்)</span><div id="appThemes"></div><span class="lab">வீடியோ தீம்</span><div class="themes" id="themes"></div>
+            <span class="lab">App theme (whole app)</span><div id="appThemes"></div><span class="lab">Video theme</span><div class="themes" id="themes"></div>
             <div class="colors">
-              <label>பின்னணி 1 <input type="color" id="c-bg1" data-p="custom.bg1"></label>
-              <label>பின்னணி 2 <input type="color" id="c-bg2" data-p="custom.bg2"></label>
-              <label>சிறப்பு நிறம் <input type="color" id="c-accent" data-p="custom.accent"></label>
-              <label>எழுத்து <input type="color" id="c-text" data-p="custom.text"></label>
+              <label>Background 1 <input type="color" id="c-bg1" data-p="custom.bg1"></label>
+              <label>Background 2 <input type="color" id="c-bg2" data-p="custom.bg2"></label>
+              <label>Accent <input type="color" id="c-accent" data-p="custom.accent"></label>
+              <label>Text <input type="color" id="c-text" data-p="custom.text"></label>
             </div>
-            <label class="f"><span>தலைப்பு எழுத்துரு</span>
+            <label class="f"><span>Title font</span>
               <select id="fontSel" data-p="font"></select>
             </label>
             <div class="up">
-              <label class="btn small" for="musicFile">பின்னணி இசை</label>
+              <label class="btn small" for="musicFile">Background music</label>
               <input type="file" id="musicFile" data-file="music" accept="audio/*" hidden>
-              <button class="btn small warn" type="button" data-act="rmmusic">நீக்கு</button>
-              <span class="st" id="musicSt">இசை இல்லை</span>
+              <button class="btn small warn" type="button" data-act="rmmusic">Remove</button>
+              <span class="st" id="musicSt">No music</span>
             </div>
-            <label class="f"><span>இசை ஒலி அளவு</span><input type="range" id="musicVol" data-p="musicVol" min="0" max="1" step="0.05"></label>
+            <label class="f"><span>Music volume</span><input type="range" id="musicVol" data-p="musicVol" min="0" max="1" step="0.05"></label>
           </div>
         </details>
 
         <details class="pn">
-          <summary>சொற்களை மாற்று</summary>
+          <summary>Change words</summary>
           <div class="body">
             <div class="grid2">
-              <label class="f"><span>தேதி லேபிள்</span><input type="text" id="l-date" data-p="labels.date"></label>
-              <label class="f"><span>இடம் லேபிள்</span><input type="text" id="l-place" data-p="labels.place"></label>
-              <label class="f"><span>அரங்கு லேபிள்</span><input type="text" id="l-stall" data-p="labels.stall"></label>
-              <label class="f"><span>எழுத்தாளர் லேபிள்</span><input type="text" id="l-author" data-p="labels.author"></label>
-              <label class="f"><span>பதிப்பகம் லேபிள்</span><input type="text" id="l-publisher" data-p="labels.publisher"></label>
-              <label class="f"><span>தள்ளுபடி சொல்</span><input type="text" id="l-off" data-p="labels.off"></label>
-              <label class="f"><span>வாட்ஸ்அப் லேபிள்</span><input type="text" id="l-wa" data-p="labels.wa"></label>
-              <label class="f"><span>இணையம் லேபிள்</span><input type="text" id="l-web" data-p="labels.web"></label>
-              <label class="f"><span>இன்ஸ்டா லேபிள்</span><input type="text" id="l-ig" data-p="labels.ig"></label>
+              <label class="f"><span>Date label</span><input type="text" id="l-date" data-p="labels.date"></label>
+              <label class="f"><span>Place label</span><input type="text" id="l-place" data-p="labels.place"></label>
+              <label class="f"><span>Stall label</span><input type="text" id="l-stall" data-p="labels.stall"></label>
+              <label class="f"><span>Author label</span><input type="text" id="l-author" data-p="labels.author"></label>
+              <label class="f"><span>Publisher label</span><input type="text" id="l-publisher" data-p="labels.publisher"></label>
+              <label class="f"><span>Discount word</span><input type="text" id="l-off" data-p="labels.off"></label>
+              <label class="f"><span>WhatsApp label</span><input type="text" id="l-wa" data-p="labels.wa"></label>
+              <label class="f"><span>Web label</span><input type="text" id="l-web" data-p="labels.web"></label>
+              <label class="f"><span>Instagram label</span><input type="text" id="l-ig" data-p="labels.ig"></label>
             </div>
-            <div class="up"><button class="btn warn small" type="button" id="resetBtn">எல்லாவற்றையும் இயல்புநிலைக்கு மாற்று</button></div>
+            <div class="up"><button class="btn warn small" type="button" id="resetBtn">Reset everything to default</button></div>
           </div>
         </details>
       </div>
@@ -912,8 +912,8 @@ var tNow = 3.2, playing = false, last = 0, dirty = true;
 function fmt(s) { s = Math.floor(s); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
 function syncPlayer() {
   $('#seek').value = tNow; $('#tl').textContent = fmt(tNow) + ' / ' + fmt(TOTAL);
-  $('#play').textContent = playing ? 'நிறுத்து' : 'இயக்கு';
-  $('#play').setAttribute('aria-label', playing ? 'நிறுத்து' : 'இயக்கு');
+  $('#play').textContent = playing ? 'Pause' : 'Play';
+  $('#play').setAttribute('aria-label', playing ? 'Pause' : 'Play');
 }
 function applyDur() {
   TOTAL = clamp(+state.dur || 90, 10, 300); state.dur = TOTAL; $('#seek').max = TOTAL;
@@ -954,37 +954,37 @@ function fillForm() {
 function renderThemes() {
   $('#themes').innerHTML = THEMES.map(function (t) {
     return '<button type="button" class="sw" data-act="theme" data-v="' + t.id + '" aria-pressed="' + (state.theme === t.id) + '"><i style="background:linear-gradient(160deg,' + t.bg1 + ',' + t.bg2 + ')"><b style="background:' + t.accent + '"></b></i><span>' + esc(t.name) + '</span></button>';
-  }).join('') + '<button type="button" class="sw" data-act="theme" data-v="custom" aria-pressed="' + (state.theme === 'custom') + '"><i style="background:linear-gradient(160deg,' + state.custom.bg1 + ',' + state.custom.bg2 + ')"><b style="background:' + state.custom.accent + '"></b></i><span>என் நிறங்கள்</span></button>';
+  }).join('') + '<button type="button" class="sw" data-act="theme" data-v="custom" aria-pressed="' + (state.theme === 'custom') + '"><i style="background:linear-gradient(160deg,' + state.custom.bg1 + ',' + state.custom.bg2 + ')"><b style="background:' + state.custom.accent + '"></b></i><span>My colours</span></button>';
 }
 function backThumb(id) { var c = media.backs[id]; return c ? 'background-image:url(' + c.url + ')' : ''; }
 function coverThumb(id) { var c = media.covers[id]; return c ? 'background-image:url(' + c.url + ')' : ''; }
 function renderBooks() {
   var n = state.books.length, d = (TOTAL / n).toFixed(n === 4 || n === 6 || n === 3 || n === 2 || n === 1 || n === 5 ? 0 : 1);
-  $('#slotHint').textContent = 'ஒவ்வொரு புத்தகமும் ' + (+(TOTAL / n).toFixed(1)) + ' வினாடி காட்டப்படும் (மொத்தம் ' + TOTAL + ' வினாடி). அதிகபட்சம் 6 புத்தகங்கள்.';
+  $('#slotHint').textContent = 'Each book shows for ' + (+(TOTAL / n).toFixed(1)) + ' s (total ' + TOTAL + ' s). Maximum 6 books.';
   $('#addBook').disabled = n >= 6;
   $('#books').innerHTML = state.books.map(function (b, i) {
     var f = function (k, label) { return '<label class="f"><span>' + label + '</span><input type="text" id="b-' + b.id + '-' + k + '" data-bid="' + b.id + '" data-bk="' + k + '" value="' + esc(b[k]) + '"></label>'; };
     return '<div class="book">' +
-      '<div class="bh"><div><strong>புத்தகம் ' + (i + 1) + '</strong> <span class="dur">' + fmt(i * TOTAL / n) + ' – ' + fmt((i + 1) * TOTAL / n) + '</span></div>' +
-      '<div class="bt"><button class="btn small" type="button" data-act="up" data-id="' + b.id + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="மேலே நகர்த்து">↑</button>' +
-      '<button class="btn small" type="button" data-act="down" data-id="' + b.id + '"' + (i === n - 1 ? ' disabled' : '') + ' aria-label="கீழே நகர்த்து">↓</button>' +
-      '<button class="btn small warn" type="button" data-act="rmbook" data-id="' + b.id + '"' + (n <= 1 ? ' disabled' : '') + '>நீக்கு</button></div></div>' +
+      '<div class="bh"><div><strong>Book ' + (i + 1) + '</strong> <span class="dur">' + fmt(i * TOTAL / n) + ' – ' + fmt((i + 1) * TOTAL / n) + '</span></div>' +
+      '<div class="bt"><button class="btn small" type="button" data-act="up" data-id="' + b.id + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="Move up">↑</button>' +
+      '<button class="btn small" type="button" data-act="down" data-id="' + b.id + '"' + (i === n - 1 ? ' disabled' : '') + ' aria-label="Move down">↓</button>' +
+      '<button class="btn small warn" type="button" data-act="rmbook" data-id="' + b.id + '"' + (n <= 1 ? ' disabled' : '') + '>Remove</button></div></div>' +
       '<div class="up"><div class="thumb cv" id="th-' + b.id + '" style="' + coverThumb(b.id) + '"></div>' +
-      '<label class="btn small" for="cvf-' + b.id + '">முன் அட்டை</label><input type="file" id="cvf-' + b.id + '" data-file="cover" data-bid="' + b.id + '" accept="image/*" hidden>' +
-      '<button class="btn small warn" type="button" data-act="rmcover" data-id="' + b.id + '">நீக்கு</button></div>' +
-      '<div class="up"><div class="thumb cv" id="thb-' + b.id + '" style="' + backThumb(b.id) + '"></div><label class="btn small" for="bkf-' + b.id + '">பின் அட்டை</label><input type="file" id="bkf-' + b.id + '" data-file="back" data-bid="' + b.id + '" accept="image/*" hidden><button class="btn small warn" type="button" data-act="rmback" data-id="' + b.id + '">நீக்கு</button></div>' +
-      f('title', 'புத்தகத் தலைப்பு') +
-      '<div class="grid2">' + f('author', 'எழுத்தாளர்') + f('publisher', 'பதிப்பகம்') + f('genre', 'புத்தக வகை') + '</div>' +
-      '<div class="grid2">' + f('oldP', 'அசல் விலை (₹)') + f('newP', 'தள்ளுபடி விலை (₹)') + '</div></div>';
+      '<label class="btn small" for="cvf-' + b.id + '">Front cover</label><input type="file" id="cvf-' + b.id + '" data-file="cover" data-bid="' + b.id + '" accept="image/*" hidden>' +
+      '<button class="btn small warn" type="button" data-act="rmcover" data-id="' + b.id + '">Remove</button></div>' +
+      '<div class="up"><div class="thumb cv" id="thb-' + b.id + '" style="' + backThumb(b.id) + '"></div><label class="btn small" for="bkf-' + b.id + '">Back cover</label><input type="file" id="bkf-' + b.id + '" data-file="back" data-bid="' + b.id + '" accept="image/*" hidden><button class="btn small warn" type="button" data-act="rmback" data-id="' + b.id + '">Remove</button></div>' +
+      f('title', 'Book title') +
+      '<div class="grid2">' + f('author', 'Author') + f('publisher', 'Publisher') + f('genre', 'Genre') + '</div>' +
+      '<div class="grid2">' + f('oldP', 'Original price (₹)') + f('newP', 'Discount price (₹)') + '</div></div>';
   }).join('');
 }
 function renderStatus() {
-  $('#logoSt').textContent = media.logo ? media.logo.name : 'PNG லோகோ இல்லை — நிறுவனப் பெயர் எழுத்தாக வரும்';
+  $('#logoSt').textContent = media.logo ? media.logo.name : 'No PNG logo — company name shows as text';
   $('#logoThumb').style.backgroundImage = media.logo ? 'url(' + media.logo.url + ')' : '';
   var sp = media.speaker;
-  $('#spSt').textContent = sp ? (sp.kind === 'video' ? 'வீடியோ: ' : 'படம்: ') + sp.name : 'இன்னும் பதிவேற்றப்படவில்லை';
+  $('#spSt').textContent = sp ? (sp.kind === 'video' ? 'Video: ' : 'Image: ') + sp.name : 'Nothing uploaded yet';
   $('#spThumb').style.backgroundImage = sp && sp.kind === 'image' ? 'url(' + sp.url + ')' : '';
-  $('#musicSt').textContent = media.music ? media.music.name : 'இசை இல்லை';
+  $('#musicSt').textContent = media.music ? media.music.name : 'No music';
 }
 function afterEdit() { dirty = true; scheduleSave(); }
 
@@ -1011,13 +1011,13 @@ document.addEventListener('change', function (e) {
 
 function handleFile(el, file) {
   var kind = el.dataset.file;
-  if (kind === 'logo') imgFromFile(file).then(function (m) { media.logo = m; renderStatus(); dirty = true; keep('logo', '', file); }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); });
-  else if (kind === 'back') { var bid = el.dataset.bid; imgFromFile(file).then(function (m) { media.backs[bid] = m; var th2 = $('#thb-' + bid); if (th2) th2.style.backgroundImage = 'url(' + m.url + ')'; dirty = true; keep('back', bid, file); }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); }); }
-  else if (kind === 'cover') { var id = el.dataset.bid; imgFromFile(file).then(function (m) { media.covers[id] = m; var th = $('#th-' + id); if (th) th.style.backgroundImage = 'url(' + m.url + ')'; dirty = true; keep('cover', id, file); }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); }); }
+  if (kind === 'logo') imgFromFile(file).then(function (m) { media.logo = m; renderStatus(); dirty = true; keep('logo', '', file); }).catch(function () { setMsg('Could not read the image.', true); });
+  else if (kind === 'back') { var bid = el.dataset.bid; imgFromFile(file).then(function (m) { media.backs[bid] = m; var th2 = $('#thb-' + bid); if (th2) th2.style.backgroundImage = 'url(' + m.url + ')'; dirty = true; keep('back', bid, file); }).catch(function () { setMsg('Could not read the image.', true); }); }
+  else if (kind === 'cover') { var id = el.dataset.bid; imgFromFile(file).then(function (m) { media.covers[id] = m; var th = $('#th-' + id); if (th) th.style.backgroundImage = 'url(' + m.url + ')'; dirty = true; keep('cover', id, file); }).catch(function () { setMsg('Could not read the image.', true); }); }
   else if (kind === 'speaker') {
     setPlaying(false);
-    if (file.type.indexOf('video') === 0) videoFromFile(file).then(function (m) { m.kind = 'video'; m.file = file; media.speaker = m; renderStatus(); dirty = true; keep('speaker', '', file); }).catch(function () { setMsg('இந்த வீடியோவை உலாவியால் இயக்க முடியவில்லை. MP4 (H.264) முயற்சிக்கவும்.', true); });
-    else imgFromFile(file).then(function (m) { m.kind = 'image'; media.speaker = m; renderStatus(); dirty = true; keep('speaker', '', file); }).catch(function () { setMsg('படத்தைப் படிக்க முடியவில்லை.', true); });
+    if (file.type.indexOf('video') === 0) videoFromFile(file).then(function (m) { m.kind = 'video'; m.file = file; media.speaker = m; renderStatus(); dirty = true; keep('speaker', '', file); }).catch(function () { setMsg('This video cannot be played. Try an MP4 (H.264).', true); });
+    else imgFromFile(file).then(function (m) { m.kind = 'image'; media.speaker = m; renderStatus(); dirty = true; keep('speaker', '', file); }).catch(function () { setMsg('Could not read the image.', true); });
   }
   else if (kind === 'music') { media.music = { file: file, name: file.name }; renderStatus(); keep('music', '', file); }
   el.value = '';
@@ -1031,7 +1031,7 @@ document.addEventListener('click', function (e) {
   else if (act === 'rmlogo') { media.logo = null; renderStatus(); dirty = true; drop('logo', ''); }
   else if (act === 'rmspeaker') { setPlaying(false); media.speaker = null; renderStatus(); dirty = true; drop('speaker', ''); }
   else if (act === 'rmmusic') { media.music = null; renderStatus(); drop('music', ''); }
-  else if (act === 'addbook') { if (state.books.length < 6) { state.books.push({ id: uid(), title: 'புதிய புத்தகத் தலைப்பு', author: '', publisher: state.org, genre: '', oldP: '', newP: '' }); renderBooks(); afterEdit(); } }
+  else if (act === 'addbook') { if (state.books.length < 6) { state.books.push({ id: uid(), title: 'New book title', author: '', publisher: state.org, genre: '', oldP: '', newP: '' }); renderBooks(); afterEdit(); } }
   else if (act === 'rmbook') { if (state.books.length > 1) { state.books = state.books.filter(function (x) { return x.id !== id; }); delete media.covers[id]; delete media.backs[id]; drop('cover', id); drop('back', id); renderBooks(); afterEdit(); } }
   else if (act === 'rmback') { delete media.backs[id]; var thb = $('#thb-' + id); if (thb) thb.style.backgroundImage = ''; dirty = true; drop('back', id); }
   else if (act === 'rmcover') { delete media.covers[id]; var th = $('#th-' + id); if (th) th.style.backgroundImage = ''; dirty = true; drop('cover', id); }
@@ -1042,8 +1042,8 @@ document.addEventListener('click', function (e) {
 });
 $('#resetBtn').addEventListener('click', function (e) {
   var btn = e.currentTarget;
-  if (!resetArm) { resetArm = 1; btn.textContent = 'உறுதி செய்ய மீண்டும் அழுத்தவும்'; setTimeout(function () { resetArm = 0; btn.textContent = 'எல்லாவற்றையும் இயல்புநிலைக்கு மாற்று'; }, 4000); return; }
-  resetArm = 0; btn.textContent = 'எல்லாவற்றையும் இயல்புநிலைக்கு மாற்று';
+  if (!resetArm) { resetArm = 1; btn.textContent = 'Tap again to confirm'; setTimeout(function () { resetArm = 0; btn.textContent = 'Reset everything to default'; }, 4000); return; }
+  resetArm = 0; btn.textContent = 'Reset everything to default';
   state = clone(DEFAULT); media.covers = {}; media.backs = {}; if (window.MediaStore) MediaStore.delPrefix('bk:cover:'), MediaStore.delPrefix('bk:back:'); try { localStorage.removeItem(KEY); } catch (er) {}
   fillForm(); loadFonts(); dirty = true;
 });
@@ -1084,16 +1084,16 @@ async function buildAudio(SR) {
 }
 function showResult(blob) {
   outBlob = blob; var url = URL.createObjectURL(blob), v = $('#outVid');
-  v.src = url; $('#result').hidden = false; $('#sizeTxt').textContent = (blob.size / 1048576).toFixed(1) + ' MB · ' + TOTAL + ' வினாடி · MP4';
+  v.src = url; $('#result').hidden = false; $('#sizeTxt').textContent = (blob.size / 1048576).toFixed(1) + ' MB · ' + TOTAL + ' s · MP4';
 }
 async function doExport() {
   if (exporting) return;
-  if (!('VideoEncoder' in window) || !window.Mp4Muxer) { setMsg('இந்த உலாவியில் MP4 ஏற்றுமதி இயலாது. கணினியில் Chrome அல்லது Edge பயன்படுத்துங்கள்.', true); return; }
+  if (!('VideoEncoder' in window) || !window.Mp4Muxer) { setMsg('MP4 export is not possible in this browser. Use Chrome or Edge on a computer.', true); return; }
   exporting = true; cancelFlag = false; setPlaying(false);
   $('#exportBtn').disabled = true; $('#cancelBtn').hidden = false; $('#result').hidden = true; $('#prog').style.width = '0%';
   var venc = null, aenc = null, note = '';
   try {
-    setMsg('எழுத்துருக்களை ஏற்றுகிறேன்…'); await loadFonts();
+    setMsg('Loading fonts…'); await loadFonts();
     var W = state.res === '1080' ? 1080 : 720, H = W === 1080 ? 1920 : 1280, fps = clamp(+state.fps || 24, 15, 30), total = Math.round(TOTAL * fps), SR = 44100;
     var vcfg = null, codecs = ['avc1.640029', 'avc1.4D0029', 'avc1.42E029'], hws = ['prefer-hardware', 'no-preference'];
     for (var ci = 0; ci < codecs.length && !vcfg; ci++) {
@@ -1102,16 +1102,16 @@ async function doExport() {
         try { var r = await VideoEncoder.isConfigSupported(cfg); if (r.supported) vcfg = cfg; } catch (e) {}
       }
     }
-    if (!vcfg) throw new Error('இந்தச் சாதனத்தில் H.264 என்கோடர் கிடைக்கவில்லை.');
+    if (!vcfg) throw new Error('No H.264 encoder on this device.');
     var mix = null, acfg = null;
     if ('AudioEncoder' in window) {
-      setMsg('ஒலியைத் தயாரிக்கிறேன்…'); mix = await buildAudio(SR);
+      setMsg('Preparing audio…'); mix = await buildAudio(SR);
       if (mix) {
         var ac = { codec: 'mp4a.40.2', sampleRate: SR, numberOfChannels: 2, bitrate: 128000 };
         try { var ar = await AudioEncoder.isConfigSupported(ac); if (ar.supported) acfg = ac; } catch (e) {}
-        if (!acfg) { mix = null; note = ' (இந்த உலாவியில் AAC ஒலி என்கோடர் இல்லாததால் ஒலி சேர்க்கப்படவில்லை)'; }
+        if (!acfg) { mix = null; note = ' (no AAC audio encoder in this browser — audio not included)'; }
       }
-    } else if (media.music || (media.speaker && media.speaker.kind === 'video')) note = ' (இந்த உலாவியில் ஒலி என்கோடிங் இல்லாததால் ஒலி சேர்க்கப்படவில்லை)';
+    } else if (media.music || (media.speaker && media.speaker.kind === 'video')) note = ' (no audio encoding in this browser — audio not included)';
     var muxOpts = { target: new Mp4Muxer.ArrayBufferTarget(), video: { codec: 'avc', width: W, height: H, frameRate: fps }, fastStart: 'in-memory', firstTimestampBehavior: 'offset' };
     if (acfg) muxOpts.audio = { codec: 'aac', numberOfChannels: 2, sampleRate: SR };
     var muxer = new Mp4Muxer.Muxer(muxOpts), encErr = null;
@@ -1140,21 +1140,21 @@ async function doExport() {
       if (i % 12 === 0) {
         var pc = (i / total * 100), el = (performance.now() - t0) / 1000, left = i > 20 ? el / i * (total - i) : 0;
         $('#prog').style.width = pc.toFixed(1) + '%';
-        setMsg('பிரேம் ' + i + ' / ' + total + ' (' + pc.toFixed(0) + '%)' + (left ? ' · மீதம் சுமார் ' + (left > 90 ? Math.ceil(left / 60) + ' நிமிடம்' : Math.ceil(left) + ' வினாடி') : ''));
+        setMsg('Frame ' + i + ' / ' + total + ' (' + pc.toFixed(0) + '%)' + (left ? ' · about ' + (left > 90 ? Math.ceil(left / 60) + ' min left' : Math.ceil(left) + ' s left') : ''));
         await yieldNow();
       }
     }
-    setMsg('கோப்பை முடிக்கிறேன்…');
+    setMsg('Finishing the file…');
     await venc.flush();
     if (aenc) { while (audioPos < mix.L.length) pushAudio(); await aenc.flush(); }
     muxer.finalize();
     var blob = new Blob([muxer.target.buffer], { type: 'video/mp4' });
     $('#prog').style.width = '100%';
     showResult(blob);
-    setMsg('முடிந்தது. கீழே பார்த்து சேமிக்கலாம்.' + note);
+    setMsg('Done. Check below and save.' + note);
   } catch (err) {
-    if (err && err.message === 'cancel') setMsg('ஏற்றுமதி நிறுத்தப்பட்டது.');
-    else setMsg('ஏற்றுமதி தோல்வி: ' + (err && err.message ? err.message : err), true);
+    if (err && err.message === 'cancel') setMsg('Export cancelled.');
+    else setMsg('Export failed: ' + (err && err.message ? err.message : err), true);
     $('#prog').style.width = '0%';
   } finally {
     try { if (venc && venc.state !== 'closed') venc.close(); } catch (e) {}
@@ -1167,16 +1167,16 @@ $('#exportBtn').addEventListener('click', doExport);
 $('#cancelBtn').addEventListener('click', function () { cancelFlag = true; });
 $('#saveBtn').addEventListener('click', async function () {
   if (!outBlob) return;
-  if (!dl) { try { var nm = 'book-promo-' + TOTAL + 's.mp4', f = new File([outBlob], nm, { type: 'video/mp4' }); if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f] }); setMsg('சேமிக்கப்பட்டது.'); return; } } catch (e) { if (e && e.name === 'AbortError') return; } var a = document.createElement('a'); a.href = URL.createObjectURL(outBlob); a.download = 'book-promo-' + TOTAL + 's.mp4'; document.body.appendChild(a); a.click(); a.remove(); setMsg('பதிவிறக்கம் தொடங்கியது.'); return; }
-  try { await dl.save({ filename: 'book-promo-' + TOTAL + 's.mp4', data: outBlob }); setMsg('சேமிக்கப்பட்டது.'); }
+  if (!dl) { try { var nm = 'book-promo-' + TOTAL + 's.mp4', f = new File([outBlob], nm, { type: 'video/mp4' }); if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f] }); setMsg('Saved.'); return; } } catch (e) { if (e && e.name === 'AbortError') return; } var a = document.createElement('a'); a.href = URL.createObjectURL(outBlob); a.download = 'book-promo-' + TOTAL + 's.mp4'; document.body.appendChild(a); a.click(); a.remove(); setMsg('Download started.'); return; }
+  try { await dl.save({ filename: 'book-promo-' + TOTAL + 's.mp4', data: outBlob }); setMsg('Saved.'); }
   catch (e) {
     var c = e && e.code;
-    if (c === 'declined') setMsg('சேமிப்பு ரத்து செய்யப்பட்டது. மீண்டும் "MP4 சேமி" அழுத்தலாம்.');
-    else if (c === 'rate_limited') setMsg('சற்று காத்திருந்து மீண்டும் முயற்சிக்கவும்.', true);
-    else setMsg('சேமிக்க முடியவில்லை. வீடியோவின் மெனுவில் (⋮) "பதிவிறக்கு" பயன்படுத்தவும்.', true);
+    if (c === 'declined') setMsg('Save cancelled. Tap "Save MP4" again.');
+    else if (c === 'rate_limited') setMsg('Wait a moment and try again.', true);
+    else setMsg('Could not save. Use "Download" in the video menu (⋮).', true);
   }
 });
-(async function () { try { dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { dl = null; } if (!dl) $('#saveBtn').title = 'நேரடிச் சேமிப்பு இல்லை'; })();
+(async function () { try { dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { dl = null; } if (!dl) $('#saveBtn').title = 'Direct save not available'; })();
 
 /* ---------- follow the app theme ---------- */
 var APP2BOOK = { royal: 'royal', night: 'hibiscus', sun: 'turmeric', ink: 'ink', emerald: 'emerald' }, firstTheme = true;

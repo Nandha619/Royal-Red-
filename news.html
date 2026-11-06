@@ -2,7 +2,7 @@
 <html lang="ta">
 <head>
 <meta charset="utf-8">
-<title>தீக்கதிர் – செய்தி வீடியோ ஸ்டுடியோ</title>
+<title>News Studio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="application-name" content="Theekkathir News Studio">
 <meta name="description" content="தீக்கதிர் செய்தி வீடியோ தயாரிப்பு ஸ்டுடியோ">
@@ -64,24 +64,17 @@ details.sub.once{opacity:.85}
 html.m-view #tl{display:none}
 .tl-row{display:flex;gap:8px;align-items:center}
 .tl-sp{flex:1}
-#tlT{font:800 13px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums}
-#tl button{padding:7px 12px;font-size:13px;min-height:34px}
-#tl small{color:#9a9a9a;font-size:11px;line-height:1.4}
-#tlAll{display:flex;gap:3px;height:30px}
-.tl-blk{position:relative;flex:1 1 0;min-width:22px;padding:0;border-radius:6px;background:#2a2a2a;color:#ddd;border:1px solid #444;font-size:12px;overflow:hidden}
-.tl-blk.on{background:var(--red);color:var(--on,#fff);border-color:var(--gold)}
-.tl-blk.off{opacity:.35}
-.tl-blk i{position:absolute;bottom:0;width:3px;height:9px;background:var(--gold)}
-#tlTrack{position:relative;height:48px;border-radius:8px;background:#1b1b1b;border:1px solid #444;touch-action:none;cursor:pointer;overflow:hidden}
-.tl-pin{position:absolute;top:5px;height:38px;min-width:34px;max-width:60%;padding:0 6px;border-radius:7px;background:var(--gold);color:#101010;font:800 11px/38px system-ui,"Noto Sans Tamil",sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:grab;touch-action:none;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
-.tl-pin.ghost{background:rgba(255,255,255,.16);color:#fff;border:1px dashed #bbb;cursor:pointer;line-height:36px}
-.tl-pin.on{outline:2px solid #fff}
-.tl-pin.bad{background:#7a2b2b;color:#fff}
-#tlHead{position:absolute;top:0;bottom:0;width:2px;background:#fff;pointer-events:none;z-index:2}
-#tlPop{display:grid;gap:8px;background:#161616;border:1px solid var(--gold);border-radius:10px;padding:10px}
-#tlPop[hidden]{display:none}
-.tl-pr{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.tl-pr label{color:#bbb;font-size:12px}
+#tlT{font:700 12px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums}
+#tl button{padding:5px 10px;font-size:12px;min-height:32px}
+#tl small{color:#8a93a3;font-size:11px;line-height:1.4}
+#tlBar{position:relative;height:46px;border-radius:8px;background:#14171d;border:1px solid #2a2f3b;touch-action:none;cursor:pointer;overflow:hidden;user-select:none}
+.tl-blk{position:absolute;top:0;bottom:0;box-sizing:border-box;border-right:1px solid #0e1013;background:#232834;color:#cfd4de;display:flex;flex-direction:column;justify-content:center;align-items:center;font:700 12px/1.1 system-ui,sans-serif;overflow:hidden;pointer-events:none}
+.tl-blk.alt{background:#1c212b}
+.tl-blk.on{background:#8f2b2b;color:#fff;box-shadow:inset 0 0 0 2px #f2b33d}
+.tl-blk span{font-weight:500;font-size:10px;opacity:.7}
+.tl-h{position:absolute;top:0;bottom:0;width:22px;margin-left:-11px;cursor:ew-resize;z-index:3;touch-action:none}
+.tl-h::after{content:"";position:absolute;left:9px;top:5px;bottom:5px;width:4px;border-radius:2px;background:#f2b33d}
+#tlHead{position:absolute;top:0;bottom:0;width:2px;background:#fff;pointer-events:none;z-index:4}
 #vInfo{display:none}
 html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);transform:translateX(-50%);z-index:5;background:rgba(0,0,0,.62);color:#fff;font:800 12px "Noto Sans Tamil",sans-serif;padding:3px 12px;border-radius:99px;pointer-events:none}
 </style>
@@ -92,48 +85,137 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
 <main>
 <div class="stage"><canvas id="cv" width="1080" height="1920"></canvas>
 <div id="tl">
-  <div class="tl-row"><button id="tlPlay" type="button" class="alt">▶</button><span id="tlT">0:00 / 0:30</span><span class="tl-sp"></span><button id="tlAdd" type="button">＋ புரோமோ</button></div>
-  <div id="tlAll" aria-label="எல்லாச் செய்திகள்"></div>
-  <div id="tlTrack" aria-label="நேரக்கோடு"><div id="tlHead"></div></div>
-  <small class="tl-lg">தங்கம் = நீங்கள் வைத்த புரோமோ (இழுத்து நகர்த்தலாம்; தட்டினால் நேரம் / சொல்) · வெள்ளை = தானியங்கி (தட்டினால் நீங்களே நகர்த்தலாம்) · கோட்டில் தொட்டால் அந்த நேரத்துக்குச் செல்லும்</small>
-  <div id="tlPop" hidden>
-    <div class="tl-pr"><label>⏱ நேரம் (வினாடி அல்லது நிமி:வினாடி)<input id="tpT" inputmode="decimal"></label><label>🏷 இந்தப் புள்ளியின் சொல் (காலியாக = முக்கிய சொல்)<input id="tpW"></label></div>
-    <div class="tl-row"><button id="tpGo" type="button" class="alt">▶ பார்</button><button id="tpDel" type="button" class="alt">🗑 நீக்கு</button><span class="tl-sp"></span><button id="tpOk" type="button">✔ முடிந்தது</button></div>
-  </div>
+  <div class="tl-row"><button id="tlPlay" type="button" class="alt" aria-label="Play / pause">▶</button><button id="tlSnd" type="button" class="alt" aria-label="Preview sound" title="Preview sound">🔇</button><span id="tlT">0:00 / 0:00</span><span class="tl-sp"></span><button id="tlSplit" type="button" class="alt" title="Add a news (splits the current one)">＋ News</button><button id="tlMerge" type="button" class="alt" title="Delete this news (its time goes to the previous)">− News</button></div>
+  <div id="tlBar" aria-label="News timeline"><div id="tlHead"></div></div>
+  <small class="tl-lg">Each block is one news. Drag a gold handle to choose where the next news (headline · ticker · script) starts; tap a block to open it.</small>
 </div></div>
 <div id="vInfo"></div>
 <div class="panel" id="mainPanel">
-  <h2>தீக்கதிர் – செய்தி ஸ்டுடியோ</h2>
+  <h2>News Studio <small>Mobile TV template</small></h2>
   <div class="row">
-    <button id="bPlay" class="alt">முன்னோட்டம்</button>
-    <button id="bOne">MP4 உருவாக்கு (இந்த செய்தி)</button>
-    <button id="bAll" class="gold">MP4 உருவாக்கு (அனைத்தும்)</button>
-    <button id="bCard" style="flex:1 1 100%">நியூஸ் கார்டு (போட்டோ)</button>
+    <button id="bCombo" class="gold" type="button">Render MP4 · full video</button>
+    <button id="bPlay" class="alt">▶ Preview</button>
+    <button id="bCard" class="alt">News card</button>
   </div>
-  <div id="st">தயார். 1080×1920 · 30 FPS</div><small id="net"></small>
+  <div id="st">Ready. 1080×1920 · 30 FPS</div><small id="net"></small>
   <div class="bar" aria-hidden="true"><div id="xProg"></div></div>
-  <div class="row"><button id="xCancel" class="gold" hidden>நிறுத்து</button></div>
-  <section class="ess" id="essBox">
-    <h3>📝 தினசரி — முக்கியமானவை மட்டும்</h3>
-  <div class="tabs" id="tabs"></div>
-  <div class="row">
-    <button class="alt" id="bAdd">＋ புதிய செய்தி</button>
-    <button class="alt" id="bDel">🗑 நீக்கு</button>
-    <button class="alt" id="bDate">📅 இன்றைய தேதி</button>
-  </div>
-  <div class="row" style="align-items:end"><label>📍 இடம்<input data-k="loc"></label><label>📅 தேதி (DD-MM-YYYY)<input data-k="date"></label><label style="flex:0 0 130px">தேதி தேர்வு<input type="date" id="dPick"></label></div>
-  <small>முன்னோட்டத்தில் படத்தின் மேலே உள்ள பட்டையில் தேதி / இடத்தை தட்டினாலும் நேரடியாக மாற்றலாம்.</small>
-  <label>தலைப்பு (வரி 1 கருப்பு, வரி 2 சிவப்பு; *சொல்* = சிவப்பு)<textarea data-k="headline" rows="3"></textarea></label>
-  <label>செய்தி ஸ்கிரிப்ட் (*சொல்* = சிவப்பு; நீளமானால் 3 கட்டமாக தோன்றி, மீண்டும் மீண்டும் சுழலும்)<textarea data-k="script" rows="6"></textarea></label><small id="pgInfo"></small>
-  <label>டிக்கர் (| கொண்டு பிரிக்கவும்)<input data-k="ticker"></label>
-  <div class="row">
-    <label>வீடியோக்கள் / படங்கள் (ஒன்றுக்கு மேல் தேர்வு செய்யலாம்)<input type="file" id="fMedia" accept="video/*,image/*" multiple><small id="mInfo"></small></label>
-    <label style="flex:0 0 150px">BREAKING<input type="checkbox" data-k="breaking" style="width:28px;height:28px"></label>
-  </div>
-  <label>⏱ இந்தச் செய்தியின் நீளம் (தொகுப்பு முறையில்; வினாடி)<select data-k="len"><option value="20">20 வினாடி</option><option value="30">30 வினாடி</option><option value="40">40 வினாடி</option><option value="50">50 வினாடி</option><option value="60">60 வினாடி</option></select></label>
-    <label>🏷 முக்கிய சொல் (BREAKING NEWS / JUST IN / முக்கிய செய்தி…) — இங்கே மாற்றினால் புரோமோ, டிக்கர் பேட்ஜ், BREAKING பட்டை எல்லாவற்றிலும் மாறும்<input id="gLabel" placeholder="BREAKING NEWS"></label>
+  <div class="row"><button id="xCancel" class="gold" hidden>Cancel</button></div>
+
+  <section class="ess" id="vidBox">
+    <h3>Video</h3>
+    <div class="row"><button id="bVidUp" type="button">⬆ Upload video (max 3:00)</button><button id="bVidClr" class="alt" type="button">Remove</button></div>
+    <input type="file" id="fVid" accept="video/*" hidden>
+    <small id="vidInfo"></small>
   </section>
-  <details class="sub" id="subPromo">
+
+  <section class="ess" id="essBox">
+    <h3>News on the video</h3>
+    <div class="tabs" id="tabs"></div>
+    <div class="row">
+      <button class="alt" id="bAdd" type="button">＋ Add news</button>
+      <button class="alt" id="bDel" type="button">Delete</button>
+      <button class="alt" id="bEven" type="button">Even split</button>
+      <button class="alt" id="bDate" type="button">📅 Today</button>
+    </div>
+    <small id="nTime"></small>
+    <div class="row" style="align-items:end">
+      <label>Starts at<input id="nStart" inputmode="decimal" placeholder="0:00" autocomplete="off"></label>
+      <label>Place<input data-k="loc"></label>
+    </div>
+    <div class="row" style="align-items:end">
+      <label>Date (DD-MM-YYYY)<input data-k="date"></label>
+      <label style="flex:0 0 130px">Pick date<input type="date" id="dPick"></label>
+    </div>
+    <label>Headline <small>line 1 black, line 2 red; *word* = red</small><textarea data-k="headline" rows="3"></textarea></label>
+    <label>Script <small>*word* = red; long text shows in up to 3 pages</small><textarea data-k="script" rows="5"></textarea></label><small id="pgInfo"></small>
+    <label>Ticker <small>separate items with |</small><input data-k="ticker"></label>
+    <div class="row" style="align-items:center">
+      <label class="chk"><input type="checkbox" data-k="breaking"> Show the key-word bar on this news</label>
+    </div>
+    <label>Key word <small>BREAKING NEWS / JUST IN / ... — one place; changes the bar and the ticker badge everywhere</small><input id="gLabel" placeholder="BREAKING NEWS"></label>
+  </section>
+
+  <details class="sub" id="subZoom">
+    <summary>Footage zoom <small>drag · pinch</small></summary>
+    <div class="subb">
+      <small>On the preview: <b>drag with a finger or the mouse</b> to move, <b>pinch / mouse wheel</b> to zoom. Each news keeps its own zoom.</small>
+      <div class="row"><button class="alt" id="bRst" type="button">Reset zoom</button></div>
+      <details class="in"><summary>Precise (sliders)</summary><div class="subb"><label>Zoom<input type="range" data-k="zoom" min="1" max="4" step="0.01" value="1"></label><div class="row"><label>Left / right<input type="range" data-k="px" min="-540" max="540" step="2" value="0"></label><label>Up / down<input type="range" data-k="py" min="-600" max="600" step="2" value="0"></label></div></div></details>
+    </div>
+  </details>
+  <details class="sub" id="subWm">
+    <summary>Watermark <small>drag · pinch</small></summary>
+    <div class="subb">
+      <label>Text<input id="gWm"></label>
+      <div class="row"><button class="alt" id="bWmEdit" type="button">✋ Adjust on preview</button></div>
+      <small>Tap the watermark on the preview (or the button), then drag to move; pinch, mouse wheel or the corner dot resizes; tap outside to finish.</small>
+      <details class="in"><summary>Precise (size · position · opacity · colour)</summary><div class="subb">
+        <div class="row"><label>Size<input type="range" id="gWmS" min="20" max="140" step="2"></label><label>Opacity<input type="range" id="gWmO" min="0.1" max="1" step="0.05"></label></div>
+        <div class="row"><label>Left / right<input type="range" id="gWmX" min="0" max="100"></label><label>Up / down<input type="range" id="gWmY" min="0" max="100"></label><label>Colour<input type="color" id="gWmC" style="padding:2px;height:34px"></label></div>
+      </div></details>
+    </div>
+  </details>
+  <details class="sub" id="subOut">
+    <summary>Quality &amp; sound <small>when needed</small></summary>
+    <div class="subb">
+      <div class="row"><button class="alt" id="qHD" type="button">HD · 1080 · 30</button><button class="alt" id="qMid" type="button">Balanced · 1080 · 24</button><button class="alt" id="qFast" type="button">Fast · 720 · 20</button></div>
+      <details class="in"><summary>Resolution &amp; frame rate</summary><div class="subb"><div class="row">
+        <label>Resolution<select id="xRes"><option value="1080" selected>1080 × 1920 (HD, recommended)</option><option value="720">720 × 1280 (smaller, faster)</option></select></label>
+        <label>Frame rate<select id="xFps"><option value="20">Fast (20 fps)</option><option value="24">Balanced (24 fps)</option><option value="30" selected>Smooth (30 fps, recommended)</option></select></label>
+      </div></div></details>
+      <label class="chk"><input type="checkbox" id="gSfx"> Sound effects in the MP4 (whoosh / impact)</label>
+      <label class="chk"><input type="checkbox" id="gTick"> Typing tick sound</label>
+      <label class="chk"><input type="checkbox" id="gSfxP"> Effects in the preview too</label>
+      <small>The sound of your uploaded video is always kept in the MP4.</small>
+    </div>
+  </details>
+  <details class="sub" id="subCardPh">
+    <summary>Card photos <small>only for the news-card poster</small></summary>
+    <div class="subb">
+      <label>Photos for this news <small>used by the News card, not by the video</small><input type="file" id="fMedia" accept="video/*,image/*" multiple><small id="mInfo"></small></label>
+      <div class="row"><button class="alt" id="bClr" type="button">Clear photos</button></div>
+    </div>
+  </details>
+  <details class="sub" id="subTheme">
+    <summary>Theme <small>whole app colours</small></summary>
+    <div class="subb"><div id="appThemes"></div></div>
+  </details>
+  <details class="sub" id="subBulk">
+    <summary>Bulk paste news <small>occasionally</small></summary>
+    <div class="subb">
+      <small>One line = one news:<br>headline | place | line1 ; line2 ; line3 | ticker</small>
+      <textarea id="bulk" rows="6" placeholder="Headline with *emphasis* | Place | line 1 ; line 2 ; line 3 | ticker text"></textarea>
+      <button class="alt" id="bImp" type="button">Import</button>
+    </div>
+  </details>
+  <details class="sub once" id="subOnce">
+    <summary>Channel setup <small>one-time · hidden</small></summary>
+    <div class="subb">
+      <div class="row"><label>Channel name<input id="gName"></label><label>Sub title<input id="gSub"></label></div>
+      <div class="row"><label>Key-word bar text<input id="gBrk"></label></div>
+      <div class="row"><label>Ticker badge line 1<input id="gTk1"></label><label>Ticker badge line 2<input id="gTk2"></label></div>
+      <label class="chk"><input type="checkbox" id="gEndOn"> End card over the last 4 seconds of the video</label>
+      <div class="row"><label>End card line<input id="gEnd"></label><label>End card thanks line<input id="gThx"></label></div>
+      <div class="row"><label>Contact heading (top right)<input id="gCt"></label><label>Phone number<input id="gPh"></label></div>
+      <label>Logo image <small>saved once</small><input type="file" id="fLogo" accept="image/*"></label>
+      <div class="row"><button class="alt" id="bSave" type="button">Save settings</button></div>
+    </div>
+  </details>
+  <details class="sub" id="subMore">
+    <summary>More render options <small>separate clips</small></summary>
+    <div class="subb">
+      <div class="row"><button class="alt" id="bOne" type="button">Render this news only</button><button class="alt" id="bAll" type="button">Render each news as its own clip</button></div>
+    </div>
+  </details>
+  <small>Keep this tab open while rendering. When it finishes, check the video and tap “Save MP4”.</small>
+  <!-- legacy controls: no longer shown (promo pop-ups and the Top-10 builder were removed from the editor);
+       kept hidden so previously saved settings and the shared code still find their fields -->
+  <div id="legacy" hidden>
+<label>⏱ இந்தச் செய்தியின் நீளம் (தொகுப்பு முறையில்; வினாடி)<select data-k="len"><option value="20">20 வினாடி</option><option value="30">30 வினாடி</option><option value="40">40 வினாடி</option><option value="50">50 வினாடி</option><option value="60">60 வினாடி</option></select></label>
+<label>இயல்புநிலை புரோமோ எழுத்து<input id="gPrDef" placeholder="BREAKING NEWS"></label>
+<label>வீடியோ நீளம் (வினாடி; அதிகபட்சம் 180 = 3 நிமிடம்)<input id="gDur" type="number" min="6" max="180"></label>
+<label>ஒரு படம் / வினாடி<input id="gSl" type="number" min="1" max="15"></label>
+<details class="sub" id="subPromo">
     <summary>🎬 புரோமோ <small>தொட்டால் துணை செட்டிங்</small></summary>
     <div class="subb">
       <div class="row" style="align-items:center;flex-wrap:wrap;gap:14px"><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gPrOn" style="width:auto"> 🎬 வீடியோ மேல் புரோமோ அனிமேஷன்</label></div>
@@ -149,15 +231,7 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
 </div></details>
     </div>
   </details>
-  <details class="sub" id="subZoom">
-    <summary>🔍 Footage Zoom / நகர்த்து <small>இழுத்து அமை</small></summary>
-    <div class="subb">
-<small>முன்னோட்டத்தில் footage மேல் <b>விரலால் அல்லது மவுஸ் பட்டனால் இழுத்தால்</b> நகரும்; <b>இரு விரல் pinch / மவுஸ் சக்கரத்தால்</b> zoom ஆகும்.</small>
-<div class="row"><button class="alt" id="bRst">Zoom மீட்டமை</button><button class="alt" id="bClr">🗑 படங்களை அழி</button></div>
-<details class="in"><summary>துல்லிய அமைப்பு (ஸ்லைடர்)</summary><div class="subb"><label>🔍 Zoom (பெரிதாக்கு)<input type="range" data-k="zoom" min="1" max="4" step="0.01" value="1"></label><div class="row"><label>↔ இடது–வலது<input type="range" data-k="px" min="-540" max="540" step="2" value="0"></label><label>↕ மேல்–கீழ்<input type="range" data-k="py" min="-600" max="600" step="2" value="0"></label></div></div></details>
-    </div>
-  </details>
-  <details class="sub" id="subCombo">
+<details class="sub" id="subCombo">
     <summary>🎞 தொகுப்பு வீடியோ — Top 10 <small>ஒரே வீடியோ · அதிகபட்சம் 3 நிமிடம்</small></summary>
     <div class="subb">
       <label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gCombo" style="width:auto"> தொகுப்பு முறை: ஒவ்வொரு செய்தியும் தன் நீளம் ஓடி, முடிவில் புரோமோ வரும்; End card கடைசியில் மட்டும்</label>
@@ -165,83 +239,27 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
       <small id="cInfo"></small>
       <div class="row"><button class="alt" id="bTpl" type="button">⭐ இந்த அமைப்பை இயல்பு அமைப்பாக சேமி</button><button class="alt" id="bTplRst" type="button">↺ இந்தச் செய்தியை இயல்புக்கு மீட்டமை</button></div>
       <small>புதிய செய்தி சேர்க்கும்போது எழுத்து (தலைப்பு / ஸ்கிரிப்ட்) காலியாகவும், மற்றவை (நீளம், BREAKING, புரோமோ எழுத்து, zoom) இயல்பு அமைப்பிலிருந்தும் தொடங்கும். முதல் செய்தியின் அமைப்பு தானாகவே இயல்பு அமைப்பாகச் சேமிக்கப்பட்டிருக்கும்.</small>
-      <div class="row"><button class="alt" id="bCP" type="button">▶ தொகுப்பு முன்னோட்டம்</button><button class="gold" id="bCombo" type="button">🎞 MP4 உருவாக்கு (தொகுப்பு)</button></div>
+      <div class="row"><button class="alt" id="bCP" type="button">▶ தொகுப்பு முன்னோட்டம்</button></div>
     </div>
   </details>
-  <details class="sub" id="subWm">
-    <summary>💧 Watermark <small>இழுத்து அமை</small></summary>
-    <div class="subb">
-      <label>Watermark எழுத்து (படம் / வீடியோ மேல்)<input id="gWm"></label>
-      <div class="row"><button class="alt" id="bWmEdit" type="button">✋ முன்னோட்டத்தில் இழுத்து அமை</button></div>
-      <small>முன்னோட்டத்தில் watermark-ஐத் தட்டினாலும் தேர்வாகும். இழுத்தால் நகரும்; இரு விரல் pinch / மவுஸ் சக்கரம் / மூலைப் புள்ளியை இழுத்தால் அளவு மாறும்; வெளியே தட்டினால் முடியும்.</small>
-      <details><summary>துல்லிய அமைப்பு (அளவு · இடம் · தெளிவு · நிறம்)</summary>
-      <div class="row"><label>அளவு<input type="range" id="gWmS" min="20" max="140" step="2"></label><label>தெளிவு<input type="range" id="gWmO" min="0.1" max="1" step="0.05"></label></div>
-      <div class="row"><label>↔ இடம்<input type="range" id="gWmX" min="0" max="100"></label><label>↕ இடம்<input type="range" id="gWmY" min="0" max="100"></label><label>நிறம்<input type="color" id="gWmC" style="padding:2px;height:42px"></label></div>
-      </details>
-    </div>
-  </details>
-  <details class="sub" id="subOut">
-    <summary>🎥 தரம் · 🔊 ஒலி <small>தேவைப்படும்போது</small></summary>
-    <div class="subb">
-<div class="row"><button class="alt" id="qHD" type="button">HD · 1080 · 30</button><button class="alt" id="qMid" type="button">சமநிலை · 1080 · 24</button><button class="alt" id="qFast" type="button">விரைவு · 720 · 20</button></div>
-  <div class="row">
-    <label>தரம்<select id="xRes"><option value="1080" selected>1080 × 1920 (HD, பரிந்துரை)</option><option value="720">720 × 1280 (சிறிய கோப்பு, விரைவு)</option></select></label>
-    <label>உருவாக்கும் வேகம்<select id="xFps"><option value="20">விரைவு (20 fps)</option><option value="24">சமநிலை (24 fps)</option><option value="30" selected>மென்மையாக (30 fps, பரிந்துரை)</option></select></label>
   </div>
-<small>🔊 ஒலி</small>
-      <div class="row" style="align-items:center;flex-wrap:wrap;gap:14px;margin-top:6px"><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gSfx" style="width:auto"> MP4-ல் ஒலி விளைவுகள் (whoosh / impact)</label><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gTick" style="width:auto"> தட்டச்சு tick ஒலி</label><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gSfxP" style="width:auto"> முன்னோட்டத்திலும் ஒலி</label></div>
-    </div>
-  </details>
-  <details class="sub" id="subTheme">
-    <summary>🎨 தீம் <small>முழு ஆப் நிறம்</small></summary>
-    <div class="subb">
-<div id="appThemes"></div>
-    </div>
-  </details>
-  <details class="sub" id="subBulk">
-    <summary>📋 10 செய்திகளை ஒட்டு <small>எப்போதாவது</small></summary>
-    <div class="subb">
-      <small>ஒரு வரி = ஒரு செய்தி:<br>தலைப்பு | இடம் | வரி1 ; வரி2 ; வரி3 | டிக்கர்</small>
-      <textarea id="bulk" rows="6" placeholder="சென்னையில் *கனமழை* | சென்னை | வரி 1 ; வரி 2 ; வரி 3 | டிக்கர் செய்தி"></textarea>
-      <button class="alt" id="bImp">இறக்குமதி செய்</button>
-    </div>
-  </details>
-  <details class="sub once" id="subOnce">
-    <summary>⚙ அடிப்படை அமைப்பு <small>ஒருமுறை மட்டும் — மறைந்திருக்கும்</small></summary>
-    <div class="subb">
-      <div class="row">
-        <label>சேனல் பெயர்<input id="gName"></label>
-        <label>வீடியோ நீளம் (வினாடி; அதிகபட்சம் 180 = 3 நிமிடம்)<input id="gDur" type="number" min="6" max="180"></label>
-      </div><small>3 நிமிட (180) வீடியோவுக்கு ரெண்டர் நேரம் அதிகமாகும்; கோப்பு அளவு அதிகமாகாமல் இருக்க 100 வினாடிக்கு மேல் பிட்ரேட் தானாகக் குறைக்கப்படும் (தரம் HD-ஆகவே இருக்கும்). ரெண்டர் முடியும் வரை இந்தத் தாவலைத் திறந்தே வைக்கவும்.</small>
-      <div class="row"><label>துணை தலைப்பு<input id="gSub"></label>
-        <label>ஒரு படம் / வினாடி<input id="gSl" type="number" min="1" max="15"></label>
-      </div>
-<div class="row"><label>BREAKING எழுத்து<input id="gBrk"></label><label>இயல்புநிலை புரோமோ எழுத்து<input id="gPrDef" placeholder="BREAKING NEWS"></label></div>
-      <div class="row"><label>டிக்கர் பேட்ஜ் வரி 1<input id="gTk1"></label><label>டிக்கர் பேட்ஜ் வரி 2<input id="gTk2"></label></div>
-      <div class="row"><label>End card வாசகம்<input id="gEnd"></label><label>End card நன்றி வரி<input id="gThx"></label></div>
-      <div class="row"><label>தொடர்பு தலைப்பு (மேல் வலது)<input id="gCt"></label><label>போன் நம்பர்<input id="gPh"></label></div>
-      <label>லோகோ படம் (ஒருமுறை சேர்த்தால் நினைவில் இருக்கும்)<input type="file" id="fLogo" accept="image/*"></label>
-<button class="alt" id="bSave">💾 அமைப்பை சேமி</button>
-    </div>
-  </details>
-  <small>குறிப்பு: MP4 உருவாக்கும் போது இந்தத் தாவலைத் திறந்தே வைக்கவும். முடிந்ததும் வீடியோவைப் பார்த்து “MP4 சேமி” அழுத்தவும். ஒலி footage வீடியோவிலிருந்து சேரும்.</small>
 </div>
 <div class="panel" id="cardPanel" style="display:none;border:2px solid var(--red)">
-  <h2>🖼 நியூஸ் கார்டு (போட்டோ)</h2>
-  <small>வீடியோவின் முதல் பக்கம் அப்படியே போட்டோவாக (1080×1920) இறங்கும். இங்கே மாற்றும் எழுத்து வீடியோவை பாதிக்காது.</small>
-  <div class="row"><button id="cJpg">⬇ JPG போட்டோ</button><button id="cPng" class="alt">⬇ PNG போட்டோ</button></div>
+  <h2>🖼 News card (photo)</h2>
+  <small>The first page of the video as a photo (1080×1920). Text changed here does not affect the video.</small>
+  <div class="row"><button id="cJpg">⬇ JPG photo</button><button id="cPng" class="alt">⬇ PNG photo</button></div>
   <div id="cSt" style="font-size:14px;color:var(--gold);min-height:20px"></div><div id="cOut"></div>
   <div class="tabs" id="ctabs"></div>
-  <div class="row"><label>📍 இடம்<input data-c="loc"></label><label>📅 தேதி<input data-c="date"></label></div>
-  <label>தலைப்பு (வரி 2 சிவப்பு; *சொல்* = சிவப்பு)<textarea data-c="headline" rows="3"></textarea></label>
-  <label>செய்தி ஸ்கிரிப்ட் (முழு எழுத்தும் கார்டில் தெரியும்)<textarea data-c="script" rows="7"></textarea></label>
-  <label>டிக்கர் (| கொண்டு பிரிக்கவும்)<input data-c="ticker"></label>
-  <div class="row"><label style="flex:0 0 130px">BREAKING<input type="checkbox" data-c="breaking" style="width:28px;height:28px"></label><label>படம் எண் (இந்த செய்தியின் கோப்பு)<input type="number" data-c="idx" min="1" value="1"></label></div>
-  <details class="in"><summary>🔍 Zoom — துல்லிய அமைப்பு (படத்தை இழுத்தும் pinch செய்தும் அமைக்கலாம்)</summary><div class="subb">
+  <div class="row"><label>Place<input data-c="loc"></label><label>Date<input data-c="date"></label></div>
+  <label>Headline (line 2 red; *word* = red)<textarea data-c="headline" rows="3"></textarea></label>
+  <label>Script (all text shows on the card)<textarea data-c="script" rows="7"></textarea></label>
+  <label>Ticker (separate with |)<input data-c="ticker"></label>
+  <div class="row"><label style="flex:0 0 130px">Key bar<input type="checkbox" data-c="breaking" style="width:28px;height:28px"></label><label>Photo no. (this news file)<input type="number" data-c="idx" min="1" value="1"></label></div>
+  <details class="in"><summary>🔍 Zoom — precise</summary><div class="subb">
   <label>🔍 Zoom<input type="range" data-c="zoom" min="1" max="4" step="0.01" value="1"></label>
   <div class="row"><label>↔<input type="range" data-c="px" min="-540" max="540" step="2" value="0"></label><label>↕<input type="range" data-c="py" min="-600" max="600" step="2" value="0"></label></div></div></details>
-  <div class="row"><button class="alt" id="cRst">Zoom மீட்டமை</button><button class="alt" id="cSync">↻ வீடியோ செய்தியிலிருந்து எடு</button><button class="alt" id="cBack">🎬 வீடியோ முறைக்கு</button></div>
-  <small>படம்/வீடியோவை முதலில் வீடியோ முறையில் சேர்க்கவும்; கார்டில் விரலால் இழுத்து நகர்த்தலாம், தேதி / இடத்தை தட்டி மாற்றலாம்.</small>
+  <div class="row"><button class="alt" id="cRst">Reset zoom</button><button class="alt" id="cSync">↻ Take from video news</button><button class="alt" id="cBack">🎬 Back to video</button></div>
+  <small>Add photos under “Card photos” first. On the card, drag to move; tap the date / place to edit.</small>
 </div>
 </main>
 <script>
@@ -275,7 +293,7 @@ function pin(x,y,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y-8,13,Math.PI,0);
 function cover(src,sw,sh,x,y,w,h,z,ox,oy){const s=Math.max(w/sw,h/sh)*z,dw=sw*s,dh=sh*s,mx=(dw-w)/2,my=(dh-h)/2;ox=clamp(ox||0,-mx,mx);oy=clamp(oy||0,-my,my);ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,8);ctx.clip();ctx.drawImage(src,x+(w-dw)/2+ox,y+(h-dh)/2+oy,dw,dh);ctx.restore()}
 const plain=s=>(s||"").replace(/\*/g,"");
 let STILL=false,cardMode=false,wmSel=false,WMB=null;
-const MLF=it=>{const L=media[cur]||[];if(!STILL)return L;const m=L[(it.idx||1)-1];return m?[m]:[]};
+const MLF=it=>{if(!STILL)return VID?[oneM(cur)]:[];const L=media[cur]||[],m=L[(it.idx||1)-1];if(m)return[m];return VID?[oneM(cur)]:[]};
 
 /* ---------- main frame (reference layout) ---------- */
 const GG=(a,b)=>{const g=ctx.createLinearGradient(a,0,b,0);g.addColorStop(0,_sh(RED,-.25));g.addColorStop(.5,_sh(RED,.08));g.addColorStop(1,_sh(RED,-.15));return g};
@@ -290,13 +308,22 @@ if(sl.length>cap){for(sf=50;sf>=30;sf-=2){sl=run(sf);cap=Math.floor(TH/(sf*1.45)
 const np=Math.max(1,Math.min(3,Math.ceil(sl.length/cap)));return{sf,sl,gp:sf*1.45,np,per:Math.max(1,Math.ceil(sl.length/np))}}
 function scriptFull(txt){let sf=50,sl=[];for(;sf>=24;sf-=2){sl=[];(txt||"").split("\n").forEach(par=>{if(par.trim())wrap(tok(par),TW,`700 ${sf}px ${FONT}`).forEach(l=>sl.push(l))});if(sl.length*sf*1.45<=TH)break}return{sf,sl,gp:sf*1.45}}
 const EC=3.8;
-/* ---------- தொகுப்பு முறை (G.combo): ஒவ்வொரு செய்தியும் தன் நீளம் (30 / 50 வி) ஓடி, கடைசியில் புரோமோ; End card கடைசிச் செய்திக்கு மட்டும் ---------- */
-const _sm=new WeakMap();
-const segLen=it=>{const k=(it.script||"")+"|"+(+it.len||30);let c=_sm.get(it);if(!c||c.k!==k){c={k,v:Math.max(+it.len||30,2+scriptPages(it.script).np*6+.4)};_sm.set(it,c)}return c.v};
-/* G.cFrom-ஆம் செய்தியிலிருந்து தொடங்கி, 180 வினாடிக்குள் (End card உட்பட) எத்தனை செய்தி அடங்கும் என்று கணக்கிடும் */
-const comboRange=()=>{const a=clamp((+G.cFrom||1)-1,0,items.length-1);let b=a,body=segLen(items[a]);for(let k=a+1;k<items.length;k++){const n=body+segLen(items[k]);if(n+EC>180)break;body=n;b=k}return{a,b,tot:Math.min(180,body+EC)}};
-const lastSeg=it=>items[comboRange().b]===it;
-const durOf=it=>G.combo?Math.min(180,segLen(it)+(lastSeg(it)?EC:0)):Math.min(180,Math.max(G.dur,2+scriptPages(it.script).np*6+EC+.4));
+/* ---------- ஒரே வீடியோ முறை: ஒரு வீடியோ (≤180 வி) · அதற்குள் 10 வரை செய்திகள்; ஒவ்வொன்றும் ஒரு நேரப்பகுதி (it.len) ---------- */
+let VID=null;const _om=[];
+const totalDur=()=>VID?Math.min(180,Math.max(1,VID.dur||1)):Math.min(180,Math.max(10,items.reduce((a,x)=>a+(+x.len||10),0)));
+const segLen=it=>Math.max(1,+it.len||10);
+const segAt=k=>{let a=0;for(let j=0;j<k&&j<items.length;j++)a+=segLen(items[j]);return a};
+const oneM=k=>{if(!VID)return null;let m=_om[k];if(!m||m.el!==VID.el){m=_om[k]={type:"v",el:VID.el,file:VID.file,one:true,k:k,get off(){return segAt(this.k)}}}return m};
+const MLs=i=>VID?[oneM(i)]:(media[i]||[]);
+const comboRange=()=>({a:0,b:items.length-1,tot:totalDur()});
+const lastSeg=it=>items[items.length-1]===it;
+const durOf=it=>Math.min(180,segLen(it));
+function oneSync(m,t){const el=m.el,tg=m.off+t;if(!isFinite(tg))return;
+  el.muted=!(rec||window._snd);
+  if(el.duration&&tg>=el.duration-.04){if(!el.paused)el.pause();return}
+  const run=(playing||rec)&&window._scrub==null;
+  if(run){const d=Math.abs(el.currentTime-tg);if(el.paused||d>.45){if(el.paused||d>.15){try{el.currentTime=tg}catch(e){}}el.play().catch(()=>{if(!el.muted){el.muted=true;el.play().catch(()=>{})}})}}
+  else{if(!el.paused)el.pause();if(Math.abs(el.currentTime-tg)>.04){try{el.currentTime=tg}catch(e){}}}}
 function draw(it,t){
   const D=durOf(it),a=(s,d)=>ease((t-s)/d),C=(s)=>{ctx.textAlign=s?"center":"left"};
   ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.textBaseline="alphabetic";ctx.textAlign="left";ctx.shadowBlur=0;
@@ -320,11 +347,11 @@ function draw(it,t){
   ctx.fillStyle=PANEL;ctx.fillRect(vx,vy,vw,vh);ctx.fillStyle="#161616";ctx.fillRect(vx+8,vy+8,vw-16,vh-16);
   const fx=vx+12,fy=vy+12,fw=vw-24,fh=vh-24,ML=MLF(it),uz=(it.zoom||1)*(1+.03*(t/D));
   const SL=G.slide||3,nM=ML.length,si=nM?Math.max(0,Math.floor(t/SL))%nM:0,st2=t%SL,nx=nM?(si+1)%nM:0;
-  if(!STILL&&!window._exp)ML.forEach((m,i)=>{if(m.type!=="v")return;const on=i===si||(nM>1&&i===nx&&st2>SL-.6);if(on&&!m.el._on){m.el._on=true;m.el.currentTime=0;m.el.play().catch(()=>{})}else if(!on&&m.el._on){m.el._on=false;m.el.pause()}m.el.muted=!(rec&&i===si)});
+  if(!STILL&&!window._exp)ML.forEach((m,i)=>{if(m.type!=="v")return;if(m.one){oneSync(m,t);return}const on=i===si||(nM>1&&i===nx&&st2>SL-.6);if(on&&!m.el._on){m.el._on=true;m.el.currentTime=0;m.el.play().catch(()=>{})}else if(!on&&m.el._on){m.el._on=false;m.el.pause()}m.el.muted=!(rec&&i===si)});
   const dm=(m,al)=>{ctx.save();ctx.globalAlpha=al;if(m.type==="v"){if(m.el.readyState>=2){cover(m.el,m.el.videoWidth,m.el.videoHeight,fx,fy,fw,fh,uz,it.px,it.py);if(window._exp)snapFrame(m)}else if(window._exp&&m._lc)cover(m._lc,m._lc.width,m._lc.height,fx,fy,fw,fh,uz,it.px,it.py)}else cover(m.el,m.el.naturalWidth,m.el.naturalHeight,fx,fy,fw,fh,uz,it.px,it.py);ctx.restore()};
   if(nM){dm(ML[si],p);if(nM>1&&st2>SL-.5)dm(ML[nx],p*ease((st2-(SL-.5))/.5))}
   else{ctx.save();ctx.fillStyle="#242424";ctx.fillRect(fx,fy,fw,fh);const gg=ctx.createLinearGradient(fx+((t*260)%1500)-400,0,fx+((t*260)%1500),0);gg.addColorStop(0,"rgba(255,255,255,0)");gg.addColorStop(.5,"rgba(255,255,255,.1)");gg.addColorStop(1,"rgba(255,255,255,0)");ctx.fillStyle=gg;ctx.fillRect(fx,fy,fw,fh);ctx.fillStyle="#9a9a9a";ctx.font=`700 44px ${FONT}`;ctx.textAlign="center";ctx.fillText("வீடியோ / படம் இங்கே",W/2,vy+vh/2+14);ctx.restore();ctx.textAlign="left"}
-  WMARK(fx,fy,fw,fh);FRAMEFX(it,t,fx,fy,fw,fh);PROMO(it,t,fx,fy,fw,fh);
+  WMARK(fx,fy,fw,fh);FRAMEFX(it,t,fx,fy,fw,fh);
   if(nM>1){for(let j=0;j<nM;j++){ctx.fillStyle=j===si?GOLD:"rgba(255,255,255,.45)";ctx.beginPath();ctx.arc(vx+vw/2-(nM-1)*14+j*28,vy+vh-30,7,0,7);ctx.fill()}}
   FRAMEBORDER(vx,vy,vw,vh,t,p);
   ctx.restore();
@@ -356,7 +383,7 @@ function draw(it,t){
 
   if(t<.7){const q=ease(t/.7),x=-W+q*W*2.2;ctx.fillStyle=YEL;ctx.fillRect(x,0,W*.5,H);ctx.fillStyle=GOLD;ctx.fillRect(x+W*.5,0,16,H)}
   /* end card */
-  if(!G.combo||lastSeg(it))ENDCARD(it,t,D);
+  if(G.endOn!==false&&lastSeg(it))ENDCARD(it,t,D);
 }
 
 
@@ -690,9 +717,9 @@ let startT=performance.now(),rec=false,playing=true;
 const VIEW=document.documentElement.classList.contains("m-view");
 function loop(now){if(window._exp){requestAnimationFrame(loop);return}if(cardMode&&items[cur].card){STILL=true;try{draw(items[cur].card,4)}catch(e){console.error(e)}requestAnimationFrame(loop);return}STILL=false;let t=Math.max(0,(now-startT)/1000);const DD=durOf(items[cur]);
 /* காட்சிப் பக்கம்: ஒரு செய்தி முடிந்ததும் அடுத்த செய்திக்குத் தானாகச் செல்லும் */
-if(window._cp&&!rec&&t>=DD){const R=comboRange();sel(cur>=R.b||cur<R.a?R.a:cur+1);requestAnimationFrame(loop);return}
+if(playing&&!rec&&t>=DD){sel(cur>=items.length-1?0:cur+1);requestAnimationFrame(loop);return}
 if(VIEW&&!rec&&items.length>1&&t>=DD){sel((cur+1)%items.length);requestAnimationFrame(loop);return}
-t=rec?Math.min(t,DD):playing?t%DD:(window._scrub!=null?window._scrub:4);syncScrub(t,DD);if(playing&&!rec){if(cur!==_sc||t<_st-.5)sfxPreview(items[cur]);_sc=cur;_st=t}try{draw(items[cur],t)}catch(e){console.error(e)}requestAnimationFrame(loop)}
+t=rec?Math.min(t,DD):playing?Math.min(t,DD):(window._scrub!=null?window._scrub:Math.min(4,DD*.5));syncScrub(t,DD);if(playing&&!rec){if(cur!==_sc||t<_st-.5)sfxPreview(items[cur]);_sc=cur;_st=t}try{draw(items[cur],t)}catch(e){console.error(e)}requestAnimationFrame(loop)}
 (async()=>{try{await document.fonts.load("800 40px 'Noto Sans Tamil'","தமிழ்");await document.fonts.load("700 40px 'Noto Sans Tamil'","தமிழ்")}catch(e){}requestAnimationFrame(loop)})();
 
 /* ---------- UI ---------- */
@@ -706,7 +733,7 @@ $("#gSub").oninput=e=>{G.sub=e.target.value;save()};
 FL.forEach(([i,k])=>{$("#"+i).oninput=e=>{G[k]=e.target.value;save()}});
 $("#gSl").onchange=e=>{G.slide=clamp(+e.target.value||3,1,15);e.target.value=G.slide;save()};
 $("#gDur").onchange=e=>{G.dur=clamp(+e.target.value||12,6,180);e.target.value=G.dur;save()};
-$("#fLogo").onchange=e=>{const f=e.target.files[0];if(!f)return;const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,500/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.max(1,Math.round(im.width*s));c.height=Math.max(1,Math.round(im.height*s));c.getContext("2d").drawImage(im,0,0,c.width,c.height);let u=c.toDataURL("image/png");if(u.length>230000)u=c.toDataURL("image/webp",.9);setLogo(u);try{localStorage.setItem("tk_logo",u)}catch(x){}$("#st").textContent="✔ லோகோ சேமிக்கப்பட்டது."};im.src=fr.result};fr.readAsDataURL(f)};
+$("#fLogo").onchange=e=>{const f=e.target.files[0];if(!f)return;const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,500/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.max(1,Math.round(im.width*s));c.height=Math.max(1,Math.round(im.height*s));c.getContext("2d").drawImage(im,0,0,c.width,c.height);let u=c.toDataURL("image/png");if(u.length>230000)u=c.toDataURL("image/webp",.9);setLogo(u);try{localStorage.setItem("tk_logo",u)}catch(x){}$("#st").textContent="✔ Logo saved."};im.src=fr.result};fr.readAsDataURL(f)};
 /* footage (வீடியோ / படம்) — செட்டிங் பக்கத்தில் சேர்த்தவை IndexedDB-ல் சேமிக்கப்பட்டு காட்சிப் பக்கத்திலும் தெரியும் */
 function addMedia(k,f,done){const u=URL.createObjectURL(f);media[k]=media[k]||[];if(f.type.startsWith("video")){const v=document.createElement("video");v.src=u;v.loop=true;v.muted=true;v.playsInline=true;v.preload="auto";v.onloadeddata=()=>{media[k].push({type:"v",el:v,file:f});done&&done()}}else{const im=new Image();im.onload=()=>{media[k].push({type:"i",el:im,file:f});done&&done()};im.src=u}}
 let pmT=0;
@@ -714,11 +741,11 @@ function persistMedia(){clearTimeout(pmT);pmT=setTimeout(()=>{if(!window.MediaSt
 $("#fMedia").onchange=e=>{const k=cur;[...e.target.files].forEach(f=>addMedia(k,f,persistMedia));e.target.value=""};
 if(window.MediaStore)MediaStore.get("tv:media").then(o=>{if(!o)return;Object.keys(o).forEach(k=>(o[k]||[]).forEach(f=>addMedia(+k,f)))});
 $("#bClr").onclick=()=>{(media[cur]||[]).forEach(m=>{if(m.type==="v")m.el.pause()});delete media[cur];persistMedia()};
-$("#bPlay").onclick=()=>{playing=!playing;$("#bPlay").textContent=playing?"⏸ முன்னோட்டம்":"▶ முன்னோட்டம்";startT=performance.now()-(playing&&window._scrub!=null?window._scrub*1000:0);window._scrub=null};
-$("#bAdd").onclick=()=>{if(items.length>=10){$("#st").textContent="அதிகபட்சம் 10 செய்திகள்.";return}items.push({...blank(),headline:"",loc:"",script:"",ticker:"",...tplSt()});save();sel(items.length-1)};
+$("#bPlay").onclick=()=>{playing=!playing;$("#bPlay").textContent=playing?"⏸ Preview":"▶ Preview";startT=performance.now()-(playing&&window._scrub!=null?window._scrub*1000:0);window._scrub=null};
+$("#bAdd").onclick=()=>{if(items.length>=10){$("#st").textContent="Maximum 10 news.";return}items.push({...blank(),headline:"",loc:"",script:"",ticker:"",...tplSt()});save();sel(items.length-1)};
 $("#bDel").onclick=()=>{if(items.length<2)return;items.splice(cur,1);const m={};Object.keys(media).forEach(k=>{k=+k;if(k<cur)m[k]=media[k];else if(k>cur)m[k-1]=media[k]});media=m;persistMedia();save();sel(Math.min(cur,items.length-1))};
-$("#bDate").onclick=()=>{items.forEach(x=>{x.date=today();x.dm=false});save();fill();$("#st").textContent="✔ அனைத்து செய்திகளுக்கும் இன்றைய தேதி அமைக்கப்பட்டது."};
-$("#bImp").onclick=()=>{const L=$("#bulk").value.split("\n").map(s=>s.trim()).filter(Boolean).slice(0,10);if(!L.length)return;items=L.map(l=>{const p=l.split("|").map(s=>s.trim());return{headline:p[0]||"",loc:p[1]||"",date:today(),script:(p[2]||"").split(";").map(s=>s.trim()).join("\n"),ticker:p[3]||plain(p[0]),...tplSt()}});media={};save();sel(0);$("#st").textContent=items.length+" செய்திகள் ஏற்றப்பட்டன. ஒவ்வொன்றிற்கும் வீடியோ சேர்க்கலாம்."};
+$("#bDate").onclick=()=>{items.forEach(x=>{x.date=today();x.dm=false});save();fill();$("#st").textContent="✔ Today's date set on all news."};
+$("#bImp").onclick=()=>{const L=$("#bulk").value.split("\n").map(s=>s.trim()).filter(Boolean).slice(0,10);if(!L.length)return;items=L.map(l=>{const p=l.split("|").map(s=>s.trim());return{headline:p[0]||"",loc:p[1]||"",date:today(),script:(p[2]||"").split(";").map(s=>s.trim()).join("\n"),ticker:p[3]||plain(p[0]),...tplSt()}});media={};save();sel(0);$("#st").textContent=items.length+" news imported."};
 
 /* ---------- export ---------- */
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -726,7 +753,7 @@ async function record(i){
   sel(i);rec=true;playMedia();
   let wl=null;try{wl=await navigator.wakeLock.request("screen")}catch(e){}
   try{
-    const st=cv.captureStream(30),ML=media[i]||[];
+    const st=cv.captureStream(30),ML=MLs(i);
     ML.forEach(m=>{if(m.type==="v"){try{m.el.captureStream().getAudioTracks().forEach(t=>st.addTrack(t))}catch(e){}}});
     const mt=mime(),r=new MediaRecorder(st,mt?{mimeType:mt,videoBitsPerSecond:8e6}:{videoBitsPerSecond:8e6}),ch=[];
     r.ondataavailable=e=>e.data.size&&ch.push(e.data);
@@ -748,7 +775,7 @@ const wmHit=e=>{if(!WMB||!G.wm||STILL)return 0;const[x,y]=toC(e.clientX,e.client
  if(wmSel&&Math.hypot(x-(b.x+b.w+10),y-(b.y+b.h+8))<=64)return 2;
  return(x>=b.x-24&&x<=b.x+b.w+24&&y>=b.y-24&&y<=b.y+b.h+24)?1:0};
 let wmMode=0,wmTap=false,wmR=null;
-function wmBtn(){const b=$("#bWmEdit");if(b)b.textContent=wmSel?"✔ இழுத்து அமைத்தல் முடிந்தது":"✋ முன்னோட்டத்தில் இழுத்து அமை"}
+function wmBtn(){const b=$("#bWmEdit");if(b)b.textContent=wmSel?"✔ Done adjusting":"✋ Adjust on preview"}
 function wmScale(f){G.wmS=clamp(Math.round((G.wmS||56)*f*10)/10,20,140);wmFill();save()}
 function wmMove(dx,dy){const b=WMB;if(!b)return;if(b.rx>1)G.wmX=clamp((G.wmX==null?100:G.wmX)+dx/b.rx*100,0,100);if(b.ry>1)G.wmY=clamp((G.wmY==null?100:G.wmY)+dy/b.ry*100,0,100);wmFill();save()}
 cv.addEventListener("pointerdown",e=>{if(!inFrame(e))return;cv.setPointerCapture(e.pointerId);ptr.set(e.pointerId,[e.clientX,e.clientY]);lastD=0;
@@ -768,14 +795,14 @@ let tap=null;
 cv.addEventListener("pointerdown",e=>{tap=inFrame(e)&&ptr.size===1?{x:e.clientX,y:e.clientY}:null});
 cv.addEventListener("pointermove",e=>{if(tap&&Math.hypot(e.clientX-tap.x,e.clientY-tap.y)>8)tap=null});
 cv.addEventListener("pointerup",e=>{if(!tap)return;tap=null;if(wmTap){wmTap=false;return}if(wmSel){wmSel=false;wmBtn();return}const r=cv.getBoundingClientRect(),x=(e.clientX-r.left)*W/r.width,y=(e.clientY-r.top)*H/r.height;if(y<VY+12||y>VY+100)return;const it=tgt();
- if(x<540){const v=prompt("தேதி (DD-MM-YYYY)",it.date||"");if(v!==null){it.date=v.trim();it.dm=true}}else{const v=prompt("இடம்",it.loc||"");if(v!==null)it.loc=v.trim()}save();fill()});
+ if(x<540){const v=prompt("Date (DD-MM-YYYY)",it.date||"");if(v!==null){it.date=v.trim();it.dm=true}}else{const v=prompt("Place",it.loc||"");if(v!==null)it.loc=v.trim()}save();fill()});
 $("#dPick").onchange=e=>{const v=e.target.value;if(!v)return;const [y,m,d]=v.split("-");const it=items[cur];it.date=d+"-"+m+"-"+y;it.dm=true;save();fill();e.target.value=""};
 cv.addEventListener("wheel",e=>{if(!inFrame(e))return;e.preventDefault();if(wmSel&&WMB){wmScale(e.deltaY<0?1.06:.94);return}const it=tgt();it.zoom=clamp((it.zoom||1)*(e.deltaY<0?1.06:.94),1,4);syncAdj()},{passive:false});
 $("#bRst").onclick=()=>{Object.assign(items[cur],{zoom:1,px:0,py:0});syncAdj()};
-setInterval(()=>{$("#mInfo").textContent=((media[cur]||[]).length)+" கோப்பு சேர்க்கப்பட்டது";const n=window._pg||1;$("#pgInfo").textContent="கட்டங்கள்: "+n+" · ஒவ்வொன்றும் 6 வினாடி · மொத்த நீளம்: "+Math.round(durOf(items[cur]))+" வினாடி (நீளம் அதிகமானால் கட்டங்கள் மீண்டும் சுழலும்)"},700);
+setInterval(()=>{$("#mInfo").textContent=((media[cur]||[]).length)+" file(s) added";const n=window._pg||1;$("#pgInfo").textContent="Script pages: "+n+" · 6 s each · this news lasts "+Math.round(durOf(items[cur]))+" s (long text repeats the pages)"},700);
 
 /* ---------- saved settings (on this phone only, works offline) ---------- */
-$("#bSave").onclick=()=>{let ok=true;try{localStorage.setItem("tk_studio2",JSON.stringify({G,items}))}catch(e){ok=false}$("#st").textContent=ok?"✔ அமைப்பு இந்த மொபைலில் சேமிக்கப்பட்டது.":"⚠ இந்த browser-ல் சேமிக்க முடியவில்லை."};
+$("#bSave").onclick=()=>{let ok=true;try{localStorage.setItem("tk_studio2",JSON.stringify({G,items}))}catch(e){ok=false}$("#st").textContent=ok?"✔ Settings saved on this device.":"⚠ This browser cannot save settings."};
 
 /* ---------- animated end card (logo + text stay together) ---------- */
 function ENDCARD(it,t,D){
@@ -810,22 +837,22 @@ function ENDCARD(it,t,D){
 const outList=document.createElement("div");outList.style.cssText="display:grid;gap:8px";$("#st").after(outList);
 const errTxt=e=>(e&&e.code?e.code+": ":"")+((e&&e.message)||e);
 async function saveOut(o,name){
-  if(!o.blob||!o.blob.size)throw new Error("வீடியோ கோப்பு காலியாக உள்ளது (0 bytes) — மீண்டும் முயற்சிக்கவும்");
+  if(!o.blob||!o.blob.size)throw new Error("The video file is empty (0 bytes) — try again");
   try{const f=new File([o.blob],name,{type:o.blob.type});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return true}}catch(e){if(e&&e.name==="AbortError")return false}
   const a=document.createElement("a");a.href=URL.createObjectURL(o.blob);a.download=name;document.body.appendChild(a);a.click();a.remove();return true
 }
 function addOut(o,i){
   const name="theekkathir-"+(i+1)+"-"+(items[i].date||today())+"."+o.ext,row=document.createElement("div"),b=document.createElement("button");
-  b.className="alt";b.textContent="⬇ சேமி: "+name+" ("+(o.blob.size/1048576).toFixed(1)+" MB)";
-  b.onclick=async()=>{try{const ok=await saveOut(o,name);$("#st").textContent=ok?"✔ சேமிக்கப்பட்டது.":"சேமிப்பு ரத்து."}catch(e){$("#st").textContent="சேமிப்பு பிழை — "+errTxt(e)}};
+  b.className="alt";b.textContent="⬇ Save: "+name+" ("+(o.blob.size/1048576).toFixed(1)+" MB)";
+  b.onclick=async()=>{try{const ok=await saveOut(o,name);$("#st").textContent=ok?"✔ Saved.":"Save cancelled."}catch(e){$("#st").textContent="Save error — "+errTxt(e)}};
   row.appendChild(b);outList.appendChild(row);return name
 }
 async function runOne(i){
   const o=await record(i),name=addOut(o,i);
-  try{return(await saveOut(o,name))?"ok":"cancel"}catch(e){$("#st").textContent="தானியங்கி சேமிப்பு பிழை — "+errTxt(e)+" · கீழே உள்ள பொத்தானை அழுத்தவும்.";return"err"}
+  try{return(await saveOut(o,name))?"ok":"cancel"}catch(e){$("#st").textContent="Auto-save error — "+errTxt(e)+" · tap the button below.";return"err"}
 }
-$("#bOne").onclick=async()=>{setCard(false);if(!okRec()){$("#st").textContent="இந்த browser-ல் வீடியோ எடுக்க முடியாது. Chrome பயன்படுத்தவும்.";return}lock(true);outList.innerHTML="";$("#st").textContent="வீடியோ உருவாகிறது… "+durOf(items[cur]).toFixed(0)+" வினாடி (tab-ஐ மூட வேண்டாம்)";try{const r=await runOne(cur);if(r==="ok")$("#st").textContent="✔ வீடியோ சேமிக்கப்பட்டது.";else if(r==="cancel")$("#st").textContent="சேமிப்பு ரத்து — கீழே உள்ள பொத்தானை அழுத்தி சேமிக்கலாம்."}catch(e){$("#st").textContent="பிழை: "+errTxt(e)}lock(false)};
-$("#bAll").onclick=async()=>{setCard(false);if(!okRec()){$("#st").textContent="Chrome பயன்படுத்தவும்.";return}lock(true);outList.innerHTML="";try{let n=0;for(let i=0;i<items.length;i++){$("#st").textContent="வீடியோ "+(i+1)+"/"+items.length+" உருவாகிறது… (tab-ஐ மூட வேண்டாம்)";if(await runOne(i)==="ok")n++;await sleep(500)}$("#st").textContent=n===items.length?"✔ "+n+" வீடியோக்களும் சேமிக்கப்பட்டன.":n+"/"+items.length+" சேமிக்கப்பட்டன — மீதியை கீழே உள்ள பொத்தான்களால் சேமிக்கவும்."}catch(e){$("#st").textContent="பிழை: "+errTxt(e)}lock(false)};
+$("#bOne").onclick=async()=>{setCard(false);if(!okRec()){$("#st").textContent="This browser cannot record video. Use Chrome.";return}lock(true);outList.innerHTML="";$("#st").textContent="Rendering video… "+durOf(items[cur]).toFixed(0)+" s (keep this tab open)";try{const r=await runOne(cur);if(r==="ok")$("#st").textContent="✔ Video saved.";else if(r==="cancel")$("#st").textContent="Save cancelled — you can save with the button below."}catch(e){$("#st").textContent="Error: "+errTxt(e)}lock(false)};
+$("#bAll").onclick=async()=>{setCard(false);if(!okRec()){$("#st").textContent="Use Chrome.";return}lock(true);outList.innerHTML="";try{let n=0;for(let i=0;i<items.length;i++){$("#st").textContent="Video "+(i+1)+"/"+items.length+" rendering… (keep this tab open)";if(await runOne(i)==="ok")n++;await sleep(500)}$("#st").textContent=n===items.length?"✔ "+n+" videos saved.":n+"/"+items.length+" saved — save the rest with the buttons below."}catch(e){$("#st").textContent="Error: "+errTxt(e)}lock(false)};
 
 /* ---------- editable watermark ---------- */
 [["gSfx","sfx"],["gTick","tick"],["gSfxP","sfxp"]].forEach(([i,k])=>{$("#"+i).onchange=e=>{G[k]=e.target.checked;save()}});
@@ -839,24 +866,24 @@ function syncScrub(t,DD){window._pt=t;const sc=document.getElementById("pScrub")
   if(+sc.max!==Math.ceil(DD))sc.max=Math.ceil(DD);
   if(playing&&document.activeElement!==sc)sc.value=t;
   const lb=document.getElementById("pScrubT");if(lb)lb.textContent=Math.floor(t/60)+":"+String(Math.floor(t%60)).padStart(2,"0")}
-$("#pScrub").oninput=e=>{const v=+e.target.value;window._scrub=v;playing=false;$("#bPlay").textContent="▶ முன்னோட்டம்";startT=performance.now()-v*1000};
+$("#pScrub").oninput=e=>{const v=+e.target.value;window._scrub=v;playing=false;$("#bPlay").textContent="▶ Preview";startT=performance.now()-v*1000};
 $("#bPrAdd").onclick=()=>{const it=items[cur],v=Math.round((window._pt||0)*10)/10,tl=promoTimes(it)||[];tl.push(v);
   it.promoAt=[...new Set(tl)].sort((a,b)=>a-b).map(x=>Number.isInteger(x)?String(x):x.toFixed(1)).join(", ");save();fill();
-  $("#st").textContent="✔ "+Math.floor(v/60)+":"+String(Math.round(v%60)).padStart(2,"0")+" நேரத்தில் புரோமோ சேர்க்கப்பட்டது."};
-$("#bPrClr").onclick=()=>{items[cur].promoAt="";save();fill();$("#st").textContent="புரோமோ நேரங்கள் அழிக்கப்பட்டன (இடைவெளி முறைக்குத் திரும்பும்)."};
+  $("#st").textContent="✔ "+Math.floor(v/60)+":"+String(Math.round(v%60)).padStart(2,"0")+" promo added."};
+$("#bPrClr").onclick=()=>{items[cur].promoAt="";save();fill();$("#st").textContent="Promo times cleared."};
 function promoAtInfo(){const el=$("#promoAtInfo");if(!el)return;const it=items[cur],tl=promoTimes(it),D=durOf(it),DU=clamp(+G.prDur||4,2,10);
   const f=x=>Math.floor(x/60)+":"+String(Math.round(x%60)).padStart(2,"0");
-  if(!tl){el.textContent="காலியாக உள்ளது → ஒவ்வொரு "+clamp(+G.prEvery||30,5,180)+" வினாடிக்கும் தானாக வரும் (வீடியோ நீளம் "+D+" வினாடி).";return}
+  if(!tl){el.textContent="Empty → every "+clamp(+G.prEvery||30,5,180)+" s (video length "+D+" s).";return}
   const ok=tl.filter(x=>x+DU<=D),bad=tl.filter(x=>x+DU>D);
-  el.textContent="வரும் நேரங்கள்: "+(ok.map(f).join(", ")||"இல்லை")+(bad.length?" · ⚠ "+bad.map(f).join(", ")+" வீடியோ நீளத்தை ("+D+" வினாடி) தாண்டுவதால் வராது":"")+" · k-வது நேரத்துக்கு k-வது வார்த்தை வரும்."}
+  el.textContent="Times: "+(ok.map(f).join(", ")||"none")+(bad.length?" · ⚠ "+bad.map(f).join(", ")+" beyond video length ("+D+" s)":"")+""}
 document.querySelectorAll('[data-k="promoAt"]').forEach(e=>e.addEventListener("input",promoAtInfo));
 $("#bPrTest").onclick=()=>{const it=items[cur],tl=promoTimes(it),DU=+G.prDur||4,D=durOf(it);let T;
-  if(tl){T=tl.find(x=>x+DU<=D);if(T==null){$("#st").textContent="கொடுத்த நேரங்கள் வீடியோ நீளத்துக்குள் (" +D+" வினாடி) இல்லை.";return}}
-  else{const E=clamp(+G.prEvery||30,5,180);if(D<E+DU){$("#st").textContent="வீடியோ நீளம் "+E+" வினாடிக்கு மேல் இருந்தால்தான் புரோமோ வரும்; அல்லது 'புரோமோ வரும் நேரங்கள்' பெட்டியில் நேரம் கொடுங்கள்.";return}T=E}
-  G.prOn=true;$("#gPrOn").checked=true;playing=true;$("#bPlay").textContent="⏸ முன்னோட்டம்";startT=performance.now()-Math.max(0,T-.5)*1000;$("#st").textContent="புரோமோ 0.5 வினாடியில் வரும்…"};
+  if(tl){T=tl.find(x=>x+DU<=D);if(T==null){$("#st").textContent="Times outside video length (" +D+" s).";return}}
+  else{const E=clamp(+G.prEvery||30,5,180);if(D<E+DU){$("#st").textContent="Video length "+E+" s needed.";return}T=E}
+  G.prOn=true;$("#gPrOn").checked=true;playing=true;$("#bPlay").textContent="⏸ Preview";startT=performance.now()-Math.max(0,T-.5)*1000;$("#st").textContent="Promo in 0.5 s…"};
 function wmFill(){$("#gWmS").value=G.wmS||56;$("#gWmO").value=G.wmO==null?.4:G.wmO;$("#gWmX").value=G.wmX==null?100:G.wmX;$("#gWmY").value=G.wmY==null?100:G.wmY;$("#gWmC").value=G.wmC||"#ffffff"}
 [["gWmS","wmS",1],["gWmO","wmO",1],["gWmX","wmX",1],["gWmY","wmY",1],["gWmC","wmC",0]].forEach(([i,k,n])=>{$("#"+i).oninput=e=>{G[k]=n?+e.target.value:e.target.value;save()}});
-$("#bWmEdit").onclick=()=>{if(!wmSel&&!G.wm){$("#st").textContent="முதலில் Watermark எழுத்தைக் கொடுக்கவும்.";return}wmSel=!wmSel;wmBtn();if(wmSel)cv.scrollIntoView({block:"nearest",behavior:"smooth"})};
+$("#bWmEdit").onclick=()=>{if(!wmSel&&!G.wm){$("#st").textContent="Enter the watermark text first.";return}wmSel=!wmSel;wmBtn();if(wmSel)cv.scrollIntoView({block:"nearest",behavior:"smooth"})};
 function WMARK(fx,fy,fw,fh){
   WMB=null;if(!G.wm)return;const o=G.wmO==null?.4:G.wmO,px=G.wmX==null?100:G.wmX,py=G.wmY==null?100:G.wmY,s=shrink(G.wm,fw-28,G.wmS||56,800);
   ctx.save();ctx.beginPath();ctx.rect(fx,fy,fw,fh);ctx.clip();ctx.font=`800 ${s}px ${FONT}`;ctx.textAlign="left";
@@ -879,7 +906,7 @@ async function record(i){
   sel(i);rec=true;playMedia();
   let wl=null;try{wl=await navigator.wakeLock.request("screen")}catch(e){}
   try{
-    const ML=media[i]||[];let best=null;
+    const ML=MLs(i);let best=null;
     for(const mt of mimes()){for(const br of [9e6,4e6]){
       const st=cv.captureStream(30);
       ML.forEach(m=>{if(m.type==="v"){try{m.el.captureStream().getAudioTracks().forEach(t=>st.addTrack(t))}catch(e){}}});
@@ -900,7 +927,7 @@ async function record(i){
       if(blob.size>0){if(await okBlob(blob))return{blob,ext:"mp4"};if(!best)best=blob}
     }}
     if(best)return{blob:best,ext:"mp4"};
-    throw new Error(mimes().length?"MP4 பதிவு தோல்வியடைந்தது. வேறு Chrome tab-களை மூடி, மீண்டும் முயற்சிக்கவும்.":"இந்த Chrome MP4 பதிவை ஆதரிக்கவில்லை — Chrome-ஐ புதுப்பிக்கவும் (v126 அல்லது அதற்கு மேல்).")
+    throw new Error(mimes().length?"MP4 recording failed. Close other Chrome tabs and try again.":"This Chrome does not support MP4 recording — update Chrome (v126 or newer).")
   }finally{rec=false;try{wl&&wl.release()}catch(e){}}
 }
 
@@ -917,19 +944,19 @@ $("#cRst").onclick=()=>{Object.assign(getCard(items[cur]),{zoom:1,px:0,py:0});fi
 async function cardOut(type){
   const c=getCard(items[cur]);STILL=true;draw(c,4);
   const name="theekkathir-card-"+(cur+1)+"-"+(c.date||today())+(type==="image/png"?".png":".jpg");
-  const blob=await new Promise(r=>cv.toBlob(r,type,.95));if(!blob)throw new Error("படம் உருவாகவில்லை");
-  const o={blob},box=$("#cOut");box.innerHTML="";const b=document.createElement("button");b.className="alt";b.textContent="⬇ சேமி: "+name+" ("+(blob.size/1048576).toFixed(1)+" MB)";
-  b.onclick=async()=>{try{await saveOut(o,name);$("#cSt").textContent="✔ சேமிக்கப்பட்டது."}catch(e){$("#cSt").textContent="பிழை — "+errTxt(e)}};box.appendChild(b);
-  try{if(await saveOut(o,name))$("#cSt").textContent="✔ சேமிக்கப்பட்டது."}catch(e){$("#cSt").textContent="கீழே உள்ள பொத்தானை அழுத்தி சேமிக்கவும்."}
+  const blob=await new Promise(r=>cv.toBlob(r,type,.95));if(!blob)throw new Error("Image could not be created");
+  const o={blob},box=$("#cOut");box.innerHTML="";const b=document.createElement("button");b.className="alt";b.textContent="⬇ Save: "+name+" ("+(blob.size/1048576).toFixed(1)+" MB)";
+  b.onclick=async()=>{try{await saveOut(o,name);$("#cSt").textContent="✔ Saved."}catch(e){$("#cSt").textContent="Error — "+errTxt(e)}};box.appendChild(b);
+  try{if(await saveOut(o,name))$("#cSt").textContent="✔ Saved."}catch(e){$("#cSt").textContent="Save with the button below."}
 }
-$("#cJpg").onclick=()=>cardOut("image/jpeg").catch(e=>$("#cSt").textContent="பிழை — "+errTxt(e));
-$("#cPng").onclick=()=>cardOut("image/png").catch(e=>$("#cSt").textContent="பிழை — "+errTxt(e));
+$("#cJpg").onclick=()=>cardOut("image/jpeg").catch(e=>$("#cSt").textContent="Error — "+errTxt(e));
+$("#cPng").onclick=()=>cardOut("image/png").catch(e=>$("#cSt").textContent="Error — "+errTxt(e));
 
 tabs();fill();
 
 /* ---------- offline ---------- */
 if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol)){navigator.serviceWorker.register("sw.js").catch(()=>{})}
-const netInfo=()=>{const e=document.getElementById("net");if(e)e.textContent=navigator.onLine?"இணையம் உள்ளது (தேவையில்லை)":"✔ Offline முறை"};
+const netInfo=()=>{const e=document.getElementById("net");if(e)e.textContent=navigator.onLine?"Online (not required)":"✔ Offline mode"};
 addEventListener("online",netInfo);addEventListener("offline",netInfo);netInfo();
 
 /* ---------- MP4 export: frame-by-frame (same method as the book studio) ---------- */
@@ -966,7 +993,7 @@ async function syncVideos(ML,t,fps){
   const SL=G.slide||3,nM=ML.length;if(!nM)return;
   const k0=Math.floor(t/SL),si=k0%nM,st2=t%SL,nx=(si+1)%nM,tol=.5/(fps||24),jobs=[];
   ML.forEach((m,i)=>{if(m.type!=="v")return;let lt=null;
-    if(nM===1)lt=t;else if(i===si)lt=st2+(k0>0?.6:0);else if(i===nx&&st2>SL-.6)lt=st2-(SL-.6);
+    if(nM===1)lt=t+(m.off||0);else if(i===si)lt=st2+(k0>0?.6:0);else if(i===nx&&st2>SL-.6)lt=st2-(SL-.6);
     if(lt==null){if(m._pb){m.el.pause();m._pb=false}return}
     jobs.push(driveVideo(m,lt,tol))});
   await Promise.all(jobs)}
@@ -1001,13 +1028,13 @@ function sfxMk(it,c){const D=durOf(it),sr=c.sampleRate,d=sfxRender(it,D,sr),b=c.
 function sfxPreview(it){if(!G.sfxp||G.sfx===false)return;const c=acx();if(!c||c.state!=="running")return;try{const sn=sfxMk(it,c);sn.connect(c.destination);sn.start()}catch(e){}}
 function sfxStream(it){if(G.sfx===false)return null;const c=acx();if(!c)return null;try{const dst=c.createMediaStreamDestination(),sn=sfxMk(it,c);sn.connect(dst);return{tracks:dst.stream.getAudioTracks(),start:()=>{try{c.resume();sn.start()}catch(e){}}}}catch(e){return null}}
 async function buildAudio(i,D,SR){
-  const ML=media[i]||[],nM=ML.length,SL=G.slide||3,len=Math.round(D*SR);let L=null,R=null;
-  const add=(buf,s0,s1)=>{const n=buf.length;if(!n)return;if(!L){L=new Float32Array(len);R=new Float32Array(len)}
+  const ML=MLs(i),nM=ML.length,SL=G.slide||3,len=Math.round(D*SR);let L=null,R=null;
+  const add=(buf,s0,s1,j0)=>{const n=buf.length;if(!n)return;if(!L){L=new Float32Array(len);R=new Float32Array(len)}
     const c0=buf.getChannelData(0),c1=buf.numberOfChannels>1?buf.getChannelData(1):c0;
-    for(let p=Math.max(0,s0),j=0,e=Math.min(len,s1);p<e;p++){L[p]+=c0[j];R[p]+=c1[j];if(++j>=n)j=0}};
+    for(let p=Math.max(0,s0),j=(j0||0)%n,e=Math.min(len,s1);p<e;p++){L[p]+=c0[j];R[p]+=c1[j];if(++j>=n)j=0}};
   for(let idx=0;idx<nM;idx++){const m=ML[idx];if(m.type!=="v"||!m.file)continue;let buf=null;
     try{buf=await new OfflineAudioContext(2,SR,SR).decodeAudioData(await m.file.arrayBuffer())}catch(e){continue}
-    if(nM===1){add(buf,0,len);continue}
+    if(nM===1){add(buf,0,len,m.one?Math.round((m.off||0)*SR):0);continue}
     for(let k=idx;k*SL<D;k+=nM)add(buf,Math.round(Math.max(0,k*SL-(k>0?.6:0))*SR),Math.round((k+1)*SL*SR))}
   if(!L)return null;const fade=Math.round(SR*.6);
   for(let p=0;p<len;p++){const g=p>len-fade?(len-p)/fade:1;L[p]=Math.max(-1,Math.min(1,L[p]*g));R[p]=Math.max(-1,Math.min(1,R[p]*g))}
@@ -1022,19 +1049,19 @@ async function exportOne(i,idx,count){
     for(const codec of["avc1.640029","avc1.4D0029","avc1.42E029"]){if(vcfg)break;for(const hw of["prefer-hardware","no-preference"]){
       const c={codec,width:RW,height:RH,bitrate:Math.round((RW===1080?9e6:4.5e6)*Math.max(.45,Math.min(1,100/D))),framerate:fps,hardwareAcceleration:hw};
       try{if((await VideoEncoder.isConfigSupported(c)).supported){vcfg=c;break}}catch(e){}}}
-    if(!vcfg)throw new Error("இந்தச் சாதனத்தில் H.264 என்கோடர் கிடைக்கவில்லை.");
+    if(!vcfg)throw new Error("No H.264 encoder on this device.");
     let mix=null,acfg=null;
-    if("AudioEncoder"in window){xMsg("ஒலியைத் தயாரிக்கிறேன்…");mix=addSfx(await buildAudio(i,D,SR),it,D,SR);
+    if("AudioEncoder"in window){xMsg("Preparing audio…");mix=addSfx(await buildAudio(i,D,SR),it,D,SR);
       if(mix){const ac={codec:"mp4a.40.2",sampleRate:SR,numberOfChannels:2,bitrate:128000};
         try{if((await AudioEncoder.isConfigSupported(ac)).supported)acfg=ac}catch(e){}
-        if(!acfg){mix=null;note=" (இந்த உலாவியில் AAC ஒலி என்கோடர் இல்லாததால் ஒலி சேர்க்கப்படவில்லை)"}}}
+        if(!acfg){mix=null;note=" (no AAC audio encoder in this browser — audio not included)"}}}
     const mo={target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:"avc",width:RW,height:RH,frameRate:fps},fastStart:"in-memory",firstTimestampBehavior:"offset"};
     if(acfg)mo.audio={codec:"aac",numberOfChannels:2,sampleRate:SR};
     const muxer=new Mp4Muxer.Muxer(mo);let encErr=null;
     venc=new VideoEncoder({output:(c,m)=>muxer.addVideoChunk(c,m),error:e=>{encErr=e}});venc.configure(vcfg);
     if(acfg){aenc=new AudioEncoder({output:(c,m)=>muxer.addAudioChunk(c,m),error:e=>{encErr=e}});aenc.configure(acfg)}
     const ex=document.createElement("canvas");ex.width=RW;ex.height=RH;const ectx=ex.getContext("2d",{alpha:false});
-    const ML=media[i]||[];let aPos=0;const CH=4096,t0=performance.now();
+    const ML=MLs(i);let aPos=0;const CH=4096,t0=performance.now();
     ML.forEach(m=>{m._pb=false;m._lc=null;m._lmt=undefined});
     const pushAudio=()=>{const n=Math.min(CH,mix.L.length-aPos),d=new Float32Array(n*2);
       d.set(mix.L.subarray(aPos,aPos+n),0);d.set(mix.R.subarray(aPos,aPos+n),n);
@@ -1049,32 +1076,32 @@ async function exportOne(i,idx,count){
       if(venc.encodeQueueSize>8){ML.forEach(m=>{if(m.type==="v")m.el.pause()});while(venc.encodeQueueSize>8)await yieldNow()}
       if(f%10===0){const pc=(idx+f/total)/count*100,el=(performance.now()-t0)/1000,left=f>20?el/f*(total-f):0;
         $("#xProg").style.width=pc.toFixed(1)+"%";
-        xMsg((count>1?"வீடியோ "+(idx+1)+"/"+count+" · ":"")+"பிரேம் "+f+" / "+total+" ("+(f/total*100).toFixed(0)+"%)"+(left?" · மீதம் சுமார் "+(left>90?Math.ceil(left/60)+" நிமிடம்":Math.ceil(left)+" வினாடி"):""));
+        xMsg((count>1?"Video "+(idx+1)+"/"+count+" · ":"")+"Frame "+f+" / "+total+" ("+(f/total*100).toFixed(0)+"%)"+(left?" · "+(left>90?Math.ceil(left/60)+" min left":Math.ceil(left)+" s left"):""));
         await yieldNow()}}
     await venc.flush();if(aenc){while(aPos<mix.L.length)pushAudio();await aenc.flush()}
     muxer.finalize();
     return{blob:new Blob([muxer.target.buffer],{type:"video/mp4"}),ext:"mp4",note}
-  }finally{(media[i]||[]).forEach(m=>{if(m.type==="v"){try{m.el.pause()}catch(e){}m._pb=false;m.el.playbackRate=1}});try{if(venc&&venc.state!=="closed")venc.close()}catch(e){}try{if(aenc&&aenc.state!=="closed")aenc.close()}catch(e){}}
+  }finally{MLs(i).forEach(m=>{if(m.type==="v"){try{m.el.pause()}catch(e){}m._pb=false;m.el.playbackRate=1}});try{if(venc&&venc.state!=="closed")venc.close()}catch(e){}try{if(aenc&&aenc.state!=="closed")aenc.close()}catch(e){}}
 }
 function addResult(o,i,nm){
   const name=nm||"theekkathir-"+(i+1)+"-"+(items[i].date||today())+".mp4",row=document.createElement("div");
   row.style.cssText="display:grid;gap:8px;padding:10px;border:1px solid var(--line);border-radius:12px";
   const v=document.createElement("video");v.src=URL.createObjectURL(o.blob);v.controls=true;v.playsInline=true;v.style.cssText="width:min(100%,240px);border-radius:10px;background:#000";
-  const b=document.createElement("button");b.textContent="MP4 சேமி · "+name+" ("+(o.blob.size/1048576).toFixed(1)+" MB)";
-  b.onclick=async()=>{try{xMsg(await saveOut(o,name)?"✔ சேமிக்கப்பட்டது.":"சேமிப்பு ரத்து செய்யப்பட்டது.")}catch(e){xMsg("சேமிக்க முடியவில்லை — "+errTxt(e),1)}};
+  const b=document.createElement("button");b.textContent="Save MP4 · "+name+" ("+(o.blob.size/1048576).toFixed(1)+" MB)";
+  b.onclick=async()=>{try{xMsg(await saveOut(o,name)?"✔ Saved.":"Save cancelled.")}catch(e){xMsg("Could not save — "+errTxt(e),1)}};
   row.append(v,b);outList.appendChild(row)}
 async function runExport(list){
   setCard(false);
-  if(!("VideoEncoder"in window)||!window.Mp4Muxer){xMsg("இந்த உலாவியில் MP4 ஏற்றுமதி இயலாது. Chrome அல்லது Edge பயன்படுத்துங்கள்.",1);return}
+  if(!("VideoEncoder"in window)||!window.Mp4Muxer){xMsg("MP4 export is not possible in this browser. Use Chrome or Edge.",1);return}
   xCancel=false;lock(true);$("#xCancel").hidden=false;outList.innerHTML="";$("#xProg").style.width="0%";
   let wl=null;try{wl=await navigator.wakeLock.request("screen")}catch(e){}
   let done=0,note="";
   try{
     for(let k=0;k<list.length;k++){const o=await exportOne(list[k],k,list.length);addResult(o,list[k]);done++;note=o.note}
-    $("#xProg").style.width="100%";xMsg("முடிந்தது — "+done+" வீடியோ. கீழே பார்த்து “MP4 சேமி” அழுத்தவும்."+note)
+    $("#xProg").style.width="100%";xMsg("Done — "+done+" video(s). Check below and tap “Save MP4”."+note)
   }catch(e){
-    if(e&&e.message==="cancel")xMsg("ஏற்றுமதி நிறுத்தப்பட்டது"+(done?" ("+done+" வீடியோ தயார்)":"")+".");
-    else xMsg("ஏற்றுமதி தோல்வி: "+errTxt(e),1);
+    if(e&&e.message==="cancel")xMsg("Export cancelled"+(done?" ("+done+" ready)":"")+".");
+    else xMsg("Export failed: "+errTxt(e),1);
     $("#xProg").style.width="0%"
   }finally{window._exp=false;lock(false);$("#xCancel").hidden=true;try{wl&&wl.release()}catch(e){}playMedia();startT=performance.now()}
 }
@@ -1085,19 +1112,19 @@ $("#xCancel").onclick=()=>{xCancel=true};
 /* ---------- தொகுப்பு வீடியோ: பல செய்திகள் → ஒரே MP4 (≤180 வினாடி) ---------- */
 function comboFill(){$("#gCombo").checked=!!G.combo;$("#gFrom").value=G.cFrom||1;comboInfo()}
 function comboInfo(){const el=$("#cInfo");if(!el)return;const R=comboRange(),n=items.length,f=x=>Math.floor(x/60)+":"+String(Math.round(x%60)).padStart(2,"0");
-  el.textContent="இந்த வீடியோவில்: செய்தி "+(R.a+1)+(R.b>R.a?" – "+(R.b+1):"")+" · மொத்தம் "+f(R.tot)+" ("+Math.round(R.tot)+" வினாடி / 180)"+(R.b<n-1?" · மீதி செய்திகள் அடுத்த part-ல்: தொடக்க எண் "+(R.b+2)+" என்று கொடுக்கவும்.":" · எல்லா செய்திகளும் அடங்கும்.")}
+  el.textContent="In this video: news "+(R.a+1)+(R.b>R.a?" – "+(R.b+1):"")+" · total "+f(R.tot)+" ("+Math.round(R.tot)+" s / 180)"+(R.b<n-1?""+(R.b+2)+"":"")}
 $("#gCombo").onchange=e=>{G.combo=e.target.checked;save();comboInfo()};
 $("#gFrom").onchange=e=>{G.cFrom=clamp(Math.round(+e.target.value||1),1,Math.max(1,items.length));e.target.value=G.cFrom;save();comboInfo()};
-$("#bTpl").onclick=()=>{const it=items[cur];G.tpl={breaking:!!it.breaking,promo:it.promo||"",len:+it.len||30};save();xMsg("✔ இந்த அமைப்பு (நீளம் "+G.tpl.len+" வி, BREAKING "+(G.tpl.breaking?"ஆம்":"இல்லை")+") இயல்பு அமைப்பாகச் சேமிக்கப்பட்டது.")};
-$("#bTplRst").onclick=()=>{Object.assign(items[cur],tplSt());save();fill();syncAdj();xMsg("✔ இந்தச் செய்தியின் அமைப்பு இயல்புக்கு மாற்றப்பட்டது (எழுத்து மாறவில்லை).")};
+$("#bTpl").onclick=()=>{const it=items[cur];G.tpl={breaking:!!it.breaking,promo:it.promo||"",len:+it.len||30};save();xMsg("✔ Template saved (length "+G.tpl.len+" s, key bar "+(G.tpl.breaking?"yes":"none")+").")};
+$("#bTplRst").onclick=()=>{Object.assign(items[cur],tplSt());save();fill();syncAdj();xMsg("✔ Reset to default.")};
 $("#bCP").onclick=()=>{
-  if(window._cp){window._cp=false;$("#bCP").textContent="▶ தொகுப்பு முன்னோட்டம்";return}
+  if(window._cp){window._cp=false;$("#bCP").textContent="▶ Preview all";return}
   G.combo=true;$("#gCombo").checked=true;save();comboInfo();
-  window._cp=true;$("#bCP").textContent="⏹ முன்னோட்டத்தை நிறுத்து";playing=true;$("#bPlay").textContent="⏸ முன்னோட்டம்";sel(comboRange().a)};
+  window._cp=true;$("#bCP").textContent="⏹ Stop";playing=true;$("#bPlay").textContent="⏸ Preview";sel(comboRange().a)};
 setInterval(comboInfo,700);
 async function exportCombo(){
-  setCard(false);window._cp=false;$("#bCP").textContent="▶ தொகுப்பு முன்னோட்டம்";
-  if(!("VideoEncoder"in window)||!window.Mp4Muxer){xMsg("இந்த உலாவியில் MP4 ஏற்றுமதி இயலாது. Chrome அல்லது Edge பயன்படுத்துங்கள்.",1);return}
+  setCard(false);window._cp=false;window.normLens&&window.normLens();
+  if(!("VideoEncoder"in window)||!window.Mp4Muxer){xMsg("MP4 export is not possible in this browser. Use Chrome or Edge.",1);return}
   G.combo=true;$("#gCombo").checked=true;save();
   const R=comboRange(),segs=[];let D=0;
   for(let k=R.a;k<=R.b;k++){const d=durOf(items[k]);segs.push({i:k,off:D,D:d});D+=d}
@@ -1105,22 +1132,23 @@ async function exportCombo(){
   xCancel=false;lock(true);$("#xCancel").hidden=false;outList.innerHTML="";$("#xProg").style.width="0%";
   let wl=null;try{wl=await navigator.wakeLock.request("screen")}catch(e){}
   let venc=null,aenc=null,note="",ok=false;window._exp=true;
-  const stopVid=i=>(media[i]||[]).forEach(m=>{if(m.type==="v"){try{m.el.pause()}catch(e){}m._pb=false;m.el.playbackRate=1}});
+  const stopVid=i=>MLs(i).forEach(m=>{if(m.type==="v"){try{m.el.pause()}catch(e){}m._pb=false;m.el.playbackRate=1}});
   try{
     let vcfg=null;
     for(const codec of["avc1.640029","avc1.4D0029","avc1.42E029"]){if(vcfg)break;for(const hw of["prefer-hardware","no-preference"]){
       const c={codec,width:RW,height:RH,bitrate:Math.round((RW===1080?9e6:4.5e6)*Math.max(.45,Math.min(1,100/D))),framerate:fps,hardwareAcceleration:hw};
       try{if((await VideoEncoder.isConfigSupported(c)).supported){vcfg=c;break}}catch(e){}}}
-    if(!vcfg)throw new Error("இந்தச் சாதனத்தில் H.264 என்கோடர் கிடைக்கவில்லை.");
+    if(!vcfg)throw new Error("No H.264 encoder on this device.");
     let mix=null,acfg=null;
     if("AudioEncoder"in window){
-      xMsg("ஒலியைத் தயாரிக்கிறேன்…");
+      xMsg("Preparing audio…");
       const len=Math.round(D*SR),M={L:new Float32Array(len),R:new Float32Array(len)};let any=false;
-      for(const s of segs){const part=addSfx(await buildAudio(s.i,s.D,SR),items[s.i],s.D,SR);if(!part)continue;any=true;const o=Math.round(s.off*SR);
+      if(VID&&VID.file){try{const buf=await new OfflineAudioContext(2,SR,SR).decodeAudioData(await VID.file.arrayBuffer()),c0=buf.getChannelData(0),c1=buf.numberOfChannels>1?buf.getChannelData(1):c0,n=Math.min(len,buf.length);M.L.set(c0.subarray(0,n));M.R.set(c1.subarray(0,n));any=true}catch(e){}}
+      for(const s of segs){const part=VID?addSfx(null,items[s.i],s.D,SR):addSfx(await buildAudio(s.i,s.D,SR),items[s.i],s.D,SR);if(!part)continue;any=true;const o=Math.round(s.off*SR);
         for(let p=0;p<part.L.length&&o+p<len;p++){M.L[o+p]=clamp(M.L[o+p]+part.L[p],-1,1);M.R[o+p]=clamp(M.R[o+p]+part.R[p],-1,1)}}
       if(any){mix=M;const ac={codec:"mp4a.40.2",sampleRate:SR,numberOfChannels:2,bitrate:128000};
         try{if((await AudioEncoder.isConfigSupported(ac)).supported)acfg=ac}catch(e){}
-        if(!acfg){mix=null;note=" (இந்த உலாவியில் AAC ஒலி என்கோடர் இல்லாததால் ஒலி சேர்க்கப்படவில்லை)"}}}
+        if(!acfg){mix=null;note=" (no AAC audio encoder in this browser — audio not included)"}}}
     const mo={target:new Mp4Muxer.ArrayBufferTarget(),video:{codec:"avc",width:RW,height:RH,frameRate:fps},fastStart:"in-memory",firstTimestampBehavior:"offset"};
     if(acfg)mo.audio={codec:"aac",numberOfChannels:2,sampleRate:SR};
     const muxer=new Mp4Muxer.Muxer(mo);let encErr=null;
@@ -1136,25 +1164,25 @@ async function exportCombo(){
       if(xCancel)throw new Error("cancel");if(encErr)throw encErr;
       const t=f/fps;let k=segs.findIndex(s=>t<s.off+s.D);if(k<0)k=segs.length-1;
       const s=segs[k],it=items[s.i];
-      if(k!==si){if(si>=0)stopVid(segs[si].i);si=k;cur=s.i;(media[s.i]||[]).forEach(m=>{m._pb=false;m._lc=null;m._lmt=undefined})}
+      if(k!==si){if(si>=0)stopVid(segs[si].i);si=k;cur=s.i;MLs(s.i).forEach(m=>{m._pb=false;m._lc=null;m._lmt=undefined})}
       const lt=Math.min(t-s.off,s.D);
-      await syncVideos(media[s.i]||[],lt,fps);draw(it,lt);ectx.drawImage(cv,0,0,RW,RH);
+      await syncVideos(MLs(s.i),lt,fps);draw(it,lt);ectx.drawImage(cv,0,0,RW,RH);
       const fr=new VideoFrame(ex,{timestamp:Math.round(f*1e6/fps),duration:Math.round(1e6/fps)});
       venc.encode(fr,{keyFrame:f%(fps*2)===0});fr.close();
       while(aenc&&aPos<mix.L.length&&aPos/SR<=t+.3)pushAudio();
       if(venc.encodeQueueSize>8){segs.forEach(g=>stopVid(g.i));while(venc.encodeQueueSize>8)await yieldNow()}
       if(f%10===0){const pc=f/total*100,el=(performance.now()-t0)/1000,left=f>20?el/f*(total-f):0;
         $("#xProg").style.width=pc.toFixed(1)+"%";
-        xMsg("தொகுப்பு · செய்தி "+(s.i+1)+" · பிரேம் "+f+" / "+total+" ("+pc.toFixed(0)+"%)"+(left?" · மீதம் சுமார் "+(left>90?Math.ceil(left/60)+" நிமிடம்":Math.ceil(left)+" வினாடி"):""));
+        xMsg("Full video · news "+(s.i+1)+" · frame "+f+" / "+total+" ("+pc.toFixed(0)+"%)"+(left?" · "+(left>90?Math.ceil(left/60)+" min left":Math.ceil(left)+" s left"):""));
         await yieldNow()}}
     await venc.flush();if(aenc){while(aPos<mix.L.length)pushAudio();await aenc.flush()}
     muxer.finalize();
     const o={blob:new Blob([muxer.target.buffer],{type:"video/mp4"}),ext:"mp4"};
-    addResult(o,R.a,"theekkathir-top-"+(R.a+1)+"-"+(R.b+1)+"-"+(items[R.a].date||today())+".mp4");ok=true;
+    addResult(o,R.a,"news-"+items.length+"-"+(items[R.a].date||today())+".mp4");ok=true;
     $("#xProg").style.width="100%";
-    xMsg("முடிந்தது — செய்தி "+(R.a+1)+"–"+(R.b+1)+" ("+Math.round(D)+" வினாடி). கீழே பார்த்து “MP4 சேமி” அழுத்தவும்."+(R.b<items.length-1?" மீதி செய்திகளுக்கு 'தொடக்க செய்தி எண்' = "+(R.b+2)+" கொடுத்து மீண்டும் உருவாக்கவும்.":"")+note)
+    xMsg("Done — news "+(R.a+1)+"–"+(R.b+1)+" ("+Math.round(D)+" s). Check below and tap “Save MP4”."+(R.b<items.length-1?""+(R.b+2)+"":"")+note)
   }catch(e){
-    if(e&&e.message==="cancel")xMsg("ஏற்றுமதி நிறுத்தப்பட்டது.");else xMsg("ஏற்றுமதி தோல்வி: "+errTxt(e),1);
+    if(e&&e.message==="cancel")xMsg("Export cancelled.");else xMsg("Export failed: "+errTxt(e),1);
     $("#xProg").style.width="0%"
   }finally{
     segs.forEach(g=>stopVid(g.i));try{if(venc&&venc.state!=="closed")venc.close()}catch(e){}try{if(aenc&&aenc.state!=="closed")aenc.close()}catch(e){}
@@ -1188,10 +1216,9 @@ if(VIEW){
 }
 </script>
 <script>
-/* ---------- வீடியோ எடிட்டர்: நேரக்கோடு + புரோமோ புள்ளிகள் + ஒரே "முக்கிய சொல்" ---------- */
+/* ---------- Video editor: one video (≤3:00) · up to 10 news as time segments · one key word ---------- */
 (function(){
 "use strict";
-/* ===== ஒரே முக்கிய சொல்: BREAKING பட்டை + இயல்பு புரோமோ + டிக்கர் பேட்ஜ் (2 வரி) எல்லாம் ஒன்றாக மாறும் ===== */
 const labelVal=()=>G.label!=null?G.label:(G.brk||"BREAKING NEWS");
 window.labelFill=function(){const e=$("#gLabel");if(e&&document.activeElement!==e)e.value=labelVal()};
 function labelApply(v){
@@ -1202,96 +1229,109 @@ function labelApply(v){
   save()}
 $("#gLabel").oninput=e=>{if(e.target.value.trim())labelApply(e.target.value)};
 $("#gLabel").onchange=e=>{if(!e.target.value.trim())e.target.value=labelVal();else labelApply(e.target.value)};
-/* தனித்தனி மாற்றம் (மேம்பட்டது) செய்தால் முக்கிய சொல் பெட்டியும் அதைப் பிரதிபலிக்கும் */
 ["gBrk"].forEach(i=>{const e=$("#"+i);if(e)e.addEventListener("input",()=>{G.label=e.value;labelFill()})});
+const endOn=$("#gEndOn");endOn.onchange=()=>{G.endOn=endOn.checked;save()};
 
-/* ===== தரம் முன்னமைவுகள் ===== */
-const preset=(res,fps)=>{const a=$("#xRes"),b=$("#xFps");a.value=res;b.value=fps;[a,b].forEach(x=>x.dispatchEvent(new Event("change")));$("#st").textContent="✔ தரம்: "+res+" × "+(res==="1080"?1920:1280)+" · "+fps+" fps"};
+const preset=(res,fps)=>{const a=$("#xRes"),b=$("#xFps");a.value=res;b.value=fps;[a,b].forEach(x=>x.dispatchEvent(new Event("change")));$("#st").textContent="✔ Quality: "+res+" × "+(res==="1080"?1920:1280)+" · "+fps+" fps"};
 $("#qHD").onclick=()=>preset("1080","30");$("#qMid").onclick=()=>preset("1080","24");$("#qFast").onclick=()=>preset("720","20");
 
-/* ===== நேரக்கோடு ===== */
-const trk=$("#tlTrack"),head=$("#tlHead"),all=$("#tlAll"),pop=$("#tlPop"),tT=$("#tlT");
 const fmt=x=>Math.floor(x/60)+":"+String(Math.floor(x%60)).padStart(2,"0");
+const fmt1=x=>{const m=Math.floor(x/60),s=Math.round((x-m*60)*10)/10;return m+":"+(s<10?"0":"")+s.toFixed(1)};
 const r1=x=>Math.round(x*10)/10;
 const parseT=v=>{v=String(v||"").trim();const m=v.match(/^(\d+):(\d{1,2}(?:\.\d+)?)$/);if(m)return +m[1]*60+(+m[2]);const n=parseFloat(v);return isFinite(n)&&n>=0?n:null};
-const DU=()=>clamp(+G.prDur||4,2,10);
-const Dmax=it=>durOf(it)-(G.combo&&lastSeg(it)?EC:0);
-const tokens=it=>(it.promo||"").trim()?it.promo.split("|").map(x=>x.trim()):[];
-const pins=it=>{const ts=promoTimes(it)||[],tk=tokens(it);return ts.map((t,k)=>({t,w:tk.length?(tk[k%tk.length]||"@"):"@"}))};
-function defaults(it){const D=Math.max(0,durOf(it)),du=DU();
-  if(G.combo){const S0=D-du-(lastSeg(it)?EC:0);return S0>=0?[S0]:[]}
-  const E=clamp(+G.prEvery||30,5,180),o=[];for(let q=1;q*E+du<=D;q++)o.push(q*E);return o}
-function setPins(it,P){
-  P=P.slice().sort((a,b)=>a.t-b.t);const seen=new Set();
-  P=P.filter(p=>{const k=r1(p.t);if(seen.has(k))return false;seen.add(k);p.t=k;return true});
-  it.promoAt=P.map(p=>Number.isInteger(p.t)?String(p.t):p.t.toFixed(1)).join(", ");
-  if(P.length){const anyW=P.some(p=>p.w&&p.w!=="@"),hadW=tokens(it).some(w=>w&&w!=="@");
-    it.promo=(anyW||hadW)?P.map(p=>p.w||"@").join(" | "):""}
-  save();
-  const a=document.querySelector('[data-k="promoAt"]');if(a)a.value=it.promoAt;
-  const b=document.querySelector('[data-k="promo"]');if(b)b.value=it.promo||"";
-  if(typeof promoAtInfo==="function")promoAtInfo()}
-let selT=null,drag=null,sig="";
-const labelText=w=>(w&&w!=="@")?w:(G.prDef==null?"BREAKING NEWS":G.prDef);
-function signature(){const it=items[cur];
-  return [cur,G.combo?1:0,G.cFrom,G.prDur,G.prEvery,G.prDef,G.prOn,it.promoAt,it.promo,Math.round(durOf(it)*10),selT,items.map(x=>(+x.len||30)+"|"+(x.promoAt||"")+"|"+((x.script||"").length)).join(";")].join("~")}
+const minSeg=()=>Math.min(2,totalDur()/Math.max(1,items.length));
+
+/* make the lengths add up to the video length */
+window.normLens=function(){
+  const T=r1(totalDur()),n=items.length;let sum=items.reduce((a,x)=>a+segLen(x),0);
+  if(VID||sum>180){const k=T/sum;items.forEach(x=>{x.len=Math.max(.5,r1(segLen(x)*k))});}
+  sum=items.reduce((a,x)=>a+segLen(x),0);
+  if(VID||sum>180){items[n-1].len=Math.max(.5,r1(segLen(items[n-1])+(T-sum)))}
+  save()};
+function setBoundary(k,at){ /* k = index of the news that starts at `at` (k>=1) */
+  const T=totalDur(),ms=minSeg(),a=items[k-1],b=items[k],s0=segAt(k-1),e1=s0+segLen(a)+segLen(b);
+  at=r1(clamp(at,s0+ms,e1-ms));a.len=r1(at-s0);b.len=r1(e1-at);save()}
+function shiftMedia(from,d){const m={};Object.keys(media).forEach(k=>{k=+k;if(k<from)m[k]=media[k];else if(d>0||k>from)m[k+d]=media[k]});media=m;persistMedia()}
+
+/* ---- video upload ---- */
+const vInfo=$("#vidInfo");
+function info(){
+  if(!VID){vInfo.textContent="No video yet. Upload one video (max 3:00) — all your news go on its timeline.";return}
+  vInfo.textContent=(VID.name||"video")+" · "+fmt(VID.dur)+(VID.dur>180?" (only the first 3:00 is used)":"");}
+function loadVid(f,persist){
+  const v=document.createElement("video"),u=URL.createObjectURL(f);v.src=u;v.muted=true;v.playsInline=true;v.preload="auto";v.loop=false;
+  v.onloadedmetadata=()=>{
+    if(VID&&VID.url)try{URL.revokeObjectURL(VID.url)}catch(e){}
+    try{VID&&VID.el.pause()}catch(e){}
+    VID={el:v,file:f,url:u,dur:v.duration||1,name:f.name};
+    window.normLens();
+    if(persist&&window.MediaStore)MediaStore.put("tv:one",f);
+    info();sig="";
+    $("#st").textContent=v.duration>180?"⚠ Video is longer than 3:00 — only the first 3:00 is used.":"✔ Video added. Drag the gold handles to place each news.";
+    sel(cur)};
+  v.onerror=()=>{$("#st").textContent="This video could not be opened. Try an MP4 (H.264).";};}
+$("#bVidUp").onclick=()=>$("#fVid").click();
+$("#fVid").onchange=e=>{const f=e.target.files[0];e.target.value="";if(f)loadVid(f,true)};
+$("#bVidClr").onclick=()=>{if(!VID)return;try{VID.el.pause()}catch(e){}VID=null;if(window.MediaStore)MediaStore.del("tv:one");info();sig="";$("#st").textContent="Video removed."};
+if(window.MediaStore)MediaStore.get("tv:one").then(f=>{if(f)loadVid(f,false)}).catch(()=>{});
+
+/* ---- add / delete / even split ---- */
+$("#bAdd").onclick=()=>{
+  if(items.length>=10){$("#st").textContent="Maximum 10 news.";return}
+  const it=items[cur],L=segLen(it),ms=minSeg();
+  if(L<ms*2){$("#st").textContent="This news is too short to split — widen it first.";return}
+  const keep=r1(L/2);it.len=keep;
+  shiftMedia(cur+1,1);
+  items.splice(cur+1,0,{...blank(),headline:"",loc:"",script:"",ticker:"",...tplSt(),len:r1(L-keep)});
+  save();sel(cur+1)};
+$("#bDel").onclick=()=>{
+  if(items.length<2)return;
+  const L=segLen(items[cur]),to=cur>0?cur-1:1;items[to].len=r1(segLen(items[to])+L);
+  items.splice(cur,1);shiftMedia(cur,-1);save();sel(Math.min(cur,items.length-1))};
+const even=()=>{const n=items.length,T=r1(totalDur()),e=r1(T/n);items.forEach((x,i)=>{x.len=i<n-1?e:r1(T-e*(n-1))});save();sig="";fill()};
+$("#bEven").onclick=even;
+
+/* ---- start-time box ---- */
+$("#nStart").onchange=e=>{if(cur===0){e.target.value="0:00";return}const v=parseT(e.target.value);if(v==null){sig="";return}setBoundary(cur,v);sig="";sel(cur)};
+
+/* ---- timeline ---- */
+const bar=$("#tlBar"),head=$("#tlHead"),tT=$("#tlT");let sig="",drag=null;
+const signature=()=>[cur,Math.round(totalDur()*10),items.map(x=>segLen(x)).join(",")].join("~");
 function render(force){
   const sg=signature();if(!force&&sg===sig)return;sig=sg;
-  const it=items[cur],D=Math.max(1,durOf(it)),du=DU(),P=pins(it),ghost=!P.length,list=ghost?defaults(it).map(t=>({t,w:"@"})):P;
-  trk.querySelectorAll(".tl-pin").forEach(e=>e.remove());
-  list.forEach((p,k)=>{const e=document.createElement("div");
-    e.className="tl-pin"+(ghost?" ghost":"")+(!ghost&&selT!=null&&Math.abs(p.t-selT)<.05?" on":"")+(p.t+du>Dmax(it)+.01?" bad":"");
-    e.style.left=(p.t/D*100)+"%";e.style.width="max("+(du/D*100)+"%,34px)";e.dataset.k=k;e.title=fmt(p.t);
-    e.textContent=labelText(p.w)||"●";trk.insertBefore(e,head)});
-  /* எல்லாச் செய்திகளின் மேலோட்டம் */
-  const R=G.combo?comboRange():null;all.innerHTML="";
-  items.forEach((x,i)=>{const b=document.createElement("button");b.type="button";
-    b.className="tl-blk"+(i===cur?" on":"")+(R&&(i<R.a||i>R.b)?" off":"");b.style.flexGrow=Math.max(6,durOf(x));b.textContent=i+1;
-    const Dx=Math.max(1,durOf(x));(promoTimes(x)||defaults(x)).forEach(t=>{const m=document.createElement("i");m.style.left=Math.min(97,t/Dx*100)+"%";b.appendChild(m)});
-    b.onclick=()=>sel(i);all.appendChild(b)});
-  /* பாப்-அப் எடிட்டர் */
-  const k=selT==null?-1:P.findIndex(p=>Math.abs(p.t-selT)<.05);
-  if(k<0){pop.hidden=true}else{pop.hidden=false;if(document.activeElement!==$("#tpT"))$("#tpT").value=fmt1(P[k].t);if(document.activeElement!==$("#tpW")){$("#tpW").value=(P[k].w&&P[k].w!=="@")?P[k].w:"";$("#tpW").placeholder=labelText("@")}}
-}
-function fmt1(x){const m=Math.floor(x/60),s=r1(x-m*60);return m?m+":"+(s<10?"0":"")+s:String(s)}
-const timeAt=e=>{const r=trk.getBoundingClientRect(),D=Math.max(1,durOf(items[cur]));return clamp((e.clientX-r.left)/r.width,0,1)*D};
-function seek(v){window._scrub=v;playing=false;$("#bPlay").textContent="▶ முன்னோட்டம்";startT=performance.now()-v*1000;const sc=document.getElementById("pScrub");if(sc)sc.value=v}
-function playFrom(T){window._cp=false;window._scrub=null;playing=true;$("#bPlay").textContent="⏸ முன்னோட்டம்";startT=performance.now()-Math.max(0,T)*1000}
-function idx(P){return selT==null?-1:P.findIndex(p=>Math.abs(p.t-selT)<.05)}
-trk.addEventListener("pointerdown",e=>{
-  const pin=e.target.closest(".tl-pin");try{trk.setPointerCapture(e.pointerId)}catch(x){}
-  if(pin&&!pin.classList.contains("ghost")){const P=pins(items[cur]),k=+pin.dataset.k;drag={k,p:P[k],P,moved:false,x0:e.clientX,off:timeAt(e)-P[k].t}}
-  else if(pin){drag={ghost:true,k:+pin.dataset.k,x0:e.clientX}}
-  else{drag={scrub:true};seek(timeAt(e))}});
-trk.addEventListener("pointermove",e=>{if(!drag)return;
-  if(drag.scrub){seek(timeAt(e));return}
-  if(Math.abs(e.clientX-drag.x0)>4)drag.moved=true;if(!drag.moved||drag.ghost)return;
-  const it=items[cur],t=clamp(timeAt(e)-drag.off,0,Math.max(0,Dmax(it)-DU()));
-  drag.p.t=r1(t);selT=drag.p.t;setPins(it,drag.P);selT=drag.p.t;render(true)});
-const endDrag=e=>{if(!drag)return;const d=drag;drag=null;if(d.scrub)return;const it=items[cur];
-  if(d.ghost){const dl=defaults(it);if(!dl.length)return;setPins(it,dl.map(t=>({t:r1(t),w:"@"})));selT=r1(dl[d.k]);render(true);playFrom(selT-.6);return}
-  selT=d.p.t;render(true);playFrom(selT-.6)};
-trk.addEventListener("pointerup",endDrag);trk.addEventListener("pointercancel",()=>{drag=null});
-$("#tlAdd").onclick=()=>{const it=items[cur];if(Dmax(it)<DU()){$("#st").textContent="இந்தச் செய்தியின் நீளம் புரோமோவுக்குப் போதாது — நீளத்தை அதிகரிக்கவும்.";return}
-  const t=r1(clamp(window._pt||0,0,Math.max(0,Dmax(it)-DU()))),P=pins(it);P.push({t,w:"@"});setPins(it,P);selT=t;render(true);playFrom(t-.6);
-  $("#st").textContent="✔ "+fmt(t)+" நேரத்தில் புரோமோ வைக்கப்பட்டது — அது பாப்-அப் ஆவதைப் பாருங்கள்."};
+  const T=totalDur();bar.querySelectorAll(".tl-blk,.tl-h").forEach(e=>e.remove());
+  let a=0;items.forEach((x,i)=>{const L=segLen(x),b=document.createElement("div");
+    b.className="tl-blk"+(i%2?" alt":"")+(i===cur?" on":"");b.style.left=(a/T*100)+"%";b.style.width=(L/T*100)+"%";
+    b.innerHTML=(i+1)+"<span>"+fmt(a)+"</span>";bar.insertBefore(b,head);
+    if(i>0){const h=document.createElement("div");h.className="tl-h";h.style.left=(a/T*100)+"%";h.dataset.k=i;h.title="Start of news "+(i+1)+" · "+fmt1(a);bar.insertBefore(h,head)}
+    a+=L});
+  const st=segAt(cur);$("#nTime").textContent="News "+(cur+1)+" of "+items.length+" · "+fmt1(st)+" – "+fmt1(st+segLen(items[cur]))+" ("+r1(segLen(items[cur]))+" s) · total "+fmt(T);
+  const ns=$("#nStart");if(document.activeElement!==ns)ns.value=fmt1(st);ns.disabled=cur===0}
+const timeAt=e=>{const r=bar.getBoundingClientRect();return clamp((e.clientX-r.left)/r.width,0,1)*totalDur()};
+function openAt(g){let a=0;for(let i=0;i<items.length;i++){const L=segLen(items[i]);if(g<a+L||i===items.length-1){const t=clamp(g-a,0,L);if(i!==cur)sel(i);window._scrub=t;playing=false;$("#bPlay").textContent="▶ Preview";return}a+=L}}
+bar.addEventListener("pointerdown",e=>{try{bar.setPointerCapture(e.pointerId)}catch(x){}
+  const h=e.target.closest(".tl-h");if(h){drag={k:+h.dataset.k}}else{drag={scrub:true};openAt(timeAt(e))}});
+bar.addEventListener("pointermove",e=>{if(!drag)return;
+  if(drag.scrub){openAt(timeAt(e));return}
+  setBoundary(drag.k,timeAt(e));render(true)});
+const end=()=>{if(!drag)return;const d=drag;drag=null;if(!d.scrub){sel(d.k)}};
+bar.addEventListener("pointerup",end);bar.addEventListener("pointercancel",()=>{drag=null});
 $("#tlPlay").onclick=()=>$("#bPlay").click();
-$("#tpT").onchange=e=>{const it=items[cur],P=pins(it),k=idx(P);if(k<0)return;const v=parseT(e.target.value);if(v==null){render(true);return}
-  P[k].t=r1(clamp(v,0,Math.max(0,Dmax(it)-DU())));selT=P[k].t;setPins(it,P);selT=P[k].t;render(true);playFrom(selT-.6)};
-$("#tpW").oninput=e=>{const it=items[cur],P=pins(it),k=idx(P);if(k<0)return;P[k].w=e.target.value.trim()||"@";setPins(it,P);sig=""};
-$("#tpGo").onclick=()=>{if(selT!=null)playFrom(selT-.6)};
-$("#tpDel").onclick=()=>{const it=items[cur],P=pins(it),k=idx(P);if(k<0)return;P.splice(k,1);
-  if(P.length)setPins(it,P);else{it.promoAt="";save();const a=document.querySelector('[data-k="promoAt"]');if(a)a.value="";if(typeof promoAtInfo==="function")promoAtInfo()}
-  selT=null;render(true)};
-$("#tpOk").onclick=()=>{selT=null;render(true)};
-/* எடிட்டர் மேலே இருக்கும்போது செய்தி மாறினால் பாப்-அப் மூடும் */
+$("#tlSplit").onclick=()=>$("#bAdd").click();
+$("#tlMerge").onclick=()=>$("#bDel").click();
+$("#tlSnd").onclick=()=>{window._snd=!window._snd;$("#tlSnd").textContent=window._snd?"🔊":"🔇"};
+
+/* the settings form should also refresh the end-card box and the info line */
+const _fill=fill;
+fill=function(){_fill();endOn.checked=G.endOn!==false;info();sig=""};
 let lastCur=-1;
-(function loop(){const it=items[cur];if(cur!==lastCur){lastCur=cur;selT=null}
-  const D=Math.max(1,durOf(it)),t=clamp(window._pt||0,0,D);head.style.left=(t/D*100)+"%";
-  tT.textContent=fmt(t)+" / "+fmt(D)+(G.combo?"  ·  தொகுப்பு "+fmt(comboRange().tot)+" / 3:00":"");
+(function frame(){const L=segLen(items[cur]),t=clamp(window._pt||0,0,L);
+  const g=segAt(cur)+t,T=totalDur();head.style.left=(g/T*100)+"%";
+  tT.textContent=fmt(g)+" / "+fmt(T);
   $("#tlPlay").textContent=playing?"⏸":"▶";
-  render(false);requestAnimationFrame(loop)})();
-render(true);window.labelFill();
+  render(false);requestAnimationFrame(frame)})();
+window._ONE=true;
+info();render(true);window.labelFill();endOn.checked=G.endOn!==false;
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.js"></script>
