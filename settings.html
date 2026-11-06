@@ -23,7 +23,6 @@ html,body{margin:0}
 </style>
 </head>
 <body class="st-page">
-
 <header class="st-top" id="top">
   <div class="st-head">
     <a class="st-back" id="back" href="index.html">← Back</a>
@@ -38,10 +37,7 @@ html,body{margin:0}
     <button class="st-tab" role="tab" data-t="theme" type="button">🎨 Theme</button>
   </nav>
 </header>
-
 <main class="st-body">
-
-  <!-- ===== E-Paper ===== -->
   <section class="st-pane" id="p-epaper" role="tabpanel">
     <div class="st-native">
       <div class="sc">
@@ -54,22 +50,16 @@ html,body{margin:0}
           <button type="button" class="sb ghost" id="pdfDel">Remove PDF</button>
         </div>
         <p class="st-hint">PDF added here appears as the flipbook E-Paper on the home page.</p>
-        <div class="st-actions">
-          <a class="sb" id="pdfDl" href="#">⬇ Download</a>
-        </div>
+        <div class="st-actions"><a class="sb" id="pdfDl" href="#">⬇ Download</a></div>
         <label class="st-lab">Date used in file name</label>
         <input type="date" id="dlDate">
-        <div class="st-actions">
-          <button type="button" class="sb ghost" id="dlToday">Use today’s date</button>
-        </div>
+        <div class="st-actions"><button type="button" class="sb ghost" id="dlToday">Use today’s date</button></div>
         <p class="st-hint">Leave empty to use today’s date automatically. File name: Theekkathir-DD-MM-YYYY.pdf</p>
         <label class="st-lab">🔊 Page-turn sound</label>
         <label class="st-check"><input type="checkbox" id="sndChk"> Paper sound when turning pages</label>
       </div>
     </div>
   </section>
-
-  <!-- ===== Mobile TV ===== -->
   <section class="st-pane" id="p-tv" role="tabpanel">
     <div class="st-subtabs" role="tablist">
       <button type="button" data-sub="tv-edit" aria-selected="true">Edit</button>
@@ -78,8 +68,6 @@ html,body{margin:0}
     <div class="st-sub on" id="tv-edit"><iframe title="Mobile TV editor" src="news.html?mode=settings"></iframe></div>
     <div class="st-sub" id="tv-view"><iframe title="Mobile TV preview" src="news.html?mode=view"></iframe></div>
   </section>
-
-  <!-- ===== Book Shelf ===== -->
   <section class="st-pane" id="p-shelf" role="tabpanel">
     <div class="st-subtabs" role="tablist">
       <button type="button" data-sub="books" aria-selected="true">Books</button>
@@ -90,13 +78,9 @@ html,body{margin:0}
     <div class="st-sub" id="shopping"><iframe title="Shopping" src="articles.html?section=shopping"></iframe></div>
     <div class="st-sub" id="events"><iframe title="Events" src="articles.html?section=events"></iframe></div>
   </section>
-
-  <!-- ===== Share ===== -->
   <section class="st-pane" id="p-share" role="tabpanel">
     <div class="st-native"><div class="sc" id="shareRoot"></div></div>
   </section>
-
-  <!-- ===== Theme ===== -->
   <section class="st-pane" id="p-theme" role="tabpanel">
     <div class="st-native">
       <div class="sc">
@@ -106,9 +90,7 @@ html,body{margin:0}
       </div>
     </div>
   </section>
-
 </main>
-
 <script src="theme.js"></script>
 <script src="share-hub.js"></script>
 <script src="owner-gate.js"></script>
@@ -131,11 +113,6 @@ html,body{margin:0}
     $$('.st-tab').forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-t') === id ? 'true' : 'false'); });
     $$('.st-pane').forEach(function (p) { p.classList.toggle('on', p.id === 'p-' + id); });
     if (push !== false) try { history.replaceState(null, '', '#' + id); } catch (e) {}
-    var pane = document.getElementById('p-' + id);
-    if (pane) {
-      var ifr = pane.querySelector('iframe');
-      if (ifr && !ifr.getAttribute('data-loaded')) { ifr.setAttribute('data-loaded', '1'); }
-    }
   }
   $$('.st-tab').forEach(function (b) {
     b.addEventListener('click', function () { openTab(b.getAttribute('data-t')); });
@@ -185,10 +162,89 @@ html,body{margin:0}
   $('#sndChk').checked = ls.get('np_sound') !== '0';
   $('#sndChk').onchange = function (e) { ls.set('np_sound', e.target.checked ? '1' : '0'); toast('✔ Saved'); };
   if (window.AppTheme) AppTheme.mount('#themes');
-  var SECS = [['shopping', 'Shopping'], ['events', 'Events']];
-  var names = {}; try { names = JSON.parse(ls.get('np_tabs') || '{}') || {}; } catch (e) { names = {}; }
   openTab((location.hash || '').slice(1) || 'epaper', false);
   loadPdfInfo();
+})();
+</script>
+<script>
+/* Inject English UI helpers + audio + clock into Mobile TV iframe (news.html) */
+(function () {
+  function enhance(doc, win) {
+    if (!doc || !doc.body || doc.documentElement.getAttribute('data-en-ui')) return;
+    doc.documentElement.setAttribute('data-en-ui', '1');
+    var st = doc.createElement('style');
+    st.textContent = 'body{font-size:13.5px!important}button{padding:8px 10px!important;min-height:36px!important;font-size:12.5px!important}label{font-size:12px!important}.panel{padding:10px!important;gap:8px!important}#tlT{font:800 15px/1.2 system-ui,sans-serif!important;color:#FFC800!important}#vInfo{display:block!important;position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px)+10px);transform:translateX(-50%);z-index:5;background:rgba(0,0,0,.72);color:#FFC800;font:800 13px/1.2 system-ui,sans-serif;padding:5px 14px;border-radius:99px;pointer-events:none;font-variant-numeric:tabular-nums}#liveClock{font:800 14px system-ui,sans-serif;color:#D71920;font-variant-numeric:tabular-nums}';
+    doc.head.appendChild(st);
+    var play = doc.getElementById('bPlay');
+    if (play && !doc.getElementById('gAud')) {
+      var row = doc.createElement('div');
+      row.className = 'row';
+      row.style.cssText = 'align-items:center;gap:10px;flex-wrap:wrap';
+      row.innerHTML = '<label style="display:flex;flex-direction:row;align-items:center;gap:6px;flex:0 0 auto;color:inherit"><input type="checkbox" id="gAud" style="width:18px;height:18px;min-height:0" checked> Preview audio</label><span id="liveClock">0:00 / 0:30</span>';
+      play.parentElement && play.parentElement.insertAdjacentElement('afterend', row);
+    }
+    try {
+      var G = win.G || (win.G = {});
+      if (G.aud == null) G.aud = true;
+      var ga = doc.getElementById('gAud');
+      if (ga) {
+        ga.checked = !!G.aud;
+        ga.onchange = function () {
+          G.aud = !!ga.checked;
+          try { if (typeof win.save === 'function') win.save(); } catch (e) {}
+        };
+      }
+      if (!win._audHook) {
+        win._audHook = true;
+        setInterval(function () {
+          try {
+            var media = win.media, cur = win.cur, rec = win.rec, playing = win.playing, exp = win._exp;
+            if (!media || cur == null) return;
+            var ML = media[cur] || [];
+            ML.forEach(function (m) {
+              if (m.type !== 'v' || !m.el) return;
+              if (m.el._on) {
+                if (rec) m.el.muted = false;
+                else m.el.muted = !(G.aud && playing && !exp);
+              }
+            });
+          } catch (e) {}
+        }, 200);
+      }
+      setInterval(function () {
+        try {
+          var t = win._pt || 0;
+          var durOf = win.durOf, items = win.items, cur = win.cur;
+          if (!durOf || !items) return;
+          var D = Math.max(1, durOf(items[cur]));
+          var fmt = function (x) { return Math.floor(x / 60) + ':' + String(Math.floor(x % 60)).padStart(2, '0'); };
+          var clock = fmt(t) + ' / ' + fmt(D);
+          var lc = doc.getElementById('liveClock');
+          if (lc) lc.textContent = clock;
+          var vi = doc.getElementById('vInfo');
+          if (vi) vi.textContent = clock;
+        } catch (e) {}
+      }, 200);
+    } catch (e) {}
+  }
+  function hookIframe(iframe) {
+    if (!iframe || iframe.getAttribute('data-en-hook')) return;
+    iframe.setAttribute('data-en-hook', '1');
+    var tryEnhance = function () {
+      try {
+        var doc = iframe.contentDocument;
+        var win = iframe.contentWindow;
+        if (doc && doc.readyState === 'complete') enhance(doc, win);
+      } catch (e) {}
+    };
+    iframe.addEventListener('load', function () { setTimeout(tryEnhance, 400); setTimeout(tryEnhance, 1200); });
+    setTimeout(tryEnhance, 800);
+  }
+  function scan() {
+    document.querySelectorAll('iframe[src*="news.html"]').forEach(hookIframe);
+  }
+  scan();
+  setInterval(scan, 2000);
 })();
 </script>
 </body>
