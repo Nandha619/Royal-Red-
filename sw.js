@@ -1,5 +1,5 @@
 /* நெட்வொர்க் முதலில் (network-first): புதிய கோப்புகள் எப்போதும் உடனே தெரியும்; இணையம் இல்லையென்றால் மட்டும் பழைய நகல் */
-const CACHE='np-v9';
+const CACHE='np-v10';
 self.addEventListener('install',e=>{self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil((async()=>{
   for(const k of await caches.keys()){if(k!==CACHE)await caches.delete(k)}

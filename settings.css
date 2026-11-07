@@ -1,13 +1,13 @@
-/* Settings — "Dark pro-editor" look.
+/* Settings — "Light pro-editor" look.
    Shared by settings.html, news.html?mode=settings and book.html?mode=settings.
-   Fixed dark tokens (the public pages keep their own themes). Small type, small controls. */
+   Fixed light tokens (the public pages keep their own themes). Small type, small controls. */
 
 html.m-settings, .st-page {
-  --s-bg: #0e1013; --s-card: #161920; --s-card2: #1c2029; --s-line: #2a2f3b; --s-field: #10131a;
-  --s-fg: #e7e9ee; --s-mut: #8a93a3; --s-acc: #f2b33d; --s-on: #17120a; --s-gold: #f2b33d;
-  --s-danger: #ef5b5b; --s-ok: #4cc38a; --s-r: 8px;
+  --s-bg: #f3f4f7; --s-card: #ffffff; --s-card2: #f7f8fa; --s-line: #dfe3ea; --s-field: #ffffff;
+  --s-fg: #1a1d24; --s-mut: #6b7385; --s-acc: #c8161d; --s-on: #ffffff; --s-gold: #f2b33d;
+  --s-danger: #c8161d; --s-ok: #1f9d63; --s-r: 8px;
   --s-font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Tamil", "Latha", "Nirmala UI", sans-serif;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 /* ---------- page ---------- */
@@ -41,7 +41,7 @@ html.m-settings details > .panel, html.m-settings details > .body { border: 0 !i
 html.m-settings details > .subb, html.m-settings details.in > .subb { display: grid; gap: 10px; padding: 0 12px 12px; }
 html.m-settings details.in { background: var(--s-card2); border-color: var(--s-line); border-radius: var(--s-r); }
 html.m-settings details.sub.once { opacity: .8; }
-html.m-settings details[open] { border-color: #3a4152; }
+html.m-settings details[open] { border-color: #c3c9d6; }
 html.m-settings details.pn { order: 0 !important; }
 html.m-settings h2, .sc h2 { margin: 0; font: 700 14px/1.3 var(--s-font); color: var(--s-fg); display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 html.m-settings h2 small { font-weight: 400; font-size: 11px; color: var(--s-mut); }
@@ -51,6 +51,7 @@ html.m-settings .ess > h3 { margin: 0; font: 700 12px/1.2 var(--s-font); color: 
 
 /* ---------- fields ---------- */
 html.m-settings label, .sc label, .sc .lab { color: var(--s-mut); font-size: 12px; font-weight: 500; }
+html.m-settings label { align-content: start; }
 html.m-settings label.f { display: grid; gap: 4px; min-width: 0; }
 html.m-settings label:not(.btn):not(.f):not(.chk):not(.toggle) { display: grid; gap: 4px; }
 html.m-settings label.chk, html.m-settings .checks label:not(.btn):not(.f) { display: flex; gap: 8px; align-items: center; color: var(--s-fg); font-size: 13px; font-weight: 500; }
@@ -61,7 +62,7 @@ html.m-settings input:not([type=checkbox]):not([type=radio]):not([type=range]):n
   border: 1px solid var(--s-line); border-radius: var(--s-r); padding: 7px 10px; min-height: 34px; box-sizing: border-box;
 }
 html.m-settings textarea, .sc textarea { line-height: 1.45; }
-html.m-settings input::placeholder, html.m-settings textarea::placeholder, .sc input::placeholder { color: #566073; }
+html.m-settings input::placeholder, html.m-settings textarea::placeholder, .sc input::placeholder { color: #9aa3b5; }
 html.m-settings input[type=file], .sc input[type=file] { width: 100%; font: inherit; font-size: 12px; color: var(--s-mut); min-height: 0; padding: 4px 0; border: 0; background: transparent; }
 html.m-settings input[type=range], .sc input[type=range] { width: 100%; accent-color: var(--s-acc); height: 24px; }
 html.m-settings input[type=checkbox], .sc input[type=checkbox] { accent-color: var(--s-acc); }
@@ -81,10 +82,10 @@ html.m-settings button, html.m-settings .btn, .sc button, .sc .btn, .st-btn {
   border: 1px solid var(--s-line); background: var(--s-card2); color: var(--s-fg);
   display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-align: center; line-height: 1.2;
 }
-html.m-settings button:hover, html.m-settings .btn:hover, .sc button:hover { border-color: #465066; }
+html.m-settings button:hover, html.m-settings .btn:hover, .sc button:hover { border-color: #aab2c3; }
 html.m-settings button.gold, html.m-settings .btn.primary, .sc .btn.primary, .st-btn.primary { background: var(--s-acc); color: var(--s-on); border-color: var(--s-acc); }
 html.m-settings button.alt, html.m-settings .btn:not(.primary), .sc button.alt, .st-btn.alt { background: transparent; color: var(--s-fg); border-color: var(--s-line); }
-html.m-settings .btn.warn, html.m-settings button.warn, .sc button.warn, .st-btn.warn { color: var(--s-danger); background: transparent; border-color: #5a2a2e; }
+html.m-settings .btn.warn, html.m-settings button.warn, .sc button.warn, .st-btn.warn { color: var(--s-danger); background: transparent; border-color: #f0b9bc; }
 html.m-settings .btn.small { min-height: 28px; padding: 0 9px; font-size: 11px; }
 html.m-settings button:disabled, html.m-settings .btn[disabled], .sc button:disabled { opacity: .45; cursor: not-allowed; }
 html.m-settings .tabs { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
@@ -96,7 +97,7 @@ html.m-settings .bar > div { height: 100%; background: var(--s-acc); }
 /* ---------- preview (small) ---------- */
 html.m-settings .stage { position: static !important; background: var(--s-card); border: 1px solid var(--s-line); border-radius: 10px; padding: 10px; display: grid; gap: 8px; justify-items: center; }
 html.m-settings .stage canvas { width: min(100%, 220px); max-height: none; border-radius: 8px; }
-html.m-settings .phone { width: min(100%, 220px) !important; border-radius: 12px; box-shadow: 0 6px 18px rgba(0, 0, 0, .5); }
+html.m-settings .phone { width: min(100%, 220px) !important; border-radius: 12px; box-shadow: 0 6px 18px rgba(20, 30, 50, .18); }
 html.m-settings .player, html.m-settings .row2 { width: min(100%, 320px); }
 html.m-settings .exp video { width: min(100%, 220px); }
 html.m-settings .exp { order: 0 !important; }
@@ -104,7 +105,7 @@ html.m-settings #tl { width: min(100%, 420px); }
 
 /* ---------- settings.html header + tabs ---------- */
 .st-page { margin: 0; background: var(--s-bg); color: var(--s-fg); font: 400 13px/1.45 var(--s-font); }
-.st-top { position: sticky; top: 0; z-index: 20; padding-top: env(safe-area-inset-top, 0px); background: #11141a; border-bottom: 1px solid var(--s-line); color: var(--s-fg); }
+.st-top { position: sticky; top: 0; z-index: 20; padding-top: env(safe-area-inset-top, 0px); background: #ffffff; border-bottom: 1px solid var(--s-line); color: var(--s-fg); }
 .st-head { display: flex; align-items: center; gap: 8px; padding: 8px 10px 4px; }
 .st-head h1 { margin: 0; font: 700 14px/1.2 var(--s-font); flex: 1; min-width: 0; letter-spacing: .02em; }
 .st-back { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 12px; border-radius: var(--s-r); border: 1px solid var(--s-line); background: transparent; color: var(--s-fg); font: 600 12px var(--s-font); text-decoration: none; cursor: pointer; }
@@ -122,7 +123,7 @@ html.m-settings #tl { width: min(100%, 420px); }
 .st-kv { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
 .st-kv b { color: var(--s-fg); text-align: right; overflow-wrap: anywhere; font-weight: 600; }
 .st-kv span { color: var(--s-mut); }
-.st-toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); transform: translateX(-50%); z-index: 60; background: var(--s-fg); color: var(--s-bg); padding: 8px 14px; border-radius: var(--s-r); font-weight: 600; font-size: 12px; opacity: 0; pointer-events: none; transition: opacity .25s; }
+.st-toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); transform: translateX(-50%); z-index: 60; background: #1a1d24; color: #fff; padding: 8px 14px; border-radius: var(--s-r); font-weight: 600; font-size: 12px; opacity: 0; pointer-events: none; transition: opacity .25s; }
 .st-toast.on { opacity: 1; }
 .sc h2 { font-size: 14px; }
 .sc .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--s-fg); font-size: 13px; font-weight: 500; }
@@ -132,3 +133,26 @@ html.m-settings #tl { width: min(100%, 420px); }
 .st-empty { color: var(--s-mut); text-align: center; padding: 18px 8px; font-size: 12px; }
 
 html.m-settings [hidden], .sc [hidden], .st-page [hidden] { display: none !important; }
+
+html.m-settings .ess > h3 { color: var(--s-acc); }
+html.m-settings .ess { border-inline-start-color: var(--s-gold); }
+
+/* ---------- editor layouts: Mobile (default) · Computer ---------- */
+html.m-settings.ed-mobile textarea, html.m-settings.ed-mobile input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]):not([type=file]), html.m-settings.ed-mobile select { min-height: 40px; font-size: 14px; }
+html.m-settings.ed-mobile button { min-height: 38px; }
+html.m-settings.ed-mobile #tl button { min-height: 36px; }
+html.m-settings.ed-mobile #tlBar { height: 64px; }
+@media (min-width: 900px) {
+  html.m-settings.ed-desktop body { max-width: 1240px; }
+  html.m-settings.ed-desktop main { grid-template-columns: 340px minmax(0, 1fr); align-items: start; column-gap: 14px; }
+  html.m-settings.ed-desktop .stage { display: contents; }
+  html.m-settings.ed-desktop #cv { grid-column: 1; grid-row: 1 / span 6; position: sticky; top: 10px; margin: 0; width: 340px; max-width: none; border-radius: 10px; box-shadow: 0 6px 18px rgba(20, 30, 50, .18); align-self: start; }
+  html.m-settings.ed-desktop #tl { grid-column: 2; grid-row: 1; background: var(--s-card); border: 1px solid var(--s-line); border-radius: 10px; padding: 10px; width: auto; }
+  html.m-settings.ed-desktop #vInfo { grid-column: 2; }
+  html.m-settings.ed-desktop #mainPanel { grid-column: 2; grid-row: 2; }
+  html.m-settings.ed-desktop #cardPanel { grid-column: 2; grid-row: 2; }
+  html.m-settings.ed-desktop #essBox { grid-template-columns: 1fr 1fr; }
+  html.m-settings.ed-desktop #essBox > h3, html.m-settings.ed-desktop #essBox > details, html.m-settings.ed-desktop #essBox > .row { grid-column: 1 / -1; }
+  html.m-settings.ed-desktop #essBox > label { grid-column: auto; }
+  html.m-settings.ed-desktop #tlBar { height: 52px; }
+}

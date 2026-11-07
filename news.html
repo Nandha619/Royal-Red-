@@ -60,21 +60,26 @@ details.in>summary{padding:10px 12px;font-size:14px}
 details.in>.subb{padding:0 12px 12px}
 details.sub.once{opacity:.85}
 @media(prefers-reduced-motion:reduce){details.sub>summary::after{transition:none}}
-#tl{display:grid;gap:8px;padding:8px 2px 2px;color:#fff}
+#tl{display:grid;gap:8px;padding:8px 2px 2px;color:#1a1d24}
 html.m-view #tl{display:none}
-.tl-row{display:flex;gap:8px;align-items:center}
+.tl-row{display:flex;gap:6px;align-items:center}
 .tl-sp{flex:1}
 #tlT{font:700 12px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums}
 #tl button{padding:5px 10px;font-size:12px;min-height:32px}
-#tl small{color:#8a93a3;font-size:11px;line-height:1.4}
-#tlBar{position:relative;height:46px;border-radius:8px;background:#14171d;border:1px solid #2a2f3b;touch-action:none;cursor:pointer;overflow:hidden;user-select:none}
-.tl-blk{position:absolute;top:0;bottom:0;box-sizing:border-box;border-right:1px solid #0e1013;background:#232834;color:#cfd4de;display:flex;flex-direction:column;justify-content:center;align-items:center;font:700 12px/1.1 system-ui,sans-serif;overflow:hidden;pointer-events:none}
-.tl-blk.alt{background:#1c212b}
-.tl-blk.on{background:#8f2b2b;color:#fff;box-shadow:inset 0 0 0 2px #f2b33d}
+#tl small{color:#6b7385;font-size:11px;line-height:1.4}
+#tlScroll{overflow-x:auto;overflow-y:hidden;border-radius:8px;border:1px solid #dfe3ea;background:#eef0f4;scrollbar-width:thin;touch-action:pan-x}
+#tlBar{position:relative;height:56px;min-width:100%;cursor:pointer;user-select:none;-webkit-user-select:none}
+.tl-blk{position:absolute;top:0;bottom:0;box-sizing:border-box;border-right:1px solid #fff;background:#dde1e8;color:#2b3140;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:0 8px;font:700 12px/1.2 system-ui,sans-serif;overflow:hidden;pointer-events:none;white-space:nowrap}
+.tl-blk.alt{background:#e7eaf0}
+.tl-blk.on{background:#fbe3e4;color:#8f1218;box-shadow:inset 0 0 0 2px #d71920}
 .tl-blk span{font-weight:500;font-size:10px;opacity:.7}
-.tl-h{position:absolute;top:0;bottom:0;width:22px;margin-left:-11px;cursor:ew-resize;z-index:3;touch-action:none}
-.tl-h::after{content:"";position:absolute;left:9px;top:5px;bottom:5px;width:4px;border-radius:2px;background:#f2b33d}
-#tlHead{position:absolute;top:0;bottom:0;width:2px;background:#fff;pointer-events:none;z-index:4}
+.tl-blk em{font-style:normal;font-weight:500;font-size:10px;max-width:100%;overflow:hidden;text-overflow:ellipsis;opacity:.85}
+.tl-h{position:absolute;top:0;bottom:0;width:26px;margin-left:-13px;cursor:ew-resize;z-index:3;touch-action:none}
+.tl-h::after{content:"";position:absolute;left:10px;top:6px;bottom:6px;width:6px;border-radius:3px;background:#f2b33d;box-shadow:0 0 0 1px #b8842a}
+#tlHead{position:absolute;top:0;bottom:0;width:2px;background:#d71920;pointer-events:none;z-index:4}
+.seg{display:flex;gap:0;border:1px solid var(--s-line,#dfe3ea);border-radius:8px;overflow:hidden}
+.seg button{flex:1;border:0!important;border-radius:0!important;background:transparent!important}
+.seg button.on{background:var(--s-acc,#d71920)!important;color:#fff!important}
 #vInfo{display:none}
 html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);transform:translateX(-50%);z-index:5;background:rgba(0,0,0,.62);color:#fff;font:800 12px "Noto Sans Tamil",sans-serif;padding:3px 12px;border-radius:99px;pointer-events:none}
 </style>
@@ -85,13 +90,14 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
 <main>
 <div class="stage"><canvas id="cv" width="1080" height="1920"></canvas>
 <div id="tl">
-  <div class="tl-row"><button id="tlPlay" type="button" class="alt" aria-label="Play / pause">▶</button><button id="tlSnd" type="button" class="alt" aria-label="Preview sound" title="Preview sound">🔇</button><span id="tlT">0:00 / 0:00</span><span class="tl-sp"></span><button id="tlSplit" type="button" class="alt" title="Add a news (splits the current one)">＋ News</button><button id="tlMerge" type="button" class="alt" title="Delete this news (its time goes to the previous)">− News</button></div>
-  <div id="tlBar" aria-label="News timeline"><div id="tlHead"></div></div>
-  <small class="tl-lg">Each block is one news. Drag a gold handle to choose where the next news (headline · ticker · script) starts; tap a block to open it.</small>
+  <div class="tl-row"><button id="tlPlay" type="button" class="alt" aria-label="Play / pause">▶</button><button id="tlSnd" type="button" class="alt" aria-label="Preview sound" title="Preview sound">🔇</button><span id="tlT">0:00 / 0:00</span><span class="tl-sp"></span><button id="tlZo" type="button" class="alt" aria-label="Zoom out" title="Zoom out">−</button><button id="tlFit" type="button" class="alt" title="Fit whole video">Fit</button><button id="tlZi" type="button" class="alt" aria-label="Zoom in" title="Zoom in">＋</button></div>
+  <div id="tlScroll"><div id="tlBar" aria-label="News timeline"><div id="tlHead"></div></div></div>
+  <div class="tl-row"><small class="tl-lg" id="tlLg">Tap a block to edit it · drag a gold handle to move where a news starts · pinch or ＋/− to zoom</small><span class="tl-sp"></span><button id="tlSplit" type="button" class="alt" title="Add a news at the playhead (promo plays first)">＋ News</button><button id="tlMerge" type="button" class="alt" title="Delete this news (its time goes to the previous)">− News</button></div>
 </div></div>
 <div id="vInfo"></div>
 <div class="panel" id="mainPanel">
   <h2>News Studio <small>Mobile TV template</small></h2>
+  <div class="seg" id="edMode" role="group" aria-label="Editor mode"><button type="button" data-m="mobile">📱 Mobile</button><button type="button" data-m="desktop">🖥 Computer</button></div>
   <div class="row">
     <button id="bCombo" class="gold" type="button">Render MP4 · full video</button>
     <button id="bPlay" class="alt">▶ Preview</button>
@@ -101,46 +107,44 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
   <div class="bar" aria-hidden="true"><div id="xProg"></div></div>
   <div class="row"><button id="xCancel" class="gold" hidden>Cancel</button></div>
 
-  <section class="ess" id="vidBox">
-    <h3>Video</h3>
-    <div class="row"><button id="bVidUp" type="button">⬆ Upload video (max 3:00)</button><button id="bVidClr" class="alt" type="button">Remove</button></div>
-    <input type="file" id="fVid" accept="video/*" hidden>
-    <small id="vidInfo"></small>
+  <section class="ess" id="essBox">
+    <h3 id="nHead">News 1</h3>
+    <label>Title <small>line 1 black, line 2 red; *word* = red</small><textarea data-k="headline" rows="2"></textarea></label>
+    <label>Caption <small>*word* = red · after a full stop (.) the next sentences can move to the next page</small><textarea data-k="script" rows="5"></textarea></label>
+    <div class="row" style="align-items:end">
+      <label>Date<input data-k="date" placeholder="DD-MM-YYYY"></label>
+      <label style="flex:0 0 130px">Pick date<input type="date" id="dPick"></label>
+      <label>Place<input data-k="loc"></label>
+    </div>
+    <details class="in" id="moreNews">
+      <summary>Timing &amp; promo <small>this news</small></summary>
+      <div class="subb">
+        <div class="tabs" id="tabs"></div>
+        <div class="row">
+          <button class="alt" id="bAdd" type="button">＋ Add news</button>
+          <button class="alt" id="bDel" type="button">Delete</button>
+          <button class="alt" id="bEven" type="button">Even split</button>
+          <button class="alt" id="bDate" type="button">📅 Today</button>
+        </div>
+        <small id="nTime"></small>
+        <label>Starts at<input id="nStart" inputmode="decimal" placeholder="0:00" autocomplete="off"></label>
+        <label class="chk"><input type="checkbox" data-k="pro"> Play a 2.5 s promo (key word) when this news starts</label>
+        <label class="chk"><input type="checkbox" data-k="breaking"> Show the key-word bar on this news</label>
+        <label>Key word <small>BREAKING NEWS / JUST IN / ... — one place; changes the bar, promo and ticker badge everywhere</small><input id="gLabel" placeholder="BREAKING NEWS"></label>
+        <small id="pgInfo"></small>
+      </div>
+    </details>
   </section>
-
   <section class="ess" id="tkBox">
     <h3>Ticker · common for all news</h3>
     <label>Ticker text <small>separate items with |</small><input id="gTicker" placeholder="Headline one | Headline two"></label>
   </section>
 
-  <section class="ess" id="essBox">
-    <h3>News on the video</h3>
-    <div class="tabs" id="tabs"></div>
-    <div class="row">
-      <button class="alt" id="bAdd" type="button">＋ Add news</button>
-      <button class="alt" id="bDel" type="button">Delete</button>
-      <button class="alt" id="bEven" type="button">Even split</button>
-      <button class="alt" id="bDate" type="button">📅 Today</button>
-    </div>
-    <small id="nTime"></small>
-    <div class="row" style="align-items:end">
-      <label>Starts at<input id="nStart" inputmode="decimal" placeholder="0:00" autocomplete="off"></label>
-      <label>Place<input data-k="loc"></label>
-    </div>
-    <div class="row" style="align-items:end">
-      <label>Date (DD-MM-YYYY)<input data-k="date"></label>
-      <label style="flex:0 0 130px">Pick date<input type="date" id="dPick"></label>
-    </div>
-    <label>Title (headline) <small>line 1 black, line 2 red; *word* = red</small><textarea data-k="headline" rows="3"></textarea></label>
-    <label>Caption <small>*word* = red · after a full stop (.) the next sentences can move to the next page</small><textarea data-k="script" rows="5"></textarea></label><small id="pgInfo"></small>
-        <div class="row" style="align-items:center">
-      <label class="chk"><input type="checkbox" data-k="pro"> Play a promo (key word) when this news starts</label>
-    </div>
-    <small>The promo covers the video frame for a few seconds; this news's headline and script continue after it.</small>
-    <div class="row" style="align-items:center">
-      <label class="chk"><input type="checkbox" data-k="breaking"> Show the key-word bar on this news</label>
-    </div>
-    <label>Key word <small>BREAKING NEWS / JUST IN / ... — one place; changes the bar and the ticker badge everywhere</small><input id="gLabel" placeholder="BREAKING NEWS"></label>
+  <section class="ess" id="vidBox">
+    <h3>Video</h3>
+    <div class="row"><button id="bVidUp" type="button">⬆ Upload video (max 3:00)</button><button id="bVidClr" class="alt" type="button">Remove</button></div>
+    <input type="file" id="fVid" accept="video/*" hidden>
+    <small id="vidInfo"></small>
   </section>
 
   <details class="sub" id="subZoom">
@@ -272,7 +276,7 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
 </div>
 </main>
 <script>
-let SBY=1140;let GOLD="#FFC800",RED="#D71920",YEL="#FFC800",PAGE="#f3f3f3",PANEL="#ffffff",PANEL2="#f1f1f1",INK="#101010",TKB="#070707",TKT="#ffffff",YR="255,200,0";const _sh=(h,f)=>{const n=parseInt(h.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const m=f<0?0:255,p=Math.abs(f);r=Math.round(r+(m-r)*p);g=Math.round(g+(m-g)*p);b=Math.round(b+(m-b)*p);return "#"+((1<<24)|(r<<16)|(g<<8)|b).toString(16).slice(1)};const VX=20,VY=536,VW=1040,VH=600,HB=256,BRH=70,HLB=524,TKY=1814,GAP=12,TT=1180,TH=560,TW=920,W=1080,H=1920,FONT='"Noto Sans Tamil","Latha","Nirmala UI","Tamil Sangam MN",sans-serif';
+let SBY=1140;let GOLD="#FFC800",RED="#D71920",YEL="#FFC800",PAGE="#f3f3f3",PANEL="#ffffff",PANEL2="#f1f1f1",INK="#101010",TKB="#070707",TKT="#ffffff",YR="255,200,0";const _sh=(h,f)=>{const n=parseInt(h.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const m=f<0?0:255,p=Math.abs(f);r=Math.round(r+(m-r)*p);g=Math.round(g+(m-g)*p);b=Math.round(b+(m-b)*p);return "#"+((1<<24)|(r<<16)|(g<<8)|b).toString(16).slice(1)};const VX=20,VY=536,VW=1040,VH=600,HB=256,BRH=70,HLB=524,TKY=1814,GAP=12,TT=1180,TH=560,TW=940,W=1080,H=1920,FONT='"Noto Sans Tamil","Latha","Nirmala UI","Tamil Sangam MN",sans-serif';
 const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
 const $=s=>document.querySelector(s);
 const today=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return p(d.getDate())+"-"+p(d.getMonth()+1)+"-"+d.getFullYear()};
@@ -296,6 +300,11 @@ function tok(s){let g=false;return (s||"").trim().split(/\s+/).filter(Boolean).m
 function wrap(toks,maxW,font){ctx.font=font;const sp=ctx.measureText(" ").width;const L=[];let c=[],w=0;for(const k of toks){k.w=ctx.measureText(k.t).width;if(c.length&&w+sp+k.w>maxW){L.push(c);c=[];w=0}w+=(c.length?sp:0)+k.w;c.push(k)}if(c.length)L.push(c);return L}
 function fit(text,maxW,start,maxL,wt){let s=start,L;for(;s>=34;s-=4){L=wrap(tok(text),maxW,`${wt} ${s}px ${FONT}`);if(L.length<=maxL)break}return{L,s}}
 function drawLine(line,x,y,s,wt,col){ctx.font=`${wt} ${s}px ${FONT}`;const sp=ctx.measureText(" ").width;for(const k of line){ctx.fillStyle=k.g?RED:col;ctx.fillText(k.t,x,y);x+=k.w+sp}}
+/* caption line: justified to the box width (except a paragraph's last line); words rise + fade in one after another */
+function drawLineA(line,x,y,s,col,wi,lt,nW){ctx.font=`700 ${s}px ${FONT}`;const sp0=ctx.measureText(" ").width;let sp=sp0;
+  if(!line.last&&line.length>1){const tw=line.reduce((a,k)=>a+k.w,0),ex=(TW-tw)/(line.length-1);if(ex<sp0*3.2&&ex>0)sp=ex}
+  const st=STILL?0:Math.min(.1,1.3/Math.max(1,nW));let n=wi;const ga=ctx.globalAlpha;
+  for(const k of line){const q=STILL?1:ease((lt-n*st)/.28);ctx.globalAlpha=ga*q;ctx.fillStyle=k.g?RED:col;ctx.fillText(k.t,x,y+(1-q)*16);x+=k.w+sp;n++}ctx.globalAlpha=ga}
 function shrink(text,maxW,s,wt){while(s>22){ctx.font=`${wt} ${s}px ${FONT}`;if(ctx.measureText(text).width<=maxW)break;s-=2}return s}
 function glass(x,y,w,h,r,tint){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=tint||"rgba(255,255,255,.09)";ctx.fill();const g=ctx.createLinearGradient(0,y,0,y+h);g.addColorStop(0,"rgba(255,255,255,.22)");g.addColorStop(.5,"rgba(255,255,255,.03)");g.addColorStop(1,"rgba(255,255,255,.07)");ctx.fillStyle=g;ctx.fill();ctx.strokeStyle="rgba(255,255,255,.28)";ctx.lineWidth=2;ctx.stroke();ctx.restore()}
 function pin(x,y,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y-8,13,Math.PI,0);ctx.lineTo(x,y+16);ctx.closePath();ctx.fill();ctx.fillStyle="#101010";ctx.beginPath();ctx.arc(x,y-8,5,0,7);ctx.fill()}
@@ -310,20 +319,24 @@ const RG=(a,b)=>{const g=ctx.createLinearGradient(a,0,b,0);g.addColorStop(0,_sh(
 function poly(p){ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath()}
 function cal(x,y,s,c){ctx.strokeStyle=c;ctx.lineWidth=s*.08;ctx.beginPath();ctx.roundRect(x-s/2,y-s/2,s,s,s*.12);ctx.stroke();ctx.fillStyle=c;ctx.fillRect(x-s/2,y-s/2,s,s*.26);for(let i=0;i<3;i++)for(let j=0;j<3;j++)ctx.fillRect(x-s*.32+i*s*.25,y-s*.05+j*s*.2,s*.14,s*.1)}
 function logo(cx,cy,r,cl){ctx.save();if(logoImg){ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.clip();ctx.drawImage(logoImg,cx-r,cy-r,2*r,2*r)}else{let g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,YEL);g.addColorStop(1,_sh(YEL,-.25));ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.fill();for(let i=0;i<11;i++){const a=Math.PI+(i+.5)/11*Math.PI,a0=a-.07,a1=a+.07;ctx.fillStyle=i%2?RED:YEL;ctx.beginPath();ctx.moveTo(cx+Math.cos(a0)*r*.4,cy+r*.3+Math.sin(a0)*r*.4);ctx.lineTo(cx+Math.cos(a)*r*.92,cy+r*.3+Math.sin(a)*r*.92);ctx.lineTo(cx+Math.cos(a1)*r*.4,cy+r*.3+Math.sin(a1)*r*.4);ctx.fill()}ctx.fillStyle=RED;ctx.beginPath();ctx.arc(cx,cy+r*.3,r*.34,Math.PI,0);ctx.fill();ctx.fillStyle=_sh(YEL,-.35);if(cl){ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.clip();ctx.fillRect(cx-r,cy+r*.3,2*r,r);ctx.restore()}else ctx.fillRect(cx-r,cy+r*.3,2*r,r)}ctx.restore();ctx.strokeStyle=YEL;ctx.lineWidth=7;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke()}
-/* caption pages: a full stop (. ! ?) is a place where the next page may start; sentences are never split across pages unless one is longer than a page */
-function sentences(txt){const out=[];(txt||"").split("\n").forEach(par=>{par=par.trim();if(!par)return;let cur="",stars=0;for(let i=0;i<par.length;i++){const c=par[i];cur+=c;if(c==="*")stars++;if(/[.!?।]/.test(c)&&(i===par.length-1||/\s/.test(par[i+1]))&&stars%2===0){if(cur.trim())out.push(cur.trim());cur=""}}if(cur.trim())out.push(cur.trim())});return out}
+/* caption pages: a full stop (. ! ?) is where the next page may start; each page is re-flowed as one block and justified */
+function sentences(txt){const out=[];let pi=0;(txt||"").split("\n").forEach(par=>{par=par.trim();if(!par)return;let cur="",stars=0;for(let i=0;i<par.length;i++){const c=par[i];cur+=c;if(c==="*")stars++;if(/[.!?।]/.test(c)&&(i===par.length-1||/\s/.test(par[i+1]))&&stars%2===0){if(cur.trim())out.push({s:cur.trim(),p:pi});cur=""}}if(cur.trim())out.push({s:cur.trim(),p:pi});pi++});return out}
+const BOXH=()=>TKY-GAP-SBY,CAPH=()=>BOXH()-52;
+function flow(arr,f){const font=`700 ${f}px ${FONT}`,lines=[];let i=0;while(i<arr.length){let j=i,txt=[];while(j<arr.length&&arr[j].p===arr[i].p){txt.push(arr[j].s);j++}const L=wrap(tok(txt.join(" ")),TW,font);L.forEach((l,n)=>{l.last=n===L.length-1;lines.push(l)});i=j}return lines}
 function scriptPages(txt){
   const S=sentences(txt);
-  const build=f=>{const cap=Math.max(1,Math.floor(TH/(f*1.45))),font=`700 ${f}px ${FONT}`,P=[];let cur=[];
-    S.forEach(sn=>{const L=wrap(tok(sn),TW,font);
-      if(L.length>cap){if(cur.length){P.push(cur);cur=[]}for(let i=0;i<L.length;i+=cap)P.push(L.slice(i,i+cap));return}
-      if(cur.length+L.length>cap){P.push(cur);cur=[]}cur.push(...L)});
-    if(cur.length)P.push(cur);if(!P.length)P.push([]);return{P,cap}};
+  const build=f=>{const cap=Math.max(1,Math.floor(CAPH()/(f*1.4))),P=[];let cur=[];
+    const push=()=>{if(cur.length){P.push(cur);cur=[]}};
+    S.forEach(sn=>{
+      if(flow([sn],f).length>cap){push();/* very long sentence: split by words */
+        const w=sn.s.split(/\s+/);let part=[];w.forEach(x=>{if(flow([{s:part.concat(x).join(" "),p:sn.p}],f).length>cap){P.push([{s:part.join(" "),p:sn.p}]);part=[x]}else part.push(x)});if(part.length)cur=[{s:part.join(" "),p:sn.p}];return}
+      if(cur.length&&flow(cur.concat(sn),f).length>cap)push();cur.push(sn)});
+    push();if(!P.length)P.push([]);return{P,cap}};
   let sf=30,R=build(30);
-  for(let f=50;f>=30;f-=2){const r=build(f);if(r.P.length<=3){sf=f;R=r;break}}
-  const sl=[].concat(...R.P);
-  return{sf,sl,gp:sf*1.45,np:R.P.length,per:Math.max(1,R.cap),pages:R.P}}
-function scriptFull(txt){let sf=50,sl=[];for(;sf>=24;sf-=2){sl=[];(txt||"").split("\n").forEach(par=>{if(par.trim())wrap(tok(par),TW,`700 ${sf}px ${FONT}`).forEach(l=>sl.push(l))});if(sl.length*sf*1.45<=TH)break}return{sf,sl,gp:sf*1.45}}
+  for(let f=56;f>=30;f-=2){const r=build(f);if(r.P.length<=3){sf=f;R=r;break}}
+  const pages=R.P.map(pg=>flow(pg,sf));
+  return{sf,sl:[].concat(...pages),gp:sf*1.4,np:pages.length,per:Math.max(1,R.cap),pages}}
+function scriptFull(txt){let sf=50,sl=[];for(;sf>=24;sf-=2){sl=[];(txt||"").split("\n").forEach(par=>{if(par.trim()){const W=wrap(tok(par),TW,`700 ${sf}px ${FONT}`);W.forEach((l,n)=>{l.last=n===W.length-1;sl.push(l)})}});if(sl.length*sf*1.4<=CAPH())break}return{sf,sl,gp:sf*1.4}}
 const EC=3.8;
 /* ---------- ஒரே வீடியோ முறை: ஒரு வீடியோ (≤180 வி) · அதற்குள் 10 வரை செய்திகள்; ஒவ்வொன்றும் ஒரு நேரப்பகுதி (it.len) ---------- */
 let VID=null;const _om=[];
@@ -342,7 +355,7 @@ function oneSync(m,t){const el=m.el,tg=m.off+t;if(!isFinite(tg))return;
   if(run){const d=Math.abs(el.currentTime-tg);if(el.paused||d>.45){if(el.paused||d>.15){try{el.currentTime=tg}catch(e){}}el.play().catch(()=>{if(!el.muted){el.muted=true;el.play().catch(()=>{})}})}}
   else{if(!el.paused)el.pause();if(Math.abs(el.currentTime-tg)>.04){try{el.currentTime=tg}catch(e){}}}}
 /* promo at the start of a news (added with "Add news"): key word shown full-frame / band over the playing video */
-function proLen(it){return Math.max(1,Math.min(clamp(+G.prDur||4,2,10),durOf(it)-.5))}
+function proLen(it){return Math.max(1,Math.min(2.5,durOf(it)-.5))}
 function PRO1(it,t,fx,fy,fw,fh){
   if(STILL||!it.pro||G.prOn===false)return;
   const D=proLen(it);if(t<0||t>=D)return;
@@ -384,12 +397,12 @@ function draw(it,t){
   p=a(1.7,.7);SBY=VY+VH+GAP;ctx.save();ctx.globalAlpha=p;
   ctx.fillStyle=PANEL;ctx.fillRect(VX,SBY,VW,TKY-GAP-SBY);
   BOXFX(VX,SBY,VW,TKY-GAP-SBY,t);
-  SCRIPTSUB(t,SBY+8);
   const SP=STILL?scriptFull(it.script):scriptPages(it.script),sf=SP.sf,sl=SP.sl,gp=SP.gp,np=STILL?1:SP.np,per=STILL?Math.max(1,sl.length):SP.per;window._pg=STILL?1:SP.np;
   const ps0=2,pdur=6,uu=Math.max(0,t-ps0),pix=np>1?Math.floor(uu/pdur)%np:0,lt=np>1?uu%pdur:uu;
-  const pl=SP.pages?SP.pages[pix]||[]:sl.slice(pix*per,(pix+1)*per),fo=np>1?1-ease((lt-(pdur-.35))/.35):1,y0=SBY+58;
-  pl.forEach((ln,i)=>{const q=1;ctx.globalAlpha=p*fo*(np>1?ease(lt/.35):1);drawLine(ln,78+(1-q)*50,y0+i*gp+gp/2+sf*.32,sf,700,INK)});
-  ctx.globalAlpha=p;if(np>1){const pt=(pix+1)+" / "+np;ctx.font=`800 26px ${FONT}`;const pw=ctx.measureText(pt).width+36,px0=VX+VW-pw-26,py0=SBY+10;ctx.fillStyle=RG(px0,px0+pw);ctx.beginPath();ctx.roundRect(px0,py0,pw,38,10);ctx.fill();ctx.fillStyle="#101010";ctx.textAlign="left";ctx.fillText(pt,px0+18,py0+27)}if(np>1)for(let j=0;j<np;j++){ctx.fillStyle=j===pix?RED:"#bbb";ctx.beginPath();ctx.arc(1030-(np-1-j)*28,TKY-GAP-30,7,0,7);ctx.fill()}
+  const pl=SP.pages?SP.pages[pix]||[]:sl.slice(pix*per,(pix+1)*per),fo=np>1?1-ease((lt-(pdur-.35))/.35):1;
+  const BHh=TKY-GAP-SBY,y0=SBY+Math.max(14,(BHh-pl.length*gp)/2),nW=pl.reduce((a,l)=>a+l.length,0);let wi=0;
+  ctx.globalAlpha=p*fo;
+  pl.forEach((ln,i)=>{drawLineA(ln,60,y0+i*gp+gp/2+sf*.3,sf,INK,wi,STILL?9:lt,nW);wi+=ln.length});
   ctx.restore();
 
   /* ticker */
@@ -1327,38 +1340,74 @@ $("#bEven").onclick=even;
 $("#nStart").onchange=e=>{if(cur===0){e.target.value="0:00";return}const v=parseT(e.target.value);if(v==null){sig="";return}setBoundary(cur,v);sig="";sel(cur)};
 
 /* ---- timeline ---- */
-const bar=$("#tlBar"),head=$("#tlHead"),tT=$("#tlT");let sig="",drag=null;
-const signature=()=>[cur,Math.round(totalDur()*10),items.map(x=>segLen(x)+(x.pro?"p":"")).join(",")].join("~");
+const bar=$("#tlBar"),head=$("#tlHead"),tT=$("#tlT"),scr=$("#tlScroll");let sig="",drag=null,tlZ=1;
+const signature=()=>[cur,tlZ,Math.round(totalDur()*10),items.map(x=>segLen(x)+(x.pro?"p":"")+":"+(x.headline||"").slice(0,24)).join(",")].join("~");
+function setZoom(z,focusFrac){
+  const old=tlZ,vw=scr.clientWidth,center=focusFrac!=null?focusFrac:((scr.scrollLeft+vw/2)/Math.max(1,bar.offsetWidth));
+  tlZ=clamp(Math.round(z*100)/100,1,16);bar.style.width=(tlZ*100)+"%";sig="";render(true);
+  scr.scrollLeft=center*bar.offsetWidth-(focusFrac!=null?(vw/2):vw/2);
+  $("#tlLg").textContent=tlZ>1?("Zoom ×"+tlZ.toFixed(1)+" · swipe the track sideways to move"):"Tap a block to edit it · drag a gold handle to move where a news starts · pinch or ＋/− to zoom"}
 function render(force){
   const sg=signature();if(!force&&sg===sig)return;sig=sg;
   const T=totalDur();bar.querySelectorAll(".tl-blk,.tl-h").forEach(e=>e.remove());
   let a=0;items.forEach((x,i)=>{const L=segLen(x),b=document.createElement("div");
     b.className="tl-blk"+(i%2?" alt":"")+(i===cur?" on":"");b.style.left=(a/T*100)+"%";b.style.width=(L/T*100)+"%";
-    b.innerHTML=(i+1)+(x.pro?" ★":"")+"<span>"+fmt(a)+"</span>";bar.insertBefore(b,head);
+    const hl=(x.headline||"").replace(/\*/g,"").split("\n")[0];
+    b.innerHTML=(i+1)+(x.pro?" ★":"")+"<span>"+fmt(a)+"</span>"+(hl?"<em></em>":"");if(hl)b.querySelector("em").textContent=hl;bar.insertBefore(b,head);
     if(i>0){const h=document.createElement("div");h.className="tl-h";h.style.left=(a/T*100)+"%";h.dataset.k=i;h.title="Start of news "+(i+1)+" · "+fmt1(a);bar.insertBefore(h,head)}
     a+=L});
-  const st=segAt(cur);$("#nTime").textContent="News "+(cur+1)+" of "+items.length+" · "+fmt1(st)+" – "+fmt1(st+segLen(items[cur]))+" ("+r1(segLen(items[cur]))+" s) · total "+fmt(T);
+  const st=segAt(cur);$("#nHead").textContent="News "+(cur+1)+" of "+items.length;
+  $("#nTime").textContent=fmt1(st)+" – "+fmt1(st+segLen(items[cur]))+" ("+r1(segLen(items[cur]))+" s) · total "+fmt(T);
   const ns=$("#nStart");if(document.activeElement!==ns)ns.value=fmt1(st);ns.disabled=cur===0}
 const timeAt=e=>{const r=bar.getBoundingClientRect();return clamp((e.clientX-r.left)/r.width,0,1)*totalDur()};
 function openAt(g){let a=0;for(let i=0;i<items.length;i++){const L=segLen(items[i]);if(g<a+L||i===items.length-1){const t=clamp(g-a,0,L);if(i!==cur)sel(i);window._scrub=t;playing=false;$("#bPlay").textContent="▶ Preview";return}a+=L}}
-bar.addEventListener("pointerdown",e=>{try{bar.setPointerCapture(e.pointerId)}catch(x){}
-  const h=e.target.closest(".tl-h");if(h){drag={k:+h.dataset.k}}else{drag={scrub:true};openAt(timeAt(e))}});
+const isMob=()=>document.documentElement.classList.contains("ed-mobile");
+function toEditor(){if(!isMob())return;const el=$("#essBox");if(el)el.scrollIntoView({block:"start",behavior:"smooth"})}
+let tp=null;
+bar.addEventListener("pointerdown",e=>{
+  const h=e.target.closest(".tl-h");
+  if(h){try{bar.setPointerCapture(e.pointerId)}catch(x){}drag={k:+h.dataset.k};return}
+  if(e.pointerType==="mouse"){try{bar.setPointerCapture(e.pointerId)}catch(x){}drag={scrub:true};openAt(timeAt(e));return}
+  tp={x:e.clientX,y:e.clientY,t:performance.now(),e:e}});
 bar.addEventListener("pointermove",e=>{if(!drag)return;
   if(drag.scrub){openAt(timeAt(e));return}
   setBoundary(drag.k,timeAt(e));render(true)});
-const end=()=>{if(!drag)return;const d=drag;drag=null;if(!d.scrub){sel(d.k)}};
-bar.addEventListener("pointerup",end);bar.addEventListener("pointercancel",()=>{drag=null});
+const end=e=>{if(drag){const d=drag;drag=null;if(!d.scrub)sel(d.k);else toEditor();return}
+  if(tp&&e&&Math.abs(e.clientX-tp.x)<8&&Math.abs(e.clientY-tp.y)<8&&performance.now()-tp.t<600){openAt(timeAt(e));toEditor()}tp=null};
+bar.addEventListener("pointerup",end);bar.addEventListener("pointercancel",()=>{drag=null;tp=null});
+/* zoom: buttons, ctrl/⌘ + wheel, two-finger pinch */
+$("#tlZi").onclick=()=>setZoom(tlZ*1.6);$("#tlZo").onclick=()=>setZoom(tlZ/1.6);$("#tlFit").onclick=()=>{setZoom(1);scr.scrollLeft=0};
+scr.addEventListener("wheel",e=>{if(e.ctrlKey||e.metaKey||e.altKey){e.preventDefault();const r=bar.getBoundingClientRect();setZoom(tlZ*(e.deltaY<0?1.2:1/1.2),(e.clientX-r.left)/r.width)}},{passive:false});
+let pin=null;const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+scr.addEventListener("touchstart",e=>{if(e.touches.length===2){pin={d:dist(e.touches),z:tlZ};tp=null}},{passive:true});
+scr.addEventListener("touchmove",e=>{if(pin&&e.touches.length===2){e.preventDefault();const r=bar.getBoundingClientRect(),cx=(e.touches[0].clientX+e.touches[1].clientX)/2;setZoom(pin.z*dist(e.touches)/pin.d,(cx-r.left)/r.width)}},{passive:false});
+scr.addEventListener("touchend",e=>{if(e.touches.length<2)pin=null});
 $("#tlPlay").onclick=()=>$("#bPlay").click();
 $("#tlSplit").onclick=()=>$("#bAdd").click();
 $("#tlMerge").onclick=()=>$("#bDel").click();
 $("#tlSnd").onclick=()=>{window._snd=!window._snd;$("#tlSnd").textContent=window._snd?"🔊":"🔇"};
+
+/* ---- two layouts: Mobile (one column, big touch targets) · Computer (preview left, editor right, shortcuts) ---- */
+const root=document.documentElement;
+function setMode(m){m=m==="desktop"?"desktop":"mobile";root.classList.toggle("ed-desktop",m==="desktop");root.classList.toggle("ed-mobile",m==="mobile");
+  document.querySelectorAll("#edMode button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
+  try{localStorage.setItem("tk_ed_mode",m)}catch(e){}sig="";render(true)}
+document.querySelectorAll("#edMode button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+let m0=null;try{m0=localStorage.getItem("tk_ed_mode")}catch(e){}
+setMode(m0||(window.innerWidth>=900?"desktop":"mobile"));
+document.addEventListener("keydown",e=>{
+  if(!root.classList.contains("ed-desktop")||e.target.closest("input,textarea,select,[contenteditable]")||e.ctrlKey||e.metaKey)return;
+  if(e.key===" "){e.preventDefault();$("#bPlay").click()}
+  else if(e.key==="ArrowRight"||e.key==="ArrowLeft"){e.preventDefault();const d=(e.shiftKey?5:1)*(e.key==="ArrowRight"?1:-1),g=clamp(segAt(cur)+(window._scrub!=null?window._scrub:(window._pt||0))+d,0,totalDur()-.05);openAt(g)}
+  else if(e.key==="+"||e.key==="="){setZoom(tlZ*1.4)}else if(e.key==="-"){setZoom(tlZ/1.4)}else if(e.key==="0"){setZoom(1)}
+  else if(e.key==="n"||e.key==="N"){$("#bAdd").click()}});
 
 /* the settings form should also refresh the end-card box and the info line */
 const _fill=fill;
 fill=function(){_fill();endOn.checked=G.endOn!==false;if(document.activeElement!==gt)gt.value=G.ticker||"";info();sig=""};
 let lastCur=-1;
 (function frame(){const L=segLen(items[cur]),t=clamp(window._pt||0,0,L);
-  const g=segAt(cur)+t,T=totalDur();head.style.left=(g/T*100)+"%";
+  const g=segAt(cur)+t,T=totalDur();head.style.left=(g/T*100)+"%";if(tlZ>1&&playing){const hx=g/T*bar.offsetWidth;if(hx<scr.scrollLeft+20||hx>scr.scrollLeft+scr.clientWidth-40)scr.scrollLeft=hx-scr.clientWidth*.3}
   tT.textContent=fmt(g)+" / "+fmt(T);
   $("#tlPlay").textContent=playing?"⏸":"▶";
   render(false);requestAnimationFrame(frame)})();
