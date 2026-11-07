@@ -2,6 +2,11 @@
 <html lang="ta"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#d71920">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <title>NEWS STUDIO</title>
 <script>(function(){try{var V='shelf-5';if(localStorage.getItem('shelf_build')!==V){localStorage.setItem('shelf_build',V);var j=[];if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)j.push(navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}));if(window.caches)j.push(caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}));Promise.all(j).then(function(){location.reload()})}}catch(e){}})();</script>
 <style>
@@ -572,7 +577,23 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);
 </div>
 <div id="sec"></div><div id="tv"></div><div id="bk"></div><div id="lib"></div><div id="bkBar"><button type="button" id="bkBack" aria-label="அலமாரிக்குத் திரும்பு" title="அலமாரி">←</button><button type="button" id="bkAgain" aria-label="மீண்டும் இயக்கு" title="மீண்டும்">↻</button></div></div><div id="toast"></div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+/* pdf.js இனி பக்கத்தைத் தடுக்காது: பின்னணியில் ஏற்றப்படும்; PDF திறக்கும் முன் loadPdfJs() காத்திருக்கும் */
+var _pdfP=null;
+function loadPdfJs(){
+  if(window.pdfjsLib)return Promise.resolve();
+  if(_pdfP)return _pdfP;
+  _pdfP=new Promise(function(ok,no){
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload=function(){ok()};
+    s.onerror=function(){_pdfP=null;s.remove();no(new Error('pdf.js'))};
+    document.head.appendChild(s);
+  });
+  return _pdfP;
+}
+loadPdfJs().catch(function(){});
+</script>
 <script src="media-store.js"></script>
 <script src="articles-config.js"></script>
 <script src="article-store.js"></script>
@@ -724,7 +745,7 @@ function getFb(){
 async function openBuf(buf,name,page,save){
   $('#load').classList.add('on');
   try{
-    if(typeof pdfjsLib==='undefined')throw new Error('pdf.js');
+    await loadPdfJs();
     pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     pdf=await pdfjsLib.getDocument({data:new Uint8Array(buf.slice(0))}).promise;
     curBuf=buf;curName=name;$('#empty').style.display='none';
@@ -738,6 +759,7 @@ async function openBuf(buf,name,page,save){
 (async()=>{const d=await dbGet('pdf');if(d&&d.buf){const p=await dbGet('pg');openBuf(d.buf,d.name,p||0,false)}})();
 </script><script src="theme.js"></script>
 <script>AppTheme.mount&&AppTheme.get&&(function(){})();</script>
+<script>if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})});</script>
 
 
 <script>
