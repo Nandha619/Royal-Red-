@@ -30,6 +30,7 @@ html,body{margin:0}
   <div class="st-head">
     <a class="st-back" id="back" href="index.html">← Back</a>
     <h1>⚙ Settings</h1>
+    <div class="st-mode" id="edMode" role="group" aria-label="Editor layout"><button type="button" data-m="mobile" aria-pressed="false">📱 Mobile</button><button type="button" data-m="desktop" aria-pressed="false">🖥 Computer</button></div>
     <span data-owner-slot style="display:flex;align-items:center"></span>
   </div>
   <nav class="st-tabs" id="tabs" role="tablist" aria-label="Settings sections">
@@ -100,6 +101,13 @@ html,body{margin:0}
     </div>
   </section>
 
+  <!-- ===== Computer layout: live preview (right) ===== -->
+  <aside class="st-prev" id="prev" aria-label="Live preview">
+    <div class="st-phone"><iframe id="prevFrame" title="Live preview" allow="autoplay"></iframe></div>
+    <span class="cap">Live preview · front page</span>
+    <button type="button" id="prevRef">↻ Refresh preview</button>
+  </aside>
+
 </main>
 <div class="st-toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -119,7 +127,40 @@ html,body{margin:0}
     del: function (k) { try { localStorage.removeItem(k); } catch (e) {} }
   };
   var toastT = 0;
-  function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 2400); }
+  function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 2400); refreshPrev(); }
+
+  /* ---------- Mobile / Computer layout: Computer = edit settings LEFT · live preview RIGHT ---------- */
+  var edm = 'mobile', prevT = 0, prevSrc = '';
+  function pcOn() { return edm === 'desktop' && innerWidth >= 900; }
+  function frames() { return [].slice.call(document.querySelectorAll('.st-pane > iframe, .st-sub > iframe')); }
+  function setEd(m, fromChild) {
+    edm = m === 'desktop' ? 'desktop' : 'mobile'; ls.set('tk_ed_mode', edm);
+    [].forEach.call(document.querySelectorAll('#edMode button'), function (b) { b.setAttribute('aria-pressed', b.dataset.m === edm ? 'true' : 'false'); });
+    if (!fromChild) frames().forEach(function (f) { try { f.contentWindow.postMessage({ edMode: edm }, location.origin); } catch (e) {} });
+    syncPrev(true);
+  }
+  /* முன்னோட்டம் தேவைப்படும் பகுதிகள் (Mobile TV / Books தங்களுக்குள் preview வைத்துள்ளன) */
+  function prevView() {
+    if (cur === 'tv') return '';
+    if (cur === 'shelf') return sub === 'posts' ? 'books' : '';
+    return 'paper';
+  }
+  function syncPrev(force) {
+    var v = prevView(), on = pcOn() && !!v;
+    $('.st-body').classList.toggle('noprev', !on);
+    document.body.classList.toggle('pc', edm === 'desktop');
+    if (!on) return;
+    var src = 'index.html#' + v, f = $('#prevFrame');
+    if (!f.getAttribute('src') || prevSrc !== src) { prevSrc = src; f.src = src; }
+    else if (force === 'reload') { try { f.contentWindow.location.reload(); } catch (e) { f.src = src; } }
+  }
+  function refreshPrev() { clearTimeout(prevT); prevT = setTimeout(function () { if (pcOn() && prevView()) syncPrev('reload'); }, 900); }
+  $('#edMode').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) setEd(b.dataset.m); });
+  $('#prevRef').onclick = function () { syncPrev('reload'); };
+  addEventListener('message', function (e) { if (e.origin === location.origin && e.data && e.data.edModeSync && e.data.edModeSync !== edm) setEd(e.data.edModeSync, true); });
+  document.addEventListener('change', function (e) { if (e.target.closest('.st-native')) refreshPrev(); });
+  document.addEventListener('click', function (e) { if (e.target.closest('.st-native button, .st-native label.toggle')) refreshPrev(); });
+  addEventListener('resize', function () { syncPrev(); });
 
   /* ---------- தாவல்கள் ---------- */
   var TABS = ['epaper', 'tv', 'shelf', 'share', 'theme'];
@@ -155,7 +196,7 @@ html,body{margin:0}
     if (sub === 'posts' && window.ArticleAdmin) ArticleAdmin.mountAll($('#s-posts .st-native'), wantKind);
     wantKind = null;
     $('#back').href = 'index.html#' + SUBVIEW[sub];
-    fitFrames();
+    fitFrames(); syncPrev();
   }
   function openTab(id, push) {
     if (OLDSUB[id]) { wantKind = OLDSUB[id]; id = 'shelf'; sub = 'posts'; }
@@ -174,7 +215,7 @@ html,body{margin:0}
     $('#back').href = 'index.html#' + VIEW_OF[id];
     if (id === 'shelf') openSub(sub);
     try { if (push !== false) history.replaceState(null, '', '#' + (id === 'shelf' ? sub : id)); } catch (e) {}
-    fitFrames(); window.scrollTo(0, 0);
+    fitFrames(); syncPrev(); window.scrollTo(0, 0);
     if (id === 'epaper') loadPdfInfo();
     if (id === 'share' && window.ShareHub) ShareHub.mount($('#shareBox'));
   }
@@ -227,6 +268,7 @@ html,body{margin:0}
   /* ---------- பிற பகுதிகள் (முன்பு Shelf மெனுவில் இருந்தவை) ---------- */
   var SECS = [['shopping', 'Shopping'], ['events', 'Events']];
   var names = {}; try { names = JSON.parse(ls.get('np_tabs') || '{}') || {}; } catch (e) { names = {}; }
+  setEd(ls.get('tk_ed_mode') || (innerWidth >= 900 ? 'desktop' : 'mobile'));
   openTab((location.hash || '').slice(1) || 'epaper', false);
 })();
 </script>

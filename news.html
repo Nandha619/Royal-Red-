@@ -1388,14 +1388,15 @@ $("#tlSplit").onclick=()=>$("#bAdd").click();
 $("#tlMerge").onclick=()=>$("#bDel").click();
 $("#tlSnd").onclick=()=>{window._snd=!window._snd;$("#tlSnd").textContent=window._snd?"🔊":"🔇"};
 
-/* ---- two layouts: Mobile (one column, big touch targets) · Computer (preview left, editor right, shortcuts) ---- */
+/* ---- two layouts: Mobile (one column, big touch targets) · Computer (editor left, preview right, shortcuts) ---- */
 const root=document.documentElement;
 function setMode(m){m=m==="desktop"?"desktop":"mobile";root.classList.toggle("ed-desktop",m==="desktop");root.classList.toggle("ed-mobile",m==="mobile");
   document.querySelectorAll("#edMode button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
-  try{localStorage.setItem("tk_ed_mode",m)}catch(e){}sig="";render(true)}
+  try{localStorage.setItem("tk_ed_mode",m)}catch(e){}try{if(parent!==window)parent.postMessage({edModeSync:m},location.origin)}catch(e){}sig="";render(true)}
 document.querySelectorAll("#edMode button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
 let m0=null;try{m0=localStorage.getItem("tk_ed_mode")}catch(e){}
 setMode(m0||(window.innerWidth>=900?"desktop":"mobile"));
+addEventListener("message",e=>{if(e.origin===location.origin&&e.data&&e.data.edMode&&(e.data.edMode==="mobile"||e.data.edMode==="desktop")&&root.classList.contains("ed-"+e.data.edMode)===false)setMode(e.data.edMode)});
 document.addEventListener("keydown",e=>{
   if(!root.classList.contains("ed-desktop")||e.target.closest("input,textarea,select,[contenteditable]")||e.ctrlKey||e.metaKey)return;
   if(e.key===" "){e.preventDefault();$("#bPlay").click()}

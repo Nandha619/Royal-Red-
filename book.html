@@ -45,7 +45,11 @@ header.top { display: flex; flex-direction: column; gap: 4px; margin-bottom: 20p
 header.top h1 { font-family: var(--font-display); font-size: clamp(26px, 5vw, 36px); line-height: 1.2; margin: 0; font-weight: 800; text-wrap: balance; }
 header.top p { margin: 0; color: var(--muted); max-width: 62ch; }
 .shell { display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr); align-items: start; }
-@media (min-width: 900px) { .shell { grid-template-columns: minmax(0, 400px) minmax(0, 1fr); } .stage { position: sticky; top: 16px; } }
+@media (min-width: 900px) { html:not(.bk-mobile) .shell { grid-template-columns: minmax(0, 1fr) minmax(0, 400px); } html:not(.bk-mobile) .stage { order: 2; position: sticky; top: 16px; } html:not(.bk-mobile) .side { order: 1; } }
+.edm { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; align-self: flex-start; margin-top: 6px; }
+.edm button { border: 0; background: transparent; color: inherit; font: 600 13px inherit; padding: 6px 12px; cursor: pointer; }
+.edm button[aria-pressed=true] { background: var(--accent); color: #fff; }
+html.m-settings .edm { display: none; }
 .stage { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .phone { position: relative; width: min(100%, 400px); aspect-ratio: 9 / 16; margin: 0 auto; border-radius: 26px; overflow: hidden; background: #0A0D2E; box-shadow: 0 18px 44px rgba(20, 16, 80, .28); }
 .phone canvas { width: 100%; height: 100%; display: block; }
@@ -118,6 +122,7 @@ html.m-view .phone{width:min(100%,400px,calc((100vh - 76px)*9/16))!important}
   <header class="top">
     <h1>Book Video Studio</h1>
     <p>9:16 video for book intros and book-fair promos. Edit all text, images and colours, then download as MP4.</p>
+    <div class="edm" id="edMode" role="group" aria-label="Editor mode"><button type="button" data-m="mobile">📱 Mobile</button><button type="button" data-m="desktop">🖥 Computer</button></div>
   </header>
 
   <div class="shell">
@@ -1221,6 +1226,17 @@ window.onAppTheme = function (t) {
   renderThemes(); afterEdit();
 };
 /* ---------- boot ---------- */
+/* Mobile / Computer layout (Computer = edit settings left, preview right) — same key as the Mobile TV editor */
+function setEdMode(m) {
+  m = m === 'desktop' ? 'desktop' : 'mobile';
+  var h = document.documentElement; h.classList.toggle('bk-desktop', m === 'desktop'); h.classList.toggle('bk-mobile', m === 'mobile');
+  $$('#edMode button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.m === m ? 'true' : 'false'); });
+  try { localStorage.setItem('tk_ed_mode', m); } catch (e) {}
+  try { if (parent !== window) parent.postMessage({ edModeSync: m }, location.origin); } catch (e) {}
+}
+$$('#edMode button').forEach(function (b) { b.addEventListener('click', function () { setEdMode(b.dataset.m); }); });
+addEventListener('message', function (e) { if (e.origin === location.origin && e.data && (e.data.edMode === 'mobile' || e.data.edMode === 'desktop')) setEdMode(e.data.edMode); });
+(function () { var m0 = null; try { m0 = localStorage.getItem('tk_ed_mode'); } catch (e) {} setEdMode(m0 || (innerWidth >= 900 ? 'desktop' : 'mobile')); })();
 fillForm(); $('#seek').max = TOTAL; syncPlayer();
 restoreMedia();
 loadFonts();
