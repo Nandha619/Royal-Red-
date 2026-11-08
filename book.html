@@ -213,6 +213,12 @@ html.m-view .phone{width:min(100%,400px,calc((100vh - 76px)*9/16))!important}
               <label class="f"><span>Speaker name</span><input type="text" id="f-spName" data-p="spName"></label>
               <label class="f"><span>Role / intro</span><input type="text" id="f-spRole" data-p="spRole"></label>
             </div>
+            <div class="grid2">
+              <label class="f" style="flex:1 1 100%"><span>Zoom (100% – 300%) <b id="spZoomV"></b></span><input type="range" id="spZoom" data-p="spZoom" min="1" max="3" step="0.05" aria-label="Video zoom"></label>
+              <label class="f"><span>Move left ↔ right</span><input type="range" id="spX" data-p="spX" min="0" max="100" step="1" aria-label="Horizontal position"></label>
+              <label class="f"><span>Move up ↕ down</span><input type="range" id="spY" data-p="spY" min="0" max="100" step="1" aria-label="Vertical position"></label>
+            </div>
+            <button class="btn small" type="button" data-act="spreset">Reset zoom</button>
             
             <p class="hint">If the video is shorter than the chosen length it loops, and its sound loops with it.</p>
           </div>
@@ -332,7 +338,7 @@ var DEFAULT = {
   labels: { date: 'தேதி', place: 'இடம்', stall: 'அரங்கு எண்', author: 'எழுத்தாளர்', publisher: 'பதிப்பகம்', off: 'தள்ளுபடி', wa: 'வாட்ஸ்அப்', web: 'இணையம்', ig: 'இன்ஸ்டா' },
   theme: 'royal', custom: { bg1: '#1B2160', bg2: '#0A0D2E', accent: '#FFC043', text: '#FFF8E8' }, font: 'Baloo Thambi 2',
   show: { logo: true, orgName: true, festival: false, date: false, place: false, stall: false, title: true, cover: true, back: true, author: true, publisher: true, genre: true, price: true, discount: true, speakerTag: true, contact: true, qr: false, cta: true, dots: true },
-  res: '720', dur: 90, fps: 24, musicVol: 0.2, logoSize: 150,
+  res: '720', dur: 90, fps: 24, musicVol: 0.2, logoSize: 150, spZoom: 1, spX: 50, spY: 20,
   books: [
     { id: 'b1', title: 'நிலா முற்றத்து நினைவுகள்', author: 'மாலதி சேகர்', publisher: 'உங்கள் பதிப்பகம்', genre: 'சிறுகதைகள்', oldP: '250', newP: '199' },
     { id: 'b2', title: 'காலத்தின் கரையில்', author: 'அருண்மொழி', publisher: 'உங்கள் பதிப்பகம்', genre: 'நாவல்', oldP: '320', newP: '275' },
@@ -440,6 +446,23 @@ function drawCover(ctx, im, iw, ih, x, y, w, h, fx, fy) {
   if (!iw || !ih) return;
   var s = Math.max(w / iw, h / ih), sw = w / s, sh = h / s;
   ctx.drawImage(im, (iw - sw) * fx, (ih - sh) * fy, sw, sh, x, y, w, h);
+}
+function drawCoverZ(ctx, im, iw, ih, x, y, w, h, fx, fy, z) {
+  if (!iw || !ih) return;
+  var s = Math.max(w / iw, h / ih) * Math.max(1, z || 1), sw = w / s, sh = h / s;
+  ctx.drawImage(im, (iw - sw) * fx, (ih - sh) * fy, sw, sh, x, y, w, h);
+}
+/* வீடியோ சட்டம் தயாராக இல்லாத நேரத்தில் கருப்பு வராமல், கடைசியாகக் கிடைத்த நல்ல சட்டத்தையே வரைய */
+function speakerFrame(sp) {
+  var el = sp.el;
+  if (el.readyState >= 2 && el.videoWidth && el.videoHeight) {
+    var cw = Math.min(el.videoWidth, 1280), ch = Math.max(1, Math.round(el.videoHeight * cw / el.videoWidth));
+    if (!sp.snap) sp.snap = document.createElement('canvas');
+    if (sp.snap.width !== cw || sp.snap.height !== ch) { sp.snap.width = cw; sp.snap.height = ch; }
+    try { sp.snap.getContext('2d').drawImage(el, 0, 0, cw, ch); sp.has = true; } catch (e) {}
+    return { src: el, w: el.videoWidth, h: el.videoHeight };
+  }
+  return sp.has ? { src: sp.snap, w: sp.snap.width, h: sp.snap.height } : null;
 }
 function money(v) { var d = digits(v); return d ? '₹' + d : ''; }
 
@@ -581,8 +604,9 @@ function drawSpeaker(ctx, t, th, ink, a, o, R) {
   else if (fx !== 'matte') { ctx.save(); ctx.shadowColor = rgba(th.accent, 0.4); ctx.shadowBlur = 44; ctx.fillStyle = rgba(th.text, 0.1); rr(ctx, x, y, w, h, rad); ctx.fill(); ctx.restore(); }
   ctx.save(); rr(ctx, x, y, w, h, rad); ctx.clip();
   var drawn = false;
-  if (sp && sp.kind === 'image') { drawCover(ctx, sp.img, sp.img.naturalWidth, sp.img.naturalHeight, x, y, w, h, 0.5, 0.2); drawn = true; }
-  else if (sp && sp.kind === 'video' && sp.el.readyState >= 2 && sp.el.videoWidth) { drawCover(ctx, sp.el, sp.el.videoWidth, sp.el.videoHeight, x, y, w, h, 0.5, 0.2); drawn = true; }
+  var zx = (S.spX == null ? 50 : S.spX) / 100, zy = (S.spY == null ? 20 : S.spY) / 100, zz = S.spZoom || 1;
+  if (sp && sp.kind === 'image') { drawCoverZ(ctx, sp.img, sp.img.naturalWidth, sp.img.naturalHeight, x, y, w, h, zx, zy, zz); drawn = true; }
+  else if (sp && sp.kind === 'video') { var fr = speakerFrame(sp); if (fr) { drawCoverZ(ctx, fr.src, fr.w, fr.h, x, y, w, h, zx, zy, zz); drawn = true; } }
   if (!drawn) {
     ctx.fillStyle = rgba(th.text, 0.12); ctx.fillRect(x, y, w, h); ctx.fillStyle = rgba(th.text, 0.24);
     ctx.beginPath(); ctx.arc(540, y + h * 0.38, 120, 0, 7); ctx.fill(); ctx.beginPath(); ctx.ellipse(540, y + h * 0.92, 270, 230, 0, 0, 7); ctx.fill();
@@ -981,6 +1005,7 @@ function renderStatus() {
   $('#spSt').textContent = sp ? (sp.kind === 'video' ? 'Video: ' : 'Image: ') + sp.name : 'Nothing uploaded yet';
   $('#spThumb').style.backgroundImage = sp && sp.kind === 'image' ? 'url(' + sp.url + ')' : '';
   $('#musicSt').textContent = media.music ? media.music.name : 'No music';
+  var zl = $('#spZoomV'); if (zl) zl.textContent = '· ' + Math.round((state.spZoom || 1) * 100) + '%';
 }
 function afterEdit() { dirty = true; scheduleSave(); }
 
@@ -989,6 +1014,7 @@ function onField(e) {
   if (el.dataset && el.dataset.p) {
     var v = el.type === 'checkbox' ? el.checked : (el.type === 'range' ? +el.value : el.value);
     setPath(el.dataset.p, v);
+    if (el.dataset.p === 'spZoom') renderStatus();
     if (el.dataset.p === 'dur' || el.dataset.p === 'fps') { state[el.dataset.p] = +el.value; if (el.dataset.p === 'dur') applyDur(); }
     if (el.dataset.p.indexOf('custom.') === 0) { state.theme = 'custom'; renderThemes(); }
     if (el.dataset.p === 'font') loadFonts();
@@ -1025,6 +1051,7 @@ document.addEventListener('click', function (e) {
   var act = b.dataset.act, id = b.dataset.id, i;
   if (act === 'theme') { state.theme = b.dataset.v; var tt = THEMES.filter(function (x) { return x.id === b.dataset.v; })[0]; if (tt && tt.font) { state.font = tt.font; $('#fontSel').value = tt.font; loadFonts(); } renderThemes(); afterEdit(); }
   else if (act === 'rmlogo') { media.logo = null; renderStatus(); dirty = true; drop('logo', ''); }
+  else if (act === 'spreset') { state.spZoom = 1; state.spX = 50; state.spY = 20; ['spZoom', 'spX', 'spY'].forEach(function (k) { $('#' + k).value = state[k]; }); renderStatus(); afterEdit(); }
   else if (act === 'rmspeaker') { setPlaying(false); media.speaker = null; renderStatus(); dirty = true; drop('speaker', ''); }
   else if (act === 'rmmusic') { media.music = null; renderStatus(); drop('music', ''); }
   else if (act === 'addbook') { if (state.books.length < 6) { state.books.push({ id: uid(), title: 'New book title', author: '', publisher: state.org, genre: '', oldP: '', newP: '' }); renderBooks(); afterEdit(); } }
@@ -1051,11 +1078,22 @@ var mc = new MessageChannel();
 function yieldNow() { return new Promise(function (r) { mc.port1.onmessage = function () { r(); }; mc.port2.postMessage(0); }); }
 function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 function seekTo(v, time) {
+  /* சட்டம் உண்மையில் தயாராகும் வரை காத்திரு (முன்பு 0.7 வி-க்குப் பிறகு கருப்புச் சட்டத்துடன் தொடர்ந்தது) */
   return new Promise(function (res) {
-    if (Math.abs(v.currentTime - time) < 0.002 && v.readyState >= 2) { res(); return; }
-    var done = false, fin = function () { if (done) return; done = true; v.removeEventListener('seeked', fin); res(); };
-    v.addEventListener('seeked', fin); try { v.currentTime = time; } catch (e) { fin(); }
-    setTimeout(fin, 700);
+    var dur = v.duration;
+    if (dur && isFinite(dur)) time = Math.min(Math.max(0, time), Math.max(0, dur - 0.04));
+    if (Math.abs(v.currentTime - time) < 0.002 && v.readyState >= 2 && !v.seeking) { res(); return; }
+    var done = false, seeked = false, tm, poll;
+    var fin = function () {
+      if (done) return; done = true; clearTimeout(tm); clearInterval(poll);
+      v.removeEventListener('seeked', onS); v.removeEventListener('canplay', chk); v.removeEventListener('loadeddata', chk); res();
+    };
+    var chk = function () { if (seeked && v.readyState >= 2 && !v.seeking) fin(); };
+    var onS = function () { seeked = true; chk(); };
+    v.addEventListener('seeked', onS); v.addEventListener('canplay', chk); v.addEventListener('loadeddata', chk);
+    try { v.currentTime = time; } catch (e) { fin(); return; }
+    poll = setInterval(function () { if (!v.seeking) { seeked = true; chk(); } }, 40);
+    tm = setTimeout(fin, 6000);
   });
 }
 async function buildAudio(SR) {
