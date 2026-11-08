@@ -144,40 +144,43 @@ html.m-settings.ed-mobile #tl button { min-height: 36px; }
 html.m-settings.ed-mobile #tlBar { height: 64px; }
 @media (min-width: 900px) {
   html.m-settings.ed-desktop body { max-width: 1240px; }
-  html.m-settings.ed-desktop main { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; column-gap: 14px; }
+  html.m-settings.ed-desktop main { grid-template-columns: 340px minmax(0, 1fr); align-items: start; column-gap: 14px; }
   html.m-settings.ed-desktop .stage { display: contents; }
-  html.m-settings.ed-desktop #cv { grid-column: 2; grid-row: 1 / span 6; position: sticky; top: 10px; margin: 0; width: 340px; max-width: none; border-radius: 10px; box-shadow: 0 6px 18px rgba(20, 30, 50, .18); align-self: start; }
-  html.m-settings.ed-desktop #tl { grid-column: 1; grid-row: 1; background: var(--s-card); border: 1px solid var(--s-line); border-radius: 10px; padding: 10px; width: auto; }
-  html.m-settings.ed-desktop #vInfo { grid-column: 1; }
-  html.m-settings.ed-desktop #mainPanel { grid-column: 1; grid-row: 2; }
-  html.m-settings.ed-desktop #cardPanel { grid-column: 1; grid-row: 2; }
+  html.m-settings.ed-desktop #cv { grid-column: 1; grid-row: 1 / span 6; position: sticky; top: 10px; margin: 0; width: 340px; max-width: none; border-radius: 10px; box-shadow: 0 6px 18px rgba(20, 30, 50, .18); align-self: start; }
+  html.m-settings.ed-desktop #tl { grid-column: 2; grid-row: 1; background: var(--s-card); border: 1px solid var(--s-line); border-radius: 10px; padding: 10px; width: auto; }
+  html.m-settings.ed-desktop #vInfo { grid-column: 2; }
+  html.m-settings.ed-desktop #mainPanel { grid-column: 2; grid-row: 2; }
+  html.m-settings.ed-desktop #cardPanel { grid-column: 2; grid-row: 2; }
   html.m-settings.ed-desktop #essBox { grid-template-columns: 1fr 1fr; }
   html.m-settings.ed-desktop #essBox > h3, html.m-settings.ed-desktop #essBox > details, html.m-settings.ed-desktop #essBox > .row { grid-column: 1 / -1; }
   html.m-settings.ed-desktop #essBox > label { grid-column: auto; }
   html.m-settings.ed-desktop #tlBar { height: 52px; }
 }
 
-/* ---------- Computer layout for the Settings shell: edit settings LEFT · live preview RIGHT ---------- */
+/* ---------- Computer layout for the Settings shell: live preview LEFT (fixed) · edit settings RIGHT (scrolls) ---------- */
 .st-mode { display: flex; border: 1px solid var(--s-line); border-radius: 8px; overflow: hidden; flex: none; }
 .st-mode button { border: 0; border-radius: 0; background: transparent; color: var(--s-fg); font: 600 12px var(--s-font); min-height: 30px; padding: 0 10px; cursor: pointer; }
 .st-mode button[aria-pressed=true] { background: var(--s-acc); color: var(--s-on, #fff); }
 .st-prev { display: none; }
 @media (min-width: 900px) {
-  body.st-page.pc .st-body { display: grid; grid-template-columns: minmax(0, 1fr) 392px; column-gap: 16px; align-items: start; max-width: 1280px; margin: 0 auto; padding: 0 12px; }
-  body.st-page.pc .st-body > .st-pane { grid-column: 1; grid-row: 1; min-width: 0; }
+  body.st-page.pc .st-body { display: grid; grid-template-columns: 392px minmax(0, 1fr); column-gap: 16px; align-items: start; max-width: 1280px; margin: 0 auto; padding: 0 12px; }
+  body.st-page.pc .st-body > .st-pane { grid-column: 2; grid-row: 1; min-width: 0; }
   body.st-page.pc .st-body.noprev { grid-template-columns: minmax(0, 1fr); }
-  body.st-page.pc .st-body:not(.noprev) > .st-prev { display: flex; flex-direction: column; align-items: center; gap: 8px; grid-column: 2; grid-row: 1; position: sticky; top: 92px; padding: 12px 0; }
+  body.st-page.pc .st-body.noprev > .st-pane { grid-column: 1; }
+  body.st-page.pc .st-body:not(.noprev) > .st-prev { display: flex; flex-direction: column; align-items: center; gap: 8px; grid-column: 1; grid-row: 1; position: sticky; top: 92px; padding: 12px 0; }
   body.st-page.pc .st-top { }
 }
-.st-phone { width: 360px; height: 640px; border-radius: 26px; overflow: hidden; background: #000; box-shadow: 0 10px 30px rgba(20, 30, 50, .28); border: 6px solid #1b1b1b; box-sizing: content-box; }
+.st-phone { aspect-ratio: 9 / 16; height: min(640px, calc(100vh - 240px)); width: auto; border-radius: 26px; overflow: hidden; background: #000; box-shadow: 0 10px 30px rgba(20, 30, 50, .28); border: 6px solid #1b1b1b; box-sizing: content-box; }
 .st-phone iframe { width: 100%; height: 100%; border: 0; display: block; background: #000; }
 .st-prev .cap { font: 600 12px var(--s-font); color: var(--s-mut); }
 .st-prev button { min-height: 32px; padding: 0 14px; border-radius: var(--s-r, 8px); border: 1px solid var(--s-line); background: var(--s-card); color: var(--s-fg); font: 600 12px var(--s-font); cursor: pointer; }
 
-/* Book video studio (Settings → Book Shelf → Books), Computer layout: edit settings LEFT · preview RIGHT */
+/* Book video studio (Settings → Book Shelf → Books), Computer layout: preview LEFT (fixed) · edit settings RIGHT (scrolls) */
 @media (min-width: 900px) {
   html.m-settings.bk-desktop body { max-width: 1240px; }
-  html.m-settings.bk-desktop .shell { grid-template-columns: minmax(0, 1fr) 400px !important; gap: 16px !important; align-items: start !important; padding: 0 10px; }
-  html.m-settings.bk-desktop .stage { order: 2; position: sticky; top: 10px; }
-  html.m-settings.bk-desktop .side { order: 1; }
+  html.m-settings.bk-desktop .shell { grid-template-columns: 400px minmax(0, 1fr) !important; gap: 16px !important; align-items: start !important; padding: 0 10px; }
+  html.m-settings.bk-desktop .stage { order: 0; position: sticky !important; top: 10px; align-self: start; }
+  html.m-settings.bk-desktop .phone { width: min(100%, 360px, calc((100vh - 230px) * 9 / 16)) !important; border-radius: 22px; }
+  html.m-settings.bk-desktop .stage canvas { width: 100% !important; height: 100% !important; max-height: none !important; }
+  html.m-settings.bk-desktop .side { order: 1; min-width: 0; }
 }

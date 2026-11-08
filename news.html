@@ -1388,7 +1388,7 @@ $("#tlSplit").onclick=()=>$("#bAdd").click();
 $("#tlMerge").onclick=()=>$("#bDel").click();
 $("#tlSnd").onclick=()=>{window._snd=!window._snd;$("#tlSnd").textContent=window._snd?"🔊":"🔇"};
 
-/* ---- two layouts: Mobile (one column, big touch targets) · Computer (editor left, preview right, shortcuts) ---- */
+/* ---- two layouts: Mobile (one column, big touch targets) · Computer (preview left & fixed, editor right scrolls, shortcuts) ---- */
 const root=document.documentElement;
 function setMode(m){m=m==="desktop"?"desktop":"mobile";root.classList.toggle("ed-desktop",m==="desktop");root.classList.toggle("ed-mobile",m==="mobile");
   document.querySelectorAll("#edMode button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
