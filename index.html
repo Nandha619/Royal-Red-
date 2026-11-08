@@ -740,6 +740,7 @@ function hideHint(){$('#hint').classList.remove('on')}
 function getFb(){
   if(!fb)fb=new FlipBook(stage,{
     layout:()=>'single',
+    minimal:true,
     isActive:()=>view==='paper',
     toast:m=>toast(m),
     onPage:i=>{dbSet('pg',i);hideHint()}

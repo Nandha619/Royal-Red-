@@ -13,6 +13,9 @@
     '.fb-root.on{display:block}' +
     '.fb-view{position:absolute;left:0;right:0;top:0;bottom:var(--fbBar,76px);touch-action:none;overflow:hidden;cursor:grab}' +
     '.fb-view.drag{cursor:grabbing}' +
+    '.fb-min .fb-bar,.fb-min .fb-nav,.fb-min .fb-thumbs{display:none!important}' +
+    '.fb-pill{display:none;position:absolute;left:50%;bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:5;padding:5px 12px;border-radius:99px;background:rgba(0,0,0,.5);color:#fff;font:700 12px/1 inherit;font-variant-numeric:tabular-nums;pointer-events:none;opacity:.85}' +
+    '.fb-min .fb-pill{display:block}' +
     '.fb-zoom{position:absolute;left:50%;top:50%;transform-origin:50% 50%;will-change:transform}' +
     '.fb-book{position:relative;width:100%;height:100%}' +
     '.fb-pg{position:absolute;top:0;background:#f6f6f6 center/100% 100% no-repeat;overflow:hidden}' +
@@ -97,6 +100,8 @@
       '<button class="fb-btn fb-bSn" type="button" aria-label="ஒலி">' + I.snd + '</button>' +
       (opt.onDownload ? '<button class="fb-btn fb-bDl" type="button" aria-label="பதிவிறக்கு"><svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 11l4.5 4.5 4.5-4.5M5 19.5h14"/></svg></button>' : '') +
       '</div></div></div>';
+    var pill = el('div', 'fb-pill'); root.appendChild(pill);
+    if (opt.minimal) root.classList.add('fb-min');
     host.appendChild(root);
     var q$ = function (s) { return root.querySelector(s); };
     var view = q$('.fb-view'), zoomEl = q$('.fb-zoom'), book = q$('.fb-book'), pgL = q$('.fb-L'), pgR = q$('.fb-R'),
@@ -170,10 +175,10 @@
       var r = root.getBoundingClientRect(); if (!r.width || !r.height) return;
       var oldPi = pageIndex(), oldSpread = spread, oldPw = pw;
       W = r.width; H = r.height;
-      var barH = bar.offsetHeight || 76; root.style.setProperty('--fbBar', barH + 'px');
+      var barH = opt.minimal ? 0 : (bar.offsetHeight || 76); root.style.setProperty('--fbBar', barH + 'px');
       lay = opt.layout ? opt.layout() : 'auto';
       spread = lay === 'double' || (lay === 'auto' && W > H * 1.05);
-      var availW = W - 20 - (spread ? 0 : 0), availH = H - barH - 52;
+      var availW = W - (opt.minimal ? 0 : 20), availH = H - barH - (opt.minimal ? 0 : 52);
       pw = Math.max(80, Math.floor(Math.min(spread ? availW / 2 : availW, availH * aspect)));
       ph = Math.floor(pw / aspect);
       recalcMax();
@@ -321,7 +326,7 @@
       return (r <= N ? l + ' – ' + r : '' + l) + ' / ' + N;
     }
     function updateUI() {
-      pgn.textContent = labelFor();
+      pgn.textContent = labelFor(); pill.textContent = pgn.textContent;
       prog.value = pageIndex();
       bPrev.disabled = state <= 0; bNext.disabled = state >= maxState;
       var c = pageIndex();
