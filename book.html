@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>(function(){var m=new URLSearchParams(location.search).get('mode')||'';document.documentElement.classList.add('m-'+(m||'full'));if(m==='settings'){var l=document.createElement('link');l.rel='stylesheet';l.href='settings.css';document.head.appendChild(l)}})();</script><script src="media-store.js"></script></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>(function(){var m=new URLSearchParams(location.search).get('mode')||'';document.documentElement.classList.add('m-'+(m||'full'));if(m==='settings'){var l=document.createElement('link');l.rel='stylesheet';l.href='settings.css';document.head.appendChild(l)}})();</script><script src="media-store.js"></script><script src="video-lib.js"></script></head><body>
 <title>Book Video Studio</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -123,10 +123,11 @@ input[type=color] { width: 38px; height: 30px; border: 1px solid var(--line); bo
 .side{gap:10px}.panels{gap:8px!important}details.pn>summary{padding:10px 14px!important;font-size:17px!important}details.pn>.body{gap:8px!important;padding:0 14px 12px!important}.card{padding:12px!important}header.top{margin-bottom:12px!important}.shell{gap:16px!important}.checks{gap:6px 12px!important}
 /* ---- முதல் பக்கம் (காட்சி மட்டும்): ?mode=view ---- */
 html.m-view header.top,html.m-view .side,html.m-view .row2,html.m-view .hint,html.m-view .player{display:none!important}
-html.m-view body{padding:58px 0 0!important}
-html.m-view .shell{grid-template-columns:minmax(0,1fr)!important;gap:0!important}
-html.m-view .stage{position:static!important}
-html.m-view .phone{width:min(100%,400px,calc((100vh - 76px)*9/16))!important}
+html.m-view,html.m-view body{height:100%;overflow:hidden;padding:0!important;margin:0;background:#3a050d;overscroll-behavior:none}
+html.m-view .shell{display:block!important;max-width:none!important;padding:0!important;margin:0!important}
+html.m-view .stage{position:static!important;display:block}
+html.m-view .phone{position:fixed!important;inset:0;width:100%!important;height:100%!important;max-width:none!important;aspect-ratio:auto!important;margin:0!important;border-radius:0!important;box-shadow:none!important;background:#3a050d}
+html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 </style>
 
 <div class="wrap">
@@ -187,6 +188,7 @@ html.m-view .phone{width:min(100%,400px,calc((100vh - 76px)*9/16))!important}
           <div class="up">
             <button class="btn primary" id="saveBtn" type="button">Save MP4</button>
             <span class="st" id="sizeTxt"></span>
+            <span class="st" id="savedTxt" style="display:block"></span>
           </div>
         </div>
       </section>
@@ -266,7 +268,7 @@ html.m-view .phone{width:min(100%,400px,calc((100vh - 76px)*9/16))!important}
         <details class="pn" open style="order:-2">
           <summary>Theme / design</summary>
           <div class="body">
-            <span class="lab">App theme (whole app)</span><div id="appThemes"></div><span class="lab">Video theme</span><div class="themes" id="themes"></div>
+            <span class="lab">Video theme</span><div class="themes" id="themes"></div>
             <div class="colors">
               <label>Background 1 <input type="color" id="c-bg1" data-p="custom.bg1"></label>
               <label>Background 2 <input type="color" id="c-bg2" data-p="custom.bg2"></label>
@@ -1189,6 +1191,9 @@ async function buildAudio(SR) {
 function showResult(blob) {
   outBlob = blob; var url = URL.createObjectURL(blob), v = $('#outVid');
   v.src = url; $('#result').hidden = false; $('#sizeTxt').textContent = (blob.size / 1048576).toFixed(1) + ' MB · ' + TOTAL + ' s · MP4';
+  var sn = $('#savedTxt'); if (sn) sn.textContent = 'Saving to Share → My videos…';
+  var d = new Date(), nm = 'book-promo-' + TOTAL + 's-' + d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') + '-' + String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0') + '.mp4';
+  if (window.VideoLib) VideoLib.save('books', blob, nm).then(function (r) { if (sn) sn.textContent = r ? '✔ Saved in Settings → Share → My videos (download or share to WhatsApp Status there)' : '⚠ Could not store in Share (device storage is full) — use Download'; });
 }
 async function doExport() {
   if (exporting) return;
@@ -1311,5 +1316,5 @@ requestAnimationFrame(tick);
 </script>
 
 <script src="theme.js"></script>
-<script>AppTheme.mount("#appThemes")</script>
+
 </body></html>

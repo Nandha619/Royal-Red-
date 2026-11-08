@@ -86,6 +86,7 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
 </style>
 <script>(function(){var m=new URLSearchParams(location.search).get('mode')||'';document.documentElement.classList.add('m-'+(m||'full'));if(m==='settings'){var l=document.createElement('link');l.rel='stylesheet';l.href='settings.css';document.head.appendChild(l)}})();</script>
 <script src="media-store.js"></script>
+<script src="video-lib.js"></script>
 </head>
 <body>
 <main>
@@ -190,8 +191,20 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
     </div>
   </details>
   <details class="sub" id="subTheme">
-    <summary>Theme <small>whole app colours</small></summary>
-    <div class="subb"><div id="appThemes"></div></div>
+    <summary>Video theme <small>colours of the video</small></summary>
+    <div class="subb">
+      <div id="appThemes"></div>
+      <div class="row"><button class="alt" id="myColBtn" type="button" aria-pressed="false">🎨 My colours</button></div>
+      <div id="myCols" hidden style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px">
+        <label>Main colour <input type="color" id="mc-red" style="display:block;width:100%;height:40px;padding:2px;border-radius:8px;cursor:pointer"></label>
+        <label>Highlight <input type="color" id="mc-yel" style="display:block;width:100%;height:40px;padding:2px;border-radius:8px;cursor:pointer"></label>
+        <label>Page background <input type="color" id="mc-page" style="display:block;width:100%;height:40px;padding:2px;border-radius:8px;cursor:pointer"></label>
+        <label>Panel <input type="color" id="mc-panel" style="display:block;width:100%;height:40px;padding:2px;border-radius:8px;cursor:pointer"></label>
+        <label>Text <input type="color" id="mc-ink" style="display:block;width:100%;height:40px;padding:2px;border-radius:8px;cursor:pointer"></label>
+        <button class="alt" id="mcReset" type="button">Reset</button>
+      </div>
+      <small>Pick a ready theme or choose your own colours — the video and the front page use the same colours.</small>
+    </div>
   </details>
   <details class="sub" id="subBulk">
     <summary>Bulk paste news <small>occasionally</small></summary>
@@ -1130,7 +1143,9 @@ function addResult(o,i,nm){
   const v=document.createElement("video");v.src=URL.createObjectURL(o.blob);v.controls=true;v.playsInline=true;v.style.cssText="width:min(100%,240px);border-radius:10px;background:#000";
   const b=document.createElement("button");b.textContent="Save MP4 · "+name+" ("+(o.blob.size/1048576).toFixed(1)+" MB)";
   b.onclick=async()=>{try{xMsg(await saveOut(o,name)?"✔ Saved.":"Save cancelled.")}catch(e){xMsg("Could not save — "+errTxt(e),1)}};
-  row.append(v,b);outList.appendChild(row)}
+  const sv=document.createElement("small");sv.style.cssText="color:var(--mut)";sv.textContent="Saving to Share → My videos…";
+  row.append(v,b,sv);outList.appendChild(row);
+  if(window.VideoLib)VideoLib.save("tv",o.blob,name).then(r=>{sv.textContent=r?"✔ Saved in Settings → Share → My videos (download or share to WhatsApp Status there)":"⚠ Could not store in Share (device storage is full) — use Save MP4"});else sv.remove()}
 async function runExport(list){
   setCard(false);
   if(!("VideoEncoder"in window)||!window.Mp4Muxer){xMsg("MP4 export is not possible in this browser. Use Chrome or Edge.",1);return}
@@ -1420,7 +1435,34 @@ info();render(true);window.labelFill();endOn.checked=G.endOn!==false;
 <script defer src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.3/build/mp4-muxer.js"></script>
 <script src="theme.js"></script>
 <script>
-AppTheme.mount("#appThemes");
+/* ---- My colours: உங்கள் சொந்த நிறங்கள் (preset தேர்வு செய்தால் அணைந்துவிடும்) ---- */
+(function(){
+  var K="tk_tv_mycols",A="tk_tv_mycols_on",D={red:"#D71920",yel:"#FFC800",page:"#F3F3F3",panel:"#FFFFFF",ink:"#101010"};
+  var lsg=function(k){try{return localStorage.getItem(k)}catch(e){return null}},lss=function(k,v){try{localStorage.setItem(k,v)}catch(e){}};
+  var ld=function(){try{return Object.assign({},D,JSON.parse(lsg(K)||"{}"))}catch(e){return Object.assign({},D)}};
+  var on=function(){return lsg(A)==="1"};
+  var rgb=h=>{h=String(h).replace("#","");const n=parseInt(h,16);return[n>>16&255,n>>8&255,n&255]};
+  var hex=a=>"#"+a.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,"0")).join("");
+  var mix=(a,b,t)=>{const x=rgb(a),y=rgb(b);return hex(x.map((v,i)=>v+(y[i]-v)*t))};
+  var cv=c=>({red:c.red,yel:c.yel,page:c.page,panel:c.panel,panel2:mix(c.panel,c.page,.5),ink:c.ink,tkb:mix(c.red,"#000000",.82)});
+  var orig=window.onAppTheme;
+  window.onAppTheme=function(t){
+    if(on()){orig({cv:cv(ld())});try{sig="";render(true)}catch(e){}return}
+    orig(t);
+  };
+  var btn=document.getElementById("myColBtn"),pan=document.getElementById("myCols");
+  var ids={red:"mc-red",yel:"mc-yel",page:"mc-page",panel:"mc-panel",ink:"mc-ink"};
+  function show(){var o=on();btn.setAttribute("aria-pressed",o?"true":"false");btn.style.outline=o?"2px solid var(--gold)":"";pan.hidden=!o;pan.style.display=o?"grid":"none";
+    var c=ld();for(var k in ids)document.getElementById(ids[k]).value=c[k]}
+  function refresh(){try{var id=AppTheme.get(),T=AppTheme.themes;for(var i=0;i<T.length;i++)if(T[i].id===id){window.onAppTheme(T[i]);break}}catch(e){}}
+  btn.onclick=function(){lss(A,on()?"0":"1");show();refresh()};
+  for(var k in ids)(function(k){document.getElementById(ids[k]).oninput=function(e){var c=ld();c[k]=e.target.value;lss(K,JSON.stringify(c));lss(A,"1");show();refresh()}})(k);
+  document.getElementById("mcReset").onclick=function(){lss(K,JSON.stringify(D));refresh();show()};
+  /* preset தேர்வு → My colours அணையும் (capture: theme.js கைப்பிடிக்கு முன்) */
+  var box=document.getElementById("appThemes");
+  box.addEventListener("click",function(e){if(e.target.closest(".at-sw")&&on()){lss(A,"0");show()}},true);
+  AppTheme.mount("#appThemes");show();
+})();
 /* force canvas colors from current theme right after mount */
 (function(){try{var id=AppTheme.get();var T=AppTheme.themes;for(var i=0;i<T.length;i++)if(T[i].id===id){window.onAppTheme(T[i]);break}}catch(e){}})();
 </script>

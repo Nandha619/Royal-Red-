@@ -20,6 +20,13 @@ html,body{margin:0}
 .st-subtabs button{flex:none;min-height:30px;padding:0 12px;border-radius:var(--s-r);border:1px solid var(--s-line);background:transparent;color:var(--s-fg);font:600 12px system-ui,sans-serif;cursor:pointer}
 .st-subtabs button[aria-selected=true]{background:var(--s-acc);color:var(--s-on);border-color:var(--s-acc)}
 .st-sub{display:none}.st-sub.on{display:block}
+.st-sec{margin:8px 10px 0;border:1px solid var(--s-line);border-radius:var(--s-r);background:var(--s-card)}
+.st-sec>summary{cursor:pointer;padding:10px 12px;font:700 14px system-ui,sans-serif;color:var(--s-fg);list-style:none}
+.st-sec>summary::-webkit-details-marker{display:none}
+.st-sec>summary::after{content:'▾';float:right;color:var(--s-mut)}
+.st-sec[open]>summary::after{content:'▴'}
+.st-sec>summary b{color:var(--s-acc);font-size:12px}
+.st-sec>.st-native{padding:0 4px 8px}
 .st-sub > iframe{display:block;width:100%;border:0;background:var(--s-bg)}
 @media (prefers-reduced-motion:reduce){.st-pane > .st-native{animation:none}}
 </style>
@@ -80,14 +87,15 @@ html,body{margin:0}
 
   <!-- ===== Book Shelf: Books · Articles · Shopping · Events (ஒரே வடிவமைப்பில் துணைத் தாவல்கள்) ===== -->
   <section class="st-pane" id="p-shelf" role="tabpanel">
-    <nav class="st-subtabs" id="subtabs" role="tablist" aria-label="Book Shelf sections"></nav>
+    <nav class="st-subtabs" id="subtabs" role="tablist" aria-label="Book Shelf sections" hidden></nav>
     <div class="st-sub" id="s-books"></div>
-    <div class="st-sub" id="s-posts"><div class="st-native"></div></div>
   </section>
 
   <!-- ===== பகிர்: ஒரே இடத்தில் எழுதி இணையதளம் + Meta + WhatsApp ===== -->
   <section class="st-pane" id="p-share" role="tabpanel">
-    <div class="st-native" id="shareBox"></div>
+    <details class="st-sec" id="secVid" open><summary>🎞 My videos <b id="vidN"></b></summary><div class="st-native" id="vidBox"></div></details>
+    <details class="st-sec" id="secApr"><summary>📥 Admin approval <b id="aprN"></b></summary><div class="st-native" id="aprBox"></div></details>
+    <details class="st-sec" id="secPost" open><summary>📣 Post to website &amp; social</summary><div class="st-native" id="shareBox"></div></details>
   </section>
 
   <!-- ===== தோற்றம் ===== -->
@@ -116,6 +124,8 @@ html,body{margin:0}
 <script src="articles-config.js"></script>
 <script src="article-store.js"></script>
 <script src="articles-admin.js"></script>
+<script src="media-store.js"></script>
+<script src="video-lib.js"></script>
 <script src="share-hub.js"></script>
 <script>
 (function () {
@@ -142,8 +152,8 @@ html,body{margin:0}
   /* முன்னோட்டம் தேவைப்படும் பகுதிகள் (Mobile TV / Books தங்களுக்குள் preview வைத்துள்ளன) */
   function prevView() {
     if (cur === 'tv') return '';
-    if (cur === 'shelf') return sub === 'posts' ? 'books' : '';
-    return 'paper';
+    if (cur === 'shelf') return '';
+    return cur === 'share' ? 'books' : 'paper';
   }
   function syncPrev(force) {
     var v = prevView(), on = pcOn() && !!v;
@@ -164,7 +174,7 @@ html,body{margin:0}
 
   /* ---------- தாவல்கள் ---------- */
   var TABS = ['epaper', 'tv', 'shelf', 'share', 'theme'];
-  var SUBS = ['books', 'posts'];          /* Book Shelf பிரிவுகள் — அனைத்தும் ஒரே பக்கத்தில் */
+  var SUBS = ['books'];          /* Book Shelf பிரிவுகள் — அனைத்தும் ஒரே பக்கத்தில் */
   var SUBVIEW = { books: 'books', posts: 'article' };
   var SUBDEF = { books: ['📚', 'Books'], posts: ['📥', 'Posts'] };
   var OLDSUB = { articles: 'article', shopping: 'shopping', events: 'events' };   /* பழைய இணைப்புகள் → ஒருங்கிணைந்த பெட்டி */
@@ -193,15 +203,14 @@ html,body{margin:0}
       var f = document.createElement('iframe'); f.title = 'books'; f.src = 'book.html?mode=settings';
       f.allow = 'camera;microphone;fullscreen;autoplay;clipboard-write;display-capture'; $('#s-books').appendChild(f);
     }
-    if (sub === 'posts' && window.ArticleAdmin) ArticleAdmin.mountAll($('#s-posts .st-native'), wantKind);
-    wantKind = null;
     $('#back').href = 'index.html#' + SUBVIEW[sub];
     fitFrames(); syncPrev();
   }
   function openTab(id, push) {
-    if (OLDSUB[id]) { wantKind = OLDSUB[id]; id = 'shelf'; sub = 'posts'; }
+    var openApr = false;
+    if (OLDSUB[id]) { wantKind = OLDSUB[id]; id = 'share'; openApr = true; }
+    if (id === 'posts' || id === 'sections') { if (id === 'sections') wantKind = 'shopping'; id = 'share'; openApr = true; }
     if (SUBS.indexOf(id) >= 0) { var want = id; id = 'shelf'; sub = want; }
-    if (id === 'sections') { wantKind = 'shopping'; id = 'shelf'; sub = 'posts'; }
     if (TABS.indexOf(id) < 0) id = 'epaper';
     cur = id;
     [].forEach.call(document.querySelectorAll('.st-tab'), function (b) { b.setAttribute('aria-selected', b.dataset.t === id ? 'true' : 'false'); });
@@ -217,15 +226,22 @@ html,body{margin:0}
     try { if (push !== false) history.replaceState(null, '', '#' + (id === 'shelf' ? sub : id)); } catch (e) {}
     fitFrames(); syncPrev(); window.scrollTo(0, 0);
     if (id === 'epaper') loadPdfInfo();
-    if (id === 'share' && window.ShareHub) ShareHub.mount($('#shareBox'));
+    if (id === 'share') {
+      if (window.ShareHub) { ShareHub.mount($('#shareBox')); ShareHub.mountVideos($('#vidBox'), function (n) { $('#vidN').textContent = n ? '(' + n + ')' : ''; }); }
+      if (window.ArticleAdmin) ArticleAdmin.mountAll($('#aprBox'), wantKind);
+      if (openApr || pendingN) $('#secApr').open = true;
+      wantKind = null;
+    }
   }
   $('#tabs').addEventListener('click', function (e) { var b = e.target.closest('.st-tab'); if (b) { if (b.dataset.t === 'shelf') sub = sub || 'books'; openTab(b.dataset.t); } });
   $('#subtabs').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) { openSub(b.dataset.s); try { history.replaceState(null, '', '#' + b.dataset.s); } catch (x) {} window.scrollTo(0, 0); } });
   /* காத்திருப்பு எண்ணிக்கை: "📚 Book Shelf" தாவலிலும் "📥 Posts" துணைத் தாவலிலும் */
   function badge() {
     var t = document.querySelector('.st-tab[data-t="shelf"]');
-    if (t) t.textContent = '📚 Book Shelf' + (pendingN ? ' (' + pendingN + ')' : '');
-    if ($('#subtabs').children.length) buildSubtabs();
+    var s = document.querySelector('.st-tab[data-t="share"]');
+    if (s) s.textContent = '📣 Share' + (pendingN ? ' (' + pendingN + ')' : '');
+    if (t) t.textContent = '📚 Book Shelf';
+    var an = $('#aprN'); if (an) an.textContent = pendingN ? '(' + pendingN + ' pending)' : '';
   }
   if (window.ArticleAdmin && ArticleAdmin.watchPending) ArticleAdmin.watchPending(function (n) { pendingN = n; badge(); });
   addEventListener('resize', fitFrames);

@@ -68,5 +68,41 @@
     ul.textContent = '✔ Website: publishes directly with one click.\n▸ Facebook page + Instagram: Meta Business Suite lets you choose both in one composer (this button opens it with the caption ready; download the image and attach it). Full automation needs the Meta API + a server (Cloud Function) — a later step.\n▸ WhatsApp Status: there is no API that lets Meta post automatically; the "Share on WhatsApp" button opens the share sheet — choose My Status there. If you turn on "Share status to Instagram/Facebook Stories" in WhatsApp, it also goes to those.';
     g.appendChild(ul); box.appendChild(g);
   }
-  window.ShareHub = { mount: function (el) { box = el; if (!box.firstChild) render(); } };
+  /* ---------- 🎞 My videos: Mobile TV / Books-ல் தயாரான MP4 — பதிவிறக்கம் அல்லது WhatsApp Status ---------- */
+  var urls = [];
+  function fmt(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
+  function when(ts) { var d = new Date(ts); return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+  function dl(r) { var u = URL.createObjectURL(r.blob), a = h('a'); a.href = u; a.download = r.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 4000); }
+  function shareVideo(r) {
+    var f = new File([r.blob], r.name, { type: 'video/mp4' });
+    if (navigator.canShare && navigator.canShare({ files: [f] })) {
+      navigator.share({ files: [f], title: r.name }).catch(function () {});   /* share sheet → WhatsApp → My status */
+    } else { dl(r); toast('⬇ Downloaded — open WhatsApp → Status → + and pick this video'); }
+  }
+  function mountVideos(el, onCount) {
+    urls.forEach(function (u) { URL.revokeObjectURL(u); }); urls = [];
+    if (!window.VideoLib) { el.textContent = ''; return; }
+    VideoLib.list().then(function (a) {
+      el.innerHTML = ''; if (onCount) onCount(a.length);
+      var c = h('div', 'sc');
+      c.appendChild(h('p', 'note', 'Videos you render in Mobile TV and Books are saved here automatically. Download them, or share to WhatsApp Status from your phone.'));
+      if (!a.length) c.appendChild(h('div', 'st-empty', 'No videos yet — render one in Mobile TV or Books.'));
+      a.forEach(function (r) {
+        var row = h('div', 'vrow'), u = URL.createObjectURL(r.blob); urls.push(u);
+        row.style.cssText = 'display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;align-items:start;padding:8px 0;border-top:1px solid var(--s-line)';
+        var v = h('video'); v.src = u; v.controls = true; v.playsInline = true; v.preload = 'metadata'; v.style.cssText = 'width:96px;aspect-ratio:9/16;object-fit:cover;border-radius:8px;background:#000';
+        var side = h('div'); side.style.cssText = 'display:grid;gap:6px;min-width:0';
+        var nm = h('b', '', (r.kind === 'books' ? '📚 ' : '📺 ') + r.name); nm.style.cssText = 'font-size:13px;word-break:break-all';
+        var meta = h('span', 'note', (r.kind === 'books' ? 'Books' : 'Mobile TV') + ' · ' + fmt(r.size) + ' · ' + when(r.ts));
+        var acts = h('div', 'st-row');
+        function b(t, cls, fn) { var x = h('button', cls, t); x.type = 'button'; x.onclick = fn; acts.appendChild(x); }
+        b('⬇ Download', '', function () { dl(r); });
+        b('🟢 WhatsApp Status', 'alt', function () { shareVideo(r); });
+        b('🗑', 'alt', function () { if (confirm('Delete this video?')) VideoLib.remove(r.id).then(function () { mountVideos(el, onCount); }); });
+        side.append(nm, meta, acts); row.append(v, side); c.appendChild(row);
+      });
+      el.appendChild(c);
+    });
+  }
+  window.ShareHub = { mount: function (el) { box = el; if (!box.firstChild) render(); }, mountVideos: mountVideos };
 })();
