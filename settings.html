@@ -93,9 +93,8 @@ html,body{margin:0}
 
   <!-- ===== பகிர்: ஒரே இடத்தில் எழுதி இணையதளம் + Meta + WhatsApp ===== -->
   <section class="st-pane" id="p-share" role="tabpanel">
-    <details class="st-sec" id="secVid" open><summary>🎞 My videos <b id="vidN"></b></summary><div class="st-native" id="vidBox"></div></details>
     <details class="st-sec" id="secApr"><summary>📥 Admin approval <b id="aprN"></b></summary><div class="st-native" id="aprBox"></div></details>
-    <details class="st-sec" id="secPost" open><summary>📣 Post to website &amp; social</summary><div class="st-native" id="shareBox"></div></details>
+    <details class="st-sec" id="secPost" open><summary>📣 Share &amp; publish</summary><div class="st-native" id="shareBox"></div></details>
   </section>
 
   <!-- ===== தோற்றம் ===== -->
@@ -227,7 +226,7 @@ html,body{margin:0}
     fitFrames(); syncPrev(); window.scrollTo(0, 0);
     if (id === 'epaper') loadPdfInfo();
     if (id === 'share') {
-      if (window.ShareHub) { ShareHub.mount($('#shareBox')); ShareHub.mountVideos($('#vidBox'), function (n) { $('#vidN').textContent = n ? '(' + n + ')' : ''; }); }
+      if (window.ShareHub) { ShareHub.mount($('#shareBox')); }
       if (window.ArticleAdmin) ArticleAdmin.mountAll($('#aprBox'), wantKind);
       if (openApr || pendingN) $('#secApr').open = true;
       wantKind = null;

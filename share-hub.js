@@ -4,7 +4,8 @@
 (function () {
   'use strict';
   var KINDS = { article: ['📝 Article', 'Articles'], shopping: ['🛒 Shop poster', 'Shopping'], events: ['🎪 Event poster', 'Events'] };
-  var box, file = null, dataUrl = '';
+  var MEDIA = { tv: '📺 Mobile TV video', books: '📚 Books video', pdf: '📰 E-Paper PDF' };   /* இந்த app-ல் உருவாக்கியவை — நேரடியாகப் பகிர */
+  var box, file = null, dataUrl = '', refresh = null;
   function h(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
   function toast(m) { var t = document.getElementById('toast'); if (!t) return; t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.remove('on'); }, 2600); }
   function shrink(f, max) {
@@ -27,40 +28,94 @@
   function render() {
     box.innerHTML = '';
     var c = h('div', 'sc'); c.appendChild(h('h2', '', '📣 Share from one place'));
-    c.appendChild(h('p', 'note', 'Write once → website, Facebook, Instagram, WhatsApp. (The website publishes directly; see the notes below for the others.)'));
-    var l0 = h('label', '', 'Publish as'), ks = h('select'); Object.keys(KINDS).forEach(function (k) { var o = h('option', '', KINDS[k][0]); o.value = k; ks.appendChild(o); }); l0.appendChild(ks);
+    c.appendChild(h('p', 'note', 'Anything made in this app — articles, posters, Mobile TV and Books videos, the E-Paper PDF — can be shared from here to WhatsApp, Facebook, Instagram, Telegram and other apps. Articles and posters also publish on the website.'));
+    var l0 = h('label', '', 'Publish as'), ks = h('select'); Object.keys(KINDS).forEach(function (k) { var o = h('option', '', KINDS[k][0]); o.value = k; ks.appendChild(o); }); Object.keys(MEDIA).forEach(function (k) { var o = h('option', '', MEDIA[k]); o.value = k; ks.appendChild(o); }); l0.appendChild(ks);
     var l1 = h('label', '', 'Title *'), ti = h('input'); ti.type = 'text'; ti.maxLength = 200; l1.appendChild(ti);
     var l2 = h('label', '', 'Caption / text * (used everywhere)'), tx = h('textarea'); tx.className = 'big'; tx.maxLength = 4000; l2.appendChild(tx);
     var row = h('div', 'st-row'), pick = h('label', 'btn', '📷 JPG image'), fi = h('input'); fi.type = 'file'; fi.accept = 'image/*'; fi.hidden = true; pick.appendChild(fi); pick.style.cursor = 'pointer'; row.appendChild(pick);
     var pv = h('div'); pv.style.cssText = 'max-width:220px'; var im = h('img'); im.style.cssText = 'width:100%;border-radius:10px;display:none'; pv.appendChild(im);
     fi.onchange = function (e) { var f = e.target.files[0]; e.target.value = ''; if (!f) return; shrink(f, 1200).then(function (d) { dataUrl = d; file = new File([blobOf(d)], 'post.jpg', { type: 'image/jpeg' }); im.src = d; im.style.display = 'block'; }).catch(function (x) { toast('⚠ ' + x.message); }); };
-    c.append(l0, l1, l2, row, pv);
+    var mb = h('div'); mb.style.cssText = 'display:grid;gap:8px;margin:8px 0';
+    c.append(l0, l1, l2, row, pv, mb);
+    var cur = null, vurl = '';
+    function isMedia() { return !!MEDIA[ks.value]; }
+    function readPdf() {
+      return new Promise(function (res) {
+        try {
+          var r = indexedDB.open('epaper', 1); r.onupgradeneeded = function () { r.result.createObjectStore('kv'); };
+          r.onerror = function () { res(null); };
+          r.onsuccess = function () { var q = r.result.transaction('kv').objectStore('kv').get('pdf'); q.onsuccess = function () { res(q.result || null); }; q.onerror = function () { res(null); }; };
+        } catch (e) { res(null); }
+      });
+    }
+    function refreshMedia() {
+      var m = isMedia(); row.style.display = pv.style.display = m ? 'none' : ''; mb.style.display = m ? 'grid' : 'none';
+      l1.firstChild.nodeValue = m ? 'Title (optional)' : 'Title *'; l2.firstChild.nodeValue = m ? 'Caption / text (optional)' : 'Caption / text * (used everywhere)';
+      if (vurl) { URL.revokeObjectURL(vurl); vurl = ''; } cur = null; mb.innerHTML = '';
+      if (!m) return;
+      if (ks.value === 'pdf') {
+        mb.appendChild(h('p', 'note', 'Loading…'));
+        readPdf().then(function (d) {
+          mb.innerHTML = '';
+          if (!d || !d.buf) { mb.appendChild(h('div', 'st-empty', 'No PDF yet — add today\'s issue in the E-Paper tab first.')); return; }
+          var nm = d.name || 'Theekkathir.pdf'; cur = { blob: new Blob([d.buf], { type: 'application/pdf' }), name: nm, type: 'application/pdf' };
+          mb.appendChild(h('b', '', '📰 ' + nm)); mb.appendChild(h('span', 'note', fmt(d.buf.byteLength)));
+        });
+        return;
+      }
+      VideoLib.list().then(function (all) {
+        var a = all.filter(function (r) { return r.kind === ks.value; }); mb.innerHTML = '';
+        if (!a.length) { mb.appendChild(h('div', 'st-empty', 'No ' + (ks.value === 'books' ? 'Books' : 'Mobile TV') + ' videos yet — render one in that tab and it will appear here.')); return; }
+        var sel = h('select'); a.forEach(function (r, i) { var o = h('option', '', r.name + ' · ' + fmt(r.size) + ' · ' + when(r.ts)); o.value = i; sel.appendChild(o); });
+        var v = h('video'); v.controls = true; v.playsInline = true; v.preload = 'metadata'; v.style.cssText = 'width:100%;max-width:220px;aspect-ratio:9/16;object-fit:cover;border-radius:10px;background:#000';
+        function pickV() { var r = a[+sel.value]; if (vurl) URL.revokeObjectURL(vurl); vurl = URL.createObjectURL(r.blob); v.src = vurl; cur = { blob: r.blob, name: r.name, type: 'video/mp4', id: r.id }; }
+        sel.onchange = pickV; pickV(); mb.append(sel, v);
+      });
+    }
+    ks.onchange = refreshMedia;
 
     function caption() { return (ti.value.trim() + '\n\n' + tx.value.trim()).trim(); }
-    function valid() { if (!ti.value.trim() || !tx.value.trim()) { toast('Title and text are both required'); return false; } return true; }
+    function valid() { if (isMedia()) return true; if (!ti.value.trim() || !tx.value.trim()) { toast('Title and text are both required'); return false; } return true; }
     function publishSite() {
       var S = window.ArticleStore.forKind(ks.value), k = ks.value, t = tx.value.trim();
       return S.submit({ kind: k, name: k === 'article' ? 'NEWS STUDIO' : '-', role: k === 'article' ? 'நிர்வாகம்' : '', title: ti.value.trim(), summary: t.slice(0, 280), body: t, photo: dataUrl, cutout: false, extra: '' })
         .then(function (id) { return S.setStatus(id, 'approved'); });
     }
     var b = h('div', 'st-row');
-    function btn(txt, cls, fn) { var x = h('button', cls, txt); x.type = 'button'; x.onclick = fn; b.appendChild(x); return x; }
+    function btn(txt, cls, fn, only) { var x = h('button', cls, txt); x.type = 'button'; x.onclick = fn; x.dataset.only = only || ''; b.appendChild(x); return x; }
+    function fileOf() { return cur ? new File([cur.blob], cur.name, { type: cur.type }) : null; }
+    function needMedia() { if (!cur) { toast('Nothing to share yet'); return false; } return true; }
+    function shareFile() {
+      if (!needMedia()) return; var f = fileOf(), data = { files: [f], title: cur.name }, cp = caption(); if (cp) data.text = cp;
+      if (navigator.canShare && navigator.canShare({ files: [f] })) navigator.share(data).catch(function () {});
+      else { dlBlob(cur); toast('⬇ Downloaded — open WhatsApp / Facebook / Instagram and attach it'); }
+    }
+    function dlBlob(r) { var u = URL.createObjectURL(r.blob), a = h('a'); a.href = u; a.download = r.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 4000); }
+    /* ----- இணையதளம் வகை (article / poster) ----- */
     btn('🚀 One click: website + Meta Business Suite', '', function () {
       if (!valid()) return;
       var w = window.open('https://business.facebook.com/latest/composer', '_blank');   /* பயனர் தொடுதலுடன் உடனே திறக்க வேண்டும் */
       copy(caption()).then(function (ok) { toast(ok ? '✔ Caption copied — paste it in Business Suite' : 'Copy the caption manually'); });
       publishSite().then(function () { toast('✔ Published on the website · paste in Business Suite, choose Facebook + Instagram and tap Publish'); if (!w) toast('⚠ New tab was blocked — tap "Open Meta Business Suite" below'); })
         .catch(function (e) { toast('⚠ Could not publish on the website: ' + e.message); });
-    });
-    btn('🌐 Publish on the website only', 'alt', function () { if (!valid()) return; publishSite().then(function () { toast('✔ Published on the website'); }).catch(function (e) { toast('⚠ ' + e.message); }); });
-    btn('📘 Open Meta Business Suite', 'alt', function () { if (!valid()) return; copy(caption()); window.open('https://business.facebook.com/latest/composer', '_blank'); toast('Caption copied'); });
+    }, 'site');
+    btn('🌐 Publish on the website only', 'alt', function () { if (!valid()) return; publishSite().then(function () { toast('✔ Published on the website'); }).catch(function (e) { toast('⚠ ' + e.message); }); }, 'site');
     btn('🟢 Share on WhatsApp (Status)', 'alt', function () {
       if (!valid()) return; var data = { text: caption() };
       if (file && navigator.canShare && navigator.canShare({ files: [file] })) data.files = [file];
       if (navigator.share) navigator.share(data).catch(function () {}); else window.open('https://wa.me/?text=' + encodeURIComponent(caption()), '_blank');
-    });
-    btn('📋 Copy caption', 'alt', function () { if (valid()) copy(caption()).then(function () { toast('✔ Copied'); }); });
-    btn('⬇ Download image', 'alt', function () { if (!dataUrl) { toast('Add an image first'); return; } var a = h('a'); a.href = dataUrl; a.download = 'post.jpg'; document.body.appendChild(a); a.click(); a.remove(); });
+    }, 'site');
+    btn('⬇ Download image', 'alt', function () { if (!dataUrl) { toast('Add an image first'); return; } var a = h('a'); a.href = dataUrl; a.download = 'post.jpg'; document.body.appendChild(a); a.click(); a.remove(); }, 'site');
+    /* ----- வீடியோ / PDF வகை ----- */
+    btn('🟢 Share to WhatsApp', '', shareFile, 'media');
+    btn('📤 Share to Facebook / Instagram / other apps', 'alt', shareFile, 'media');
+    btn('⬇ Download', 'alt', function () { if (needMedia()) dlBlob(cur); }, 'media');
+    var del = btn('🗑 Delete video', 'alt', function () { if (!cur || !cur.id) { toast('Only videos can be deleted here'); return; } if (confirm('Delete this video?')) VideoLib.remove(cur.id).then(refreshMedia); }, 'media');
+    /* ----- இரண்டுக்கும் ----- */
+    btn('📘 Open Meta Business Suite', 'alt', function () { if (!valid()) return; var cp = caption(); if (cp) copy(cp); window.open('https://business.facebook.com/latest/composer', '_blank'); toast(isMedia() ? 'Download the file and attach it in Business Suite' : 'Caption copied'); });
+    btn('📋 Copy caption', 'alt', function () { var cp = caption(); if (!cp) { toast('Write a caption first'); return; } copy(cp).then(function () { toast('✔ Copied'); }); });
+    function syncBtns() { var m = isMedia(); [].forEach.call(b.children, function (x) { var o = x.dataset.only; x.style.display = (o === 'media' && !m) || (o === 'site' && m) || (x === del && ks.value === 'pdf') ? 'none' : ''; }); }
+    ks.addEventListener('change', syncBtns); refreshMedia(); syncBtns(); refresh = function () { if (isMedia()) refreshMedia(); };
     c.appendChild(b); box.appendChild(c);
 
     var g = h('div', 'sc'); g.appendChild(h('h2', '', 'ℹ What is automatic, what is manual?'));
@@ -104,5 +159,5 @@
       el.appendChild(c);
     });
   }
-  window.ShareHub = { mount: function (el) { box = el; if (!box.firstChild) render(); }, mountVideos: mountVideos };
+  window.ShareHub = { mount: function (el) { box = el; if (!box.firstChild) render(); else if (refresh) refresh(); }, mountVideos: mountVideos };
 })();
