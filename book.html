@@ -60,8 +60,8 @@ html.m-settings .edm { display: none; }
 .player .tl { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; min-width: 7.5em; text-align: right; }
 .row2 { display: flex; flex-wrap: wrap; gap: 8px 16px; width: min(100%, 400px); margin: 0 auto; align-items: center; justify-content: space-between; color: var(--muted); font-size: 13px; }
 .side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.exp { order: 0; } .panels { order: 1; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-@media (max-width: 899px) { .exp { order: 2; } }
+.exp { order: 0 !important; } .panels { display: contents !important; order: 1; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+
 .card, details.pn { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
 .card { padding: 16px; }
 details.pn > summary { cursor: pointer; list-style: none; padding: 14px 16px; font-family: var(--font-display); font-weight: 700; font-size: 18px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
@@ -194,9 +194,9 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
         </div>
       </section>
 
-      <div class="panels"><details class="pn" open style="order:-1"><summary>What shows in the video</summary><div class="body"><p class="hint">Only ticked items appear; the speaker takes the remaining space.</p><div class="checks"><label><input type="checkbox" data-p="show.speakerTag"> Speaker name bar</label><label><input type="checkbox" data-p="show.logo"> Logo</label><label><input type="checkbox" data-p="show.orgName"> Company name</label><label><input type="checkbox" data-p="show.title"> Book title</label><label><input type="checkbox" data-p="show.cover"> Front cover</label><label><input type="checkbox" data-p="show.back"> Back cover</label><label><input type="checkbox" data-p="show.author"> Author</label><label><input type="checkbox" data-p="show.publisher"> Publisher</label><label><input type="checkbox" data-p="show.genre"> Genre</label><label><input type="checkbox" data-p="show.price"> Price</label><label><input type="checkbox" data-p="show.discount"> Discount % (large)</label><label><input type="checkbox" data-p="show.contact"> Contact bar</label><label><input type="checkbox" data-p="show.qr"> QR (only if needed)</label><label><input type="checkbox" data-p="show.cta"> Call-to-action line</label><label><input type="checkbox" data-p="show.dots"> Progress dots</label></div><span class="lab">Only if needed</span><div class="checks"><label><input type="checkbox" data-p="show.festival"> Festival name</label><label><input type="checkbox" data-p="show.date"> Date</label><label><input type="checkbox" data-p="show.place"> Place</label><label><input type="checkbox" data-p="show.stall"> Stall no.</label></div></div></details>
-        <details class="pn" open>
-          <summary>General info</summary>
+      <div class="panels"><details class="pn" style="order:9"><summary>👁 What shows in the video</summary><div class="body"><p class="hint">Only ticked items appear; the speaker takes the remaining space.</p><div class="checks"><label><input type="checkbox" data-p="show.speakerTag"> Speaker name bar</label><label><input type="checkbox" data-p="show.logo"> Logo</label><label><input type="checkbox" data-p="show.orgName"> Company name</label><label><input type="checkbox" data-p="show.title"> Book title</label><label><input type="checkbox" data-p="show.cover"> Front cover</label><label><input type="checkbox" data-p="show.back"> Back cover</label><label><input type="checkbox" data-p="show.author"> Author</label><label><input type="checkbox" data-p="show.publisher"> Publisher</label><label><input type="checkbox" data-p="show.genre"> Genre</label><label><input type="checkbox" data-p="show.price"> Price</label><label><input type="checkbox" data-p="show.discount"> Discount % (large)</label><label><input type="checkbox" data-p="show.contact"> Contact bar</label><label><input type="checkbox" data-p="show.qr"> QR (only if needed)</label><label><input type="checkbox" data-p="show.cta"> Call-to-action line</label><label><input type="checkbox" data-p="show.dots"> Progress dots</label></div><span class="lab">Only if needed</span><div class="checks"><label><input type="checkbox" data-p="show.festival"> Festival name</label><label><input type="checkbox" data-p="show.date"> Date</label><label><input type="checkbox" data-p="show.place"> Place</label><label><input type="checkbox" data-p="show.stall"> Stall no.</label></div></div></details>
+        <details class="pn" open style="order:3">
+          <summary>✎ General info</summary>
           <div class="body">
             <div class="up">
               <div class="thumb" id="logoThumb"></div>
@@ -218,8 +218,8 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
           </div>
         </details>
 
-        <details class="pn" open>
-          <summary>Speaker</summary>
+        <details class="pn" open style="order:1">
+          <summary>🎤 Speaker</summary>
           <div class="body">
             <div class="up">
               <div class="thumb" id="spThumb"></div>
@@ -243,8 +243,8 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
           </div>
         </details>
 
-        <details class="pn" open>
-          <summary>Books</summary>
+        <details class="pn" open style="order:2">
+          <summary>📚 Books</summary>
           <div class="body">
             <p class="hint" id="slotHint"></p>
             <div id="books" style="display:grid;gap:12px"></div>
@@ -253,8 +253,8 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
           </div>
         </details>
 
-        <details class="pn">
-          <summary>Contact &amp; QR</summary>
+        <details class="pn" style="order:5">
+          <summary>☎ Contact &amp; QR</summary>
           <div class="body">
             <div class="grid2">
               <label class="f"><span>WhatsApp number</span><input type="text" id="f-wa" data-p="wa" inputmode="tel"></label>
@@ -266,8 +266,8 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
           </div>
         </details>
 
-        <details class="pn" open style="order:-2">
-          <summary>Theme / design</summary>
+        <details class="pn" style="order:6">
+          <summary>🎨 Theme / design</summary>
           <div class="body">
             <span class="lab">Video theme</span><div class="themes" id="themes"></div>
             <div class="colors">
@@ -289,8 +289,8 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
           </div>
         </details>
 
-        <details class="pn">
-          <summary>Change words</summary>
+        <details class="pn" style="order:7">
+          <summary>Aa Change words</summary>
           <div class="body">
             <div class="grid2">
               <label class="f"><span>Date label</span><input type="text" id="l-date" data-p="labels.date"></label>

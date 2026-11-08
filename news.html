@@ -48,6 +48,7 @@ html.m-view .stage{position:fixed;inset:0;background:var(--stg,#000);border:0;bo
 html.m-view canvas{position:absolute;inset:0;width:100%;height:100%;max-height:none;aspect-ratio:auto;object-fit:contain;border-radius:0;background:var(--stg,#000);pointer-events:none}
 /* ---- வீடியோ எடிட்டர் அமைப்பு: முக்கியம் / தொட்டால் துணை செட்டிங் / ஒருமுறை ---- */
 #edMode{display:none!important}
+.moreh{font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:6px 2px 0;border-top:1px dashed var(--line);padding-top:10px}
 .stp{display:inline-grid;place-items:center;width:22px;height:22px;margin-right:6px;border-radius:50%;background:var(--gold);color:#000;font:800 12px/1 inherit}
 .ess h3 small{font-weight:600;opacity:.7;margin-left:6px}
 .ess{display:grid;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;border-inline-start:5px solid var(--gold)}
@@ -151,6 +152,7 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
     <label>Ticker text <small>separate items with |</small><input id="gTicker" placeholder="Headline one | Headline two"></label>
   </section>
 
+  <div class="moreh">⚙ More options <small>only when needed</small></div>
   <details class="sub" id="subZoom">
     <summary>Footage zoom <small>drag · pinch</small></summary>
     <div class="subb">
