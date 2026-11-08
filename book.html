@@ -660,19 +660,27 @@ function drawSpeaker(ctx, t, th, ink, a, o, R) {
   ctx.restore();
 }
 
-function titleLines(ctx, s) { var size = 54, lines = []; for (; size >= 36; size -= 2) { sf(ctx, size, 800); lines = wrap(ctx, s, 980); if (lines.length <= 2) break; } return [size, lines.slice(0, 2)]; }
-function titleH(ctx) { var m = 1; state.books.forEach(function (b) { if (b.title) { var r = titleLines(ctx, b.title); m = Math.max(m, r[1].length * r[0] * 1.2 + 4); } }); return Math.ceil(m); }
+function titleFit(ctx, s) { var size = 62, lines = []; for (; size >= 38; size -= 2) { sf(ctx, size, 800); lines = wrap(ctx, s, 930); if (lines.length <= 2) break; } return [Math.max(size, 38), lines.slice(0, 2)]; }
+function titleH(ctx) { var m = 0; state.books.forEach(function (b) { if (b.title) { var r = titleFit(ctx, b.title); m = Math.max(m, Math.ceil(r[1].length * r[0] * 1.18 + 34)); } }); return m; }
+/* புத்தகத் தலைப்பு: வீடியோ சட்டத்துக்கும் புத்தகப் பகுதிக்கும் நடுவில் பெரிய, ஒளிரும் பட்டையாக */
 function drawTitle(ctx, t, th, p, exit, book, R) {
   var a = Math.min(p, exit); if (a <= 0 || !book.title) return;
-  var size = 54, lines = [];
-  for (; size >= 36; size -= 2) { sf(ctx, size, 800); lines = wrap(ctx, book.title, 980); if (lines.length <= 2) break; }
-  lines = lines.slice(0, 2);
-  var lh = size * 1.2, cy = R[0] + R[1] / 2;
-  ctx.save(); ctx.globalAlpha = a; ctx.translate(0, (1 - p) * 30);
+  var fit = titleFit(ctx, book.title), size = fit[0], lines = fit[1], lh = size * 1.18, ink = onColor(th.accent), fx = th.fx, cl = calm(th);
+  var x = 30, w = 1020, y = R[0], h = R[1], rad = 26;
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(0, (1 - a) * 26);
+  ctx.save();
+  if (fx !== 'matte') { ctx.shadowColor = rgba(th.accent, cl ? 0.35 : 0.65); ctx.shadowBlur = cl ? 18 : 34 + (fx === 'premium' ? 8 * Math.sin(t * 2) : 0); }
+  var g = ctx.createLinearGradient(x, y, x, y + h); g.addColorStop(0, rgba(th.accent, 1)); g.addColorStop(1, rgba(th.accent, 0.82));
+  ctx.fillStyle = g; rr(ctx, x, y, w, h, rad); ctx.fill(); ctx.restore();
+  ctx.save(); rr(ctx, x, y, w, h, rad); ctx.clip();
+  var hg = ctx.createLinearGradient(x, y, x, y + h * 0.5); hg.addColorStop(0, 'rgba(255,255,255,.32)'); hg.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = hg; ctx.fillRect(x, y, w, h * 0.5);
+  if (!cl) { var sx = x + ((t * 0.35) % 1.6 - 0.3) * w; ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.save(); ctx.transform(1, 0, -0.35, 1, 0, 0); ctx.fillRect(sx + 0.35 * h, y, 70, h); ctx.restore(); }
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 3; rr(ctx, x + 1.5, y + 1.5, w - 3, h - 3, rad); ctx.stroke();
   lines.forEach(function (ln, i) {
-    var yy = cy - lh * lines.length / 2 + lh * i + lh / 2;
-    if (th.fx === 'premium') for (var k = 7; k > 0; k--) text(ctx, ln, 540, yy + k, { size: size, weight: 800, color: 'rgba(0,0,0,.28)', align: 'center' });
-    text(ctx, ln, 540, yy, { size: size, weight: 800, color: th.text, align: 'center' });
+    var yy = y + h / 2 - lh * lines.length / 2 + lh * i + lh / 2;
+    if (ink === '#FFFFFF') text(ctx, ln, 540, yy + 3, { size: size, weight: 800, color: 'rgba(0,0,0,.35)', align: 'center', maxW: 940, min: 30 });
+    text(ctx, ln, 540, yy, { size: size, weight: 800, color: ink, align: 'center', maxW: 940, min: 30 });
   });
   ctx.restore();
 }
@@ -709,7 +717,6 @@ function drawInfo(ctx, t, lt, th, ink, exit, book, R) {
   if (sh.back) { var bkx = 1050 - CW; drawBookBox(ctx, t, th, cl, bkx, cy0, CW, CH, Math.min(eo3((lt - 0.3) / 0.6), exit), clamp((lt - 0.3) / 1), media.backs[book.id], function () { drawBackPh(ctx, bkx, cy0, CW, CH, th); }, -1, spin, media.covers[book.id], function () { drawCoverPlaceholder(ctx, bkx, cy0, CW, CH, book, th); }); x1 = bkx - 14; }
   var tx = x0, W = x1 - x0, items = [], gp = 8;
   var add = function (h, f) { items.push({ h: h, f: f }); };
-  if (sh.title && book.title) { var tz = 46, tls = []; for (; tz >= 30; tz -= 2) { sf(ctx, tz, 800); tls = wrap(ctx, book.title, W); if (tls.length <= 2) break; } tz = Math.max(tz, 30); tls = tls.slice(0, 3); var tlh = tz * 1.2; add(tls.length * tlh + 4, function (yy) { tls.forEach(function (ln, i) { var ly = yy + tlh * (i + 0.5) + 2; if (th.fx === 'premium') for (var k = 6; k > 0; k--) text(ctx, ln, tx + W / 2, ly + k, { size: tz, weight: 800, color: 'rgba(0,0,0,.28)', align: 'center' }); shineText(ctx, ln, tx + W / 2, ly, tz, th, t, W); }); }); }
   if (sh.genre && book.genre) add(44, function (yy) { sf(ctx, 27, 800); var gw = Math.min(W, ctx.measureText(book.genre).width + 48); chip(ctx, tx + (W - gw) / 2, yy, gw, 44, th); text(ctx, book.genre, tx + W / 2, yy + 23, { size: 27, weight: 800, color: ink, align: 'center', maxW: W - 30, min: 16 }); });
   if (sh.author && book.author) add(62, function (yy) { text(ctx, S.labels.author, tx + W / 2, yy + 9, { size: 20, weight: 700, color: rgba(th.text, 0.7), align: 'center', fam: SANS }); text(ctx, book.author, tx + W / 2, yy + 41, { size: 40, weight: 800, color: th.text, align: 'center', maxW: W, min: 22 }); });
   if (sh.publisher && book.publisher) add(58, function (yy) { text(ctx, S.labels.publisher, tx + W / 2, yy + 9, { size: 20, weight: 700, color: rgba(th.text, 0.7), align: 'center', fam: SANS }); text(ctx, book.publisher, tx + W / 2, yy + 38, { size: 34, weight: 700, color: th.text, align: 'center', maxW: W, min: 20 }); });
@@ -929,7 +936,8 @@ function drawFrame(ctx, t, o) {
   if (sh.dots && n > 1) { Ld = b - 6; b -= 12 + G; }
   if (hasC) { var ch = Math.max(rows.length * 38 + 20, qrT ? 140 : 0, pr ? 160 : 0); Lc = [b - ch, ch]; b -= ch + G; }
   if (sh.cta && S.cta) { Lcta = b - 48; b -= 48 + G; }
-  if (sh.cover || sh.back || sh.title || sh.author || sh.publisher || sh.genre) { var RH = (sh.cover || sh.back) ? 450 : 336; Lr = [b - RH, RH]; b -= RH + G; }
+  if (sh.cover || sh.back || sh.author || sh.publisher || sh.genre) { var RH = (sh.cover || sh.back) ? 450 : 336; Lr = [b - RH, RH]; b -= RH + G; }
+  if (sh.title && S.books.some(function (bk) { return bk.title; })) { var TH = titleH(ctx); Lt = [b - TH, TH]; b -= TH + G; }
   
   if (Lh !== undefined) drawHead(ctx, t, th, gi(0, 0.7), Lh, hh);
   if (Lf !== undefined) drawFest(ctx, t, th, gi(0.2, 0.7), Lf, fp);
