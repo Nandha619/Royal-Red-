@@ -3,8 +3,8 @@
    Fixed light tokens (the public pages keep their own themes). Small type, small controls. */
 
 html.m-settings, .st-page {
-  --s-bg: #f3f4f7; --s-card: #ffffff; --s-card2: #f7f8fa; --s-line: #dfe3ea; --s-field: #ffffff;
-  --s-fg: #1a1d24; --s-mut: #6b7385; --s-acc: #c8161d; --s-on: #ffffff; --s-gold: #f2b33d;
+  --s-bg: #fff6df; --s-card: #ffffff; --s-card2: #fffaf0; --s-line: #efd9a0; --s-field: #ffffff;
+  --s-fg: #2a1410; --s-mut: #8a6a52; --s-acc: #c8161d; --s-on: #ffffff; --s-gold: #f2b33d;
   --s-danger: #c8161d; --s-ok: #1f9d63; --s-r: 8px;
   --s-font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Tamil", "Latha", "Nirmala UI", sans-serif;
   color-scheme: light;
@@ -187,3 +187,28 @@ html.m-settings.ed-mobile #tlBar { height: 64px; }
 
 /* Mobile/Computer switches removed — layout follows screen width */
 #edMode,.st-mode,.edm{display:none!important}
+
+/* ===== Red · Gold theme (same look as the front page) ===== */
+.st-page,html.m-settings,html.m-settings body{background:linear-gradient(180deg,#fff3d0 0,#fff8e8 220px,#fff8e8 100%) fixed}
+.st-top{background:linear-gradient(135deg,#8f0d14 0%,#c8161d 55%,#e02a2a 100%);border-bottom:3px solid var(--s-gold);color:#fff;box-shadow:0 4px 14px rgba(120,10,16,.28)}
+.st-head h1{color:#ffe08a;font-weight:800;letter-spacing:.04em}
+.st-back{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35);color:#fff}
+.st-tab{color:rgba(255,255,255,.78);min-height:40px}
+.st-tab[aria-selected=true]{color:#2a1410;background:linear-gradient(180deg,#ffd75e,#f2b33d);border-bottom-color:transparent;border-radius:10px 10px 0 0}
+.st-pane > iframe{background:transparent}
+.sc,html.m-settings .panel,html.m-settings details.sub,.st-sec{border-radius:14px;border:1px solid var(--s-line);box-shadow:0 2px 10px rgba(160,100,10,.10)}
+html.m-settings .panel>h2,.sc h2{color:#8f0d14}
+html.m-settings details.sub>summary{font-weight:700}
+html.m-settings details[open].sub>summary{color:#8f0d14}
+html.m-settings .ess{background:#fff;border-inline-start:5px solid var(--s-gold);border-radius:14px;box-shadow:0 2px 10px rgba(160,100,10,.10)}
+html.m-settings .ess>h3{color:#8f0d14;font-size:13px;letter-spacing:.04em;display:flex;align-items:center;gap:4px}
+html.m-settings .stp{background:linear-gradient(180deg,#ffd75e,#f2b33d);color:#2a1410}
+html.m-settings button.gold,html.m-settings .btn.primary,.sc .btn.primary,.sc button:not(.alt):not(.warn),.st-btn.primary{background:linear-gradient(180deg,#e02a2a,#b3121a);color:#fff;border:0;box-shadow:0 2px 6px rgba(160,10,16,.3);font-weight:700;min-height:40px;border-radius:10px}
+html.m-settings button.alt,.sc button.alt{background:#fff;color:#8f0d14;border:1px solid #e6c777;min-height:40px;border-radius:10px;font-weight:700}
+html.m-settings button,.sc button{min-height:40px}
+html.m-settings button:active,.sc button:active{transform:scale(.97)}
+html.m-settings input:focus,html.m-settings select:focus,html.m-settings textarea:focus,.sc input:focus,.sc select:focus,.sc textarea:focus{border-color:var(--s-gold);box-shadow:0 0 0 3px rgba(242,179,61,.35);outline:0}
+html.m-settings input,html.m-settings select,html.m-settings textarea,.sc input,.sc select,.sc textarea{border-radius:10px;min-height:40px}
+html.m-settings .bar>div{background:linear-gradient(90deg,#c8161d,#f2b33d)}
+html.m-settings .tabs button.on{color:#8f0d14;border-bottom-color:var(--s-gold)}
+.st-toast{background:#8f0d14;color:#ffe08a}

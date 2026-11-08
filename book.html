@@ -178,7 +178,7 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
             </select>
           </label>
           <div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap">
-            <button class="btn primary" id="exportBtn" type="button">Render MP4</button>
+            <button class="btn primary" id="exportBtn" type="button">▶ Make MP4</button>
             <button class="btn warn" id="cancelBtn" type="button" hidden>Cancel</button>
           </div>
         </div>
@@ -187,7 +187,7 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
         <div id="result" hidden style="display:grid;gap:10px">
           <video id="outVid" controls playsinline></video>
           <div class="up">
-            <button class="btn primary" id="saveBtn" type="button">Save MP4</button>
+            <button class="btn primary" id="saveBtn" type="button">⬇ Save MP4</button>
             <span class="st" id="sizeTxt"></span>
             <span class="st" id="savedTxt" style="display:block"></span>
           </div>
@@ -200,9 +200,9 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
           <div class="body">
             <div class="up">
               <div class="thumb" id="logoThumb"></div>
-              <label class="btn small" for="logoFile">Upload PNG logo</label>
+              <label class="btn small" for="logoFile">⬆ Upload PNG logo</label>
               <input type="file" id="logoFile" data-file="logo" accept="image/*" hidden>
-              <button class="btn small warn" type="button" data-act="rmlogo">Remove logo</button>
+              <button class="btn small warn" type="button" data-act="rmlogo">🗑 Remove logo</button>
               <label class="f" style="flex:1 1 100%"><span>PNG logo size (height)</span><input type="range" data-p="logoSize" min="90" max="240" step="10"></label>
               <span class="st" id="logoSt">No PNG logo — company name shows as text</span>
             </div>
@@ -223,9 +223,9 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
           <div class="body">
             <div class="up">
               <div class="thumb" id="spThumb"></div>
-              <label class="btn small" for="spFile">Upload video / image</label>
+              <label class="btn small" for="spFile">⬆ Upload video / image</label>
               <input type="file" id="spFile" data-file="speaker" accept="video/*,image/*" hidden>
-              <button class="btn small warn" type="button" data-act="rmspeaker">Remove</button>
+              <button class="btn small warn" type="button" data-act="rmspeaker">🗑 Remove</button>
               <span class="st" id="spSt">Nothing uploaded yet</span>
             </div>
             <div class="grid2">
@@ -237,7 +237,7 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
               <label class="f"><span>Move left ↔ right</span><input type="range" id="spX" data-p="spX" min="0" max="100" step="1" aria-label="Horizontal position"></label>
               <label class="f"><span>Move up ↕ down</span><input type="range" id="spY" data-p="spY" min="0" max="100" step="1" aria-label="Vertical position"></label>
             </div>
-            <button class="btn small" type="button" data-act="spreset">Reset zoom</button>
+            <button class="btn small" type="button" data-act="spreset">↺ Reset zoom</button>
             
             <p class="hint">If the video is shorter than the chosen length it loops, and its sound loops with it.</p>
           </div>
@@ -248,7 +248,7 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
           <div class="body">
             <p class="hint" id="slotHint"></p>
             <div id="books" style="display:grid;gap:12px"></div>
-            <div class="up"><button class="btn primary" type="button" data-act="addbook" id="addBook">Add book</button></div>
+            <div class="up"><button class="btn primary" type="button" data-act="addbook" id="addBook">➕ Add book</button></div>
             
           </div>
         </details>
@@ -282,7 +282,7 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
             <div class="up">
               <label class="btn small" for="musicFile">Background music</label>
               <input type="file" id="musicFile" data-file="music" accept="audio/*" hidden>
-              <button class="btn small warn" type="button" data-act="rmmusic">Remove</button>
+              <button class="btn small warn" type="button" data-act="rmmusic">🗑 Remove</button>
               <span class="st" id="musicSt">No music</span>
             </div>
             <label class="f"><span>Music volume</span><input type="range" id="musicVol" data-p="musicVol" min="0" max="1" step="0.05"></label>
@@ -304,7 +304,7 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
               <label class="f"><span>Web label</span><input type="text" id="l-web" data-p="labels.web"></label>
               <label class="f"><span>Instagram label</span><input type="text" id="l-ig" data-p="labels.ig"></label>
             </div>
-            <div class="up"><button class="btn warn small" type="button" id="resetBtn">Reset everything to default</button></div>
+            <div class="up"><button class="btn warn small" type="button" id="resetBtn">↺ Reset everything to default</button></div>
           </div>
         </details>
       </div>
@@ -1057,14 +1057,14 @@ function renderBooks() {
       '<div class="bh"><div><strong>Book ' + (i + 1) + '</strong> <span class="dur">' + fmt(i * TOTAL / n) + ' – ' + fmt((i + 1) * TOTAL / n) + '</span></div>' +
       '<div class="bt"><button class="btn small" type="button" data-act="up" data-id="' + b.id + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="Move up">↑</button>' +
       '<button class="btn small" type="button" data-act="down" data-id="' + b.id + '"' + (i === n - 1 ? ' disabled' : '') + ' aria-label="Move down">↓</button>' +
-      '<button class="btn small warn" type="button" data-act="rmbook" data-id="' + b.id + '"' + (n <= 1 ? ' disabled' : '') + '>Remove</button></div></div>' +
+      '<button class="btn small warn" type="button" data-act="rmbook" data-id="' + b.id + '"' + (n <= 1 ? ' disabled' : '') + '>🗑 Remove</button></div></div>' +
       '<div class="covers">' +
       '<div class="cvbox"><span class="cap">Front cover</span><label class="thumb cv" id="th-' + b.id + '" for="cvf-' + b.id + '" style="' + coverThumb(b.id) + '" title="Tap to add front cover"></label>' +
-      '<div class="acts"><label class="btn small" for="cvf-' + b.id + '">Upload / replace</label><input type="file" id="cvf-' + b.id + '" data-file="cover" data-bid="' + b.id + '" accept="image/*" hidden>' +
-      '<button class="btn small warn" type="button" data-act="rmcover" data-id="' + b.id + '">Remove</button></div></div>' +
+      '<div class="acts"><label class="btn small" for="cvf-' + b.id + '">⬆ Upload / replace</label><input type="file" id="cvf-' + b.id + '" data-file="cover" data-bid="' + b.id + '" accept="image/*" hidden>' +
+      '<button class="btn small warn" type="button" data-act="rmcover" data-id="' + b.id + '">🗑 Remove</button></div></div>' +
       '<div class="cvbox"><span class="cap">Back cover</span><label class="thumb cv" id="thb-' + b.id + '" for="bkf-' + b.id + '" style="' + backThumb(b.id) + '" title="Tap to add back cover"></label>' +
-      '<div class="acts"><label class="btn small" for="bkf-' + b.id + '">Upload / replace</label><input type="file" id="bkf-' + b.id + '" data-file="back" data-bid="' + b.id + '" accept="image/*" hidden>' +
-      '<button class="btn small warn" type="button" data-act="rmback" data-id="' + b.id + '">Remove</button></div></div>' +
+      '<div class="acts"><label class="btn small" for="bkf-' + b.id + '">⬆ Upload / replace</label><input type="file" id="bkf-' + b.id + '" data-file="back" data-bid="' + b.id + '" accept="image/*" hidden>' +
+      '<button class="btn small warn" type="button" data-act="rmback" data-id="' + b.id + '">🗑 Remove</button></div></div>' +
       '</div>' +
       f('title', 'Book title') +
       '<div class="g3">' + f('author', 'Author') + f('publisher', 'Publisher') + f('genre', 'Genre') + '</div>' +
