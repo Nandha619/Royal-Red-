@@ -47,6 +47,9 @@ html.m-view #mainPanel,html.m-view #cardPanel{display:none!important}
 html.m-view .stage{position:fixed;inset:0;background:var(--stg,#000);border:0;border-radius:0;padding:0;display:block;cursor:pointer}
 html.m-view canvas{position:absolute;inset:0;width:100%;height:100%;max-height:none;aspect-ratio:auto;object-fit:contain;border-radius:0;background:var(--stg,#000);pointer-events:none}
 /* ---- வீடியோ எடிட்டர் அமைப்பு: முக்கியம் / தொட்டால் துணை செட்டிங் / ஒருமுறை ---- */
+#edMode{display:none!important}
+.stp{display:inline-grid;place-items:center;width:22px;height:22px;margin-right:6px;border-radius:50%;background:var(--gold);color:#000;font:800 12px/1 inherit}
+.ess h3 small{font-weight:600;opacity:.7;margin-left:6px}
 .ess{display:grid;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;border-inline-start:5px solid var(--gold)}
 .ess>h3{margin:0;font-size:15px;font-weight:800}
 details.sub{border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden}
@@ -99,18 +102,14 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
 <div id="vInfo"></div>
 <div class="panel" id="mainPanel">
   <h2>News Studio <small>Mobile TV template</small></h2>
-  <div class="seg" id="edMode" role="group" aria-label="Editor mode"><button type="button" data-m="mobile">📱 Mobile</button><button type="button" data-m="desktop">🖥 Computer</button></div>
-  <div class="row">
-    <button id="bCombo" class="gold" type="button">Render MP4 · full video</button>
-    <button id="bPlay" class="alt">▶ Preview</button>
-    <button id="bCard" class="alt">News card</button>
-  </div>
-  <div id="st">Ready. 1080×1920 · 30 FPS</div><small id="net"></small>
-  <div class="bar" aria-hidden="true"><div id="xProg"></div></div>
-  <div class="row"><button id="xCancel" class="gold" hidden>Cancel</button></div>
+
+  <section class="ess" id="tkBox">
+    <h3><span class="stp">1</span> ⏱ Track <small>ticker · all news</small></h3>
+    <label>Ticker text <small>separate items with |</small><input id="gTicker" placeholder="Headline one | Headline two"></label>
+  </section>
 
   <section class="ess" id="essBox">
-    <h3 id="nHead">News 1</h3>
+    <h3><span class="stp">2</span> ✎ Title &amp; caption <small id="nHead">News 1</small></h3>
     <label>Title <small>line 1 black, line 2 red; *word* = red</small><textarea data-k="headline" rows="2"></textarea></label>
     <label>Caption <small>*word* = red · after a full stop (.) the next sentences can move to the next page</small><textarea data-k="script" rows="5"></textarea></label>
     <div class="row" style="align-items:end">
@@ -137,18 +136,21 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
       </div>
     </details>
   </section>
-  <section class="ess" id="tkBox">
-    <h3>Ticker · common for all news</h3>
-    <label>Ticker text <small>separate items with |</small><input id="gTicker" placeholder="Headline one | Headline two"></label>
-  </section>
-
   <section class="ess" id="vidBox">
-    <h3>Video</h3>
+    <h3><span class="stp">3</span> ⬆ Video <small>upload &amp; render</small></h3>
     <div class="row"><button id="bVidUp" type="button">⬆ Upload video (max 3:00)</button><button id="bVidClr" class="alt" type="button">Remove</button></div>
     <input type="file" id="fVid" accept="video/*" hidden>
     <small id="vidInfo"></small>
+  
+  <div class="row">
+    <button id="bCombo" class="gold" type="button">⬇ Make MP4</button>
+    <button id="bPlay" class="alt">▶ Preview</button>
+    <button id="bCard" class="alt">🖼 Card</button>
+  </div>
+  <div id="st">Ready. 1080×1920 · 30 FPS</div><small id="net"></small>
+  <div class="bar" aria-hidden="true"><div id="xProg"></div></div>
+  <div class="row"><button id="xCancel" class="gold" hidden>Cancel</button></div>
   </section>
-
   <details class="sub" id="subZoom">
     <summary>Footage zoom <small>drag · pinch</small></summary>
     <div class="subb">
@@ -1409,8 +1411,9 @@ function setMode(m){m=m==="desktop"?"desktop":"mobile";root.classList.toggle("ed
   document.querySelectorAll("#edMode button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
   try{localStorage.setItem("tk_ed_mode",m)}catch(e){}try{if(parent!==window)parent.postMessage({edModeSync:m},location.origin)}catch(e){}sig="";render(true)}
 document.querySelectorAll("#edMode button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
-let m0=null;try{m0=localStorage.getItem("tk_ed_mode")}catch(e){}
+let m0=null;if(parent!==window)try{m0=localStorage.getItem("tk_ed_mode")}catch(e){}
 setMode(m0||(window.innerWidth>=900?"desktop":"mobile"));
+addEventListener("resize",()=>{if(parent===window){const w=window.innerWidth>=900?"desktop":"mobile";if(!root.classList.contains("ed-"+w))setMode(w)}});
 addEventListener("message",e=>{if(e.origin===location.origin&&e.data&&e.data.edMode&&(e.data.edMode==="mobile"||e.data.edMode==="desktop")&&root.classList.contains("ed-"+e.data.edMode)===false)setMode(e.data.edMode)});
 document.addEventListener("keydown",e=>{
   if(!root.classList.contains("ed-desktop")||e.target.closest("input,textarea,select,[contenteditable]")||e.ctrlKey||e.metaKey)return;

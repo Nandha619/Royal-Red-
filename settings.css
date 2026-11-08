@@ -184,3 +184,6 @@ html.m-settings.ed-mobile #tlBar { height: 64px; }
   html.m-settings.bk-desktop .stage canvas { width: 100% !important; height: 100% !important; max-height: none !important; }
   html.m-settings.bk-desktop .side { order: 1; min-width: 0; }
 }
+
+/* Mobile/Computer switches removed — layout follows screen width */
+#edMode,.st-mode,.edm{display:none!important}

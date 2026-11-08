@@ -123,6 +123,7 @@ input[type=color] { width: 38px; height: 30px; border: 1px solid var(--line); bo
 .side{gap:10px}.panels{gap:8px!important}details.pn>summary{padding:10px 14px!important;font-size:17px!important}details.pn>.body{gap:8px!important;padding:0 14px 12px!important}.card{padding:12px!important}header.top{margin-bottom:12px!important}.shell{gap:16px!important}.checks{gap:6px 12px!important}
 /* ---- முதல் பக்கம் (காட்சி மட்டும்): ?mode=view ---- */
 html.m-view header.top,html.m-view .side,html.m-view .row2,html.m-view .hint,html.m-view .player{display:none!important}
+.edm{display:none!important}
 html.m-view,html.m-view body{height:100%;overflow:hidden;padding:0!important;margin:0;background:#3a050d;overscroll-behavior:none}
 html.m-view .shell{display:block!important;max-width:none!important;padding:0!important;margin:0!important}
 html.m-view .stage{position:static!important;display:block}
@@ -1306,7 +1307,8 @@ function setEdMode(m) {
 }
 $$('#edMode button').forEach(function (b) { b.addEventListener('click', function () { setEdMode(b.dataset.m); }); });
 addEventListener('message', function (e) { if (e.origin === location.origin && e.data && (e.data.edMode === 'mobile' || e.data.edMode === 'desktop')) setEdMode(e.data.edMode); });
-(function () { var m0 = null; try { m0 = localStorage.getItem('tk_ed_mode'); } catch (e) {} setEdMode(m0 || (innerWidth >= 900 ? 'desktop' : 'mobile')); })();
+(function () { var m0 = null; if (parent !== window) try { m0 = localStorage.getItem('tk_ed_mode'); } catch (e) {} setEdMode(m0 || (innerWidth >= 900 ? 'desktop' : 'mobile'));
+  addEventListener('resize', function () { if (parent === window) { var w = innerWidth >= 900 ? 'desktop' : 'mobile'; if (document.documentElement.classList.contains('bk-' + w) === false) setEdMode(w); } }); })();
 fillForm(); $('#seek').max = TOTAL; syncPlayer();
 restoreMedia();
 loadFonts();
