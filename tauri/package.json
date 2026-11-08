@@ -1,0 +1,7 @@
+{
+  "name": "news-studio-tauri",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": { "prep": "node prep.js", "build": "node prep.js && tauri build" },
+  "devDependencies": { "@tauri-apps/cli": "^2.1.0", "mp4-muxer": "5.1.3" }
+}

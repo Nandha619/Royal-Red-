@@ -3,3 +3,8 @@ desktop/node_modules/
 desktop/app/
 desktop/dist/
 desktop/build/
+tauri/app/
+tauri/node_modules/
+tauri/src-tauri/target/
+tauri/src-tauri/gen/
+tauri/src-tauri/icons/

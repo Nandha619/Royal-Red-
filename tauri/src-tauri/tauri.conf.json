@@ -1,0 +1,17 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "NEWS STUDIO",
+  "version": "1.0.0",
+  "identifier": "in.newsstudio.desktop",
+  "build": { "frontendDist": "../app" },
+  "app": {
+    "windows": [ { "label": "main", "title": "NEWS STUDIO", "width": 1280, "height": 860, "minWidth": 420, "minHeight": 600, "backgroundColor": "#7A0C14" } ],
+    "security": { "csp": null }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.ico"],
+    "windows": { "webviewInstallMode": { "type": "downloadBootstrapper" } }
+  }
+}
