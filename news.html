@@ -103,13 +103,8 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
 <div class="panel" id="mainPanel">
   <h2>News Studio <small>Mobile TV template</small></h2>
 
-  <section class="ess" id="tkBox">
-    <h3><span class="stp">1</span> ⏱ Track <small>ticker · all news</small></h3>
-    <label>Ticker text <small>separate items with |</small><input id="gTicker" placeholder="Headline one | Headline two"></label>
-  </section>
-
   <section class="ess" id="essBox">
-    <h3><span class="stp">2</span> ✎ Title &amp; caption <small id="nHead">News 1</small></h3>
+    <h3><span class="stp">1</span> ✎ Title &amp; caption <small id="nHead">News 1</small></h3>
     <label>Title <small>line 1 black, line 2 red; *word* = red</small><textarea data-k="headline" rows="2"></textarea></label>
     <label>Caption <small>*word* = red · after a full stop (.) the next sentences can move to the next page</small><textarea data-k="script" rows="5"></textarea></label>
     <div class="row" style="align-items:end">
@@ -137,7 +132,7 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
     </details>
   </section>
   <section class="ess" id="vidBox">
-    <h3><span class="stp">3</span> ⬆ Video <small>upload &amp; render</small></h3>
+    <h3><span class="stp">2</span> ⬆ Video <small>upload &amp; render</small></h3>
     <div class="row"><button id="bVidUp" type="button">⬆ Upload video (max 3:00)</button><button id="bVidClr" class="alt" type="button">🗑 Remove</button></div>
     <input type="file" id="fVid" accept="video/*" hidden>
     <small id="vidInfo"></small>
@@ -151,6 +146,11 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
   <div class="bar" aria-hidden="true"><div id="xProg"></div></div>
   <div class="row"><button id="xCancel" class="gold" hidden>Cancel</button></div>
   </section>
+  <section class="ess" id="tkBox">
+    <h3><span class="stp">3</span> ⏱ Track <small>ticker · all news</small></h3>
+    <label>Ticker text <small>separate items with |</small><input id="gTicker" placeholder="Headline one | Headline two"></label>
+  </section>
+
   <details class="sub" id="subZoom">
     <summary>Footage zoom <small>drag · pinch</small></summary>
     <div class="subb">
