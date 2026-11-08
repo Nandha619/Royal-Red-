@@ -87,6 +87,17 @@ input[type=text]:focus-visible, select:focus-visible, button:focus-visible, summ
 .up .st { color: var(--muted); font-size: 13px; min-width: 0; overflow-wrap: anywhere; }
 .thumb { width: 54px; height: 54px; border-radius: 9px; border: 1px solid var(--line); background: var(--field) center / contain no-repeat; flex: none; }
 .thumb.cv { width: 40px; height: 60px; background-size: cover; }
+/* Books editor: large, clear front / back cover tiles */
+.covers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; justify-items: center; }
+.cvbox { display: grid; gap: 8px; justify-items: center; width: 100%; min-width: 0; }
+.cvbox .cap { font-size: 13px; font-weight: 700; color: var(--muted); }
+.cvbox .thumb.cv { display: block; position: relative; width: min(100%, 230px); height: auto; aspect-ratio: 2 / 3; border-radius: 10px; background-size: contain; background-color: var(--panel); border: 2px dashed var(--line); cursor: pointer; box-shadow: 0 6px 16px rgba(0, 0, 0, .12); }
+.cvbox .thumb.cv[style*="url"] { border-style: solid; }
+.cvbox .thumb.cv:not([style*="url"])::before { content: '+ Add'; position: absolute; inset: 0; display: grid; place-items: center; font-weight: 700; font-size: 15px; color: var(--muted); }
+.g3 { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.g3 > :nth-child(3) { grid-column: 1 / -1; }
+@media (min-width: 560px) { .g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .g3 > :nth-child(3) { grid-column: auto; } }
+.cvbox .acts { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 .book { border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 10px; background: var(--field); }
 .bh { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
 .bh strong { font-family: var(--font-display); font-size: 16px; }
@@ -469,6 +480,13 @@ function speakerFrame(sp) {
   }
   return sp.has ? { src: sp.snap, w: sp.snap.width, h: sp.snap.height } : null;
 }
+function drawFit(ctx, im, iw, ih, x, y, w, h) {
+  if (!iw || !ih) return;
+  var ar = iw / ih, bar = w / h;
+  if (Math.abs(ar / bar - 1) < 0.1) { drawCover(ctx, im, iw, ih, x, y, w, h, 0.5, 0.5); return; }
+  var s = Math.min(w / iw, h / ih), dw = iw * s, dh = ih * s;
+  ctx.drawImage(im, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+}
 function money(v) { var d = digits(v); return d ? '₹' + d : ''; }
 
 /* ---------- style helpers ---------- */
@@ -676,12 +694,14 @@ function drawBookBox(ctx, t, th, cl, x, y, w, h, ca, cp, im, ph, dir, spin, im2,
   if (fx === 'premium') for (var d = 14; d > 0; d -= 3) { ctx.fillStyle = rgba(th.accent, 0.35); rr(ctx, x + d * 0.8 * dir, y + d * 0.3, w, h, 12); ctx.fill(); }
   ctx.save(); if (fx !== 'matte') { ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = fx === 'premium' ? 30 : 16; ctx.shadowOffsetY = 12; } ctx.fillStyle = th.bg2; rr(ctx, x, y, w, h, 12); ctx.fill(); ctx.restore();
   ctx.save(); rr(ctx, x, y, w, h, 12); ctx.clip();
-  var fi = face ? im2 : im, fph = face ? ph2 : ph; if (fi) drawCover(ctx, fi.img, fi.img.naturalWidth, fi.img.naturalHeight, x, y, w, h, 0.5, 0.5); else fph();
+  var fi = face ? im2 : im, fph = face ? ph2 : ph; if (fi) drawFit(ctx, fi.img, fi.img.naturalWidth, fi.img.naturalHeight, x, y, w, h); else fph();
   var sx = dir > 0 ? x : x + w, g = ctx.createLinearGradient(sx, 0, sx + 22 * dir, 0); g.addColorStop(0, 'rgba(0,0,0,.38)'); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(dir > 0 ? x : x + w - 22, y, 22, h);
   ctx.restore(); ctx.strokeStyle = 'rgba(255,255,255,.28)'; ctx.lineWidth = 2; rr(ctx, x, y, w, h, 12); ctx.stroke(); ctx.restore();
 }
 function drawInfo(ctx, t, lt, th, ink, exit, book, R) {
-  var S = state, sh = S.show, cl = calm(th), y0 = R[0], H = R[1], CW = 224, CH = 336, cy0 = y0, x0 = 30, x1 = 1050;
+  var S = state, sh = S.show, cl = calm(th), y0 = R[0], H = R[1], CH = Math.min(H, 450), cy0 = y0 + (H - CH) / 2, x0 = 30, x1 = 1050;
+  var arOf = function (m) { return m && m.img && m.img.naturalHeight ? m.img.naturalWidth / m.img.naturalHeight : 0; };
+  var CW = Math.round(clamp(arOf(media.covers[book.id]) || arOf(media.backs[book.id]) || 2 / 3, 0.58, 0.76) * CH);
   var li = function (s, d) { return Math.min(eo3((lt - s) / d), exit); };
   var sp0 = (t % 20) - 12, spin = 0;
   if (sp0 >= 0 && sp0 < 1.8 && lt > 1.3 && exit >= 1) spin = Math.PI * (1 - Math.cos(Math.PI * sp0 / 1.8));
@@ -909,7 +929,7 @@ function drawFrame(ctx, t, o) {
   if (sh.dots && n > 1) { Ld = b - 6; b -= 12 + G; }
   if (hasC) { var ch = Math.max(rows.length * 38 + 20, qrT ? 140 : 0, pr ? 160 : 0); Lc = [b - ch, ch]; b -= ch + G; }
   if (sh.cta && S.cta) { Lcta = b - 48; b -= 48 + G; }
-  if (sh.cover || sh.back || sh.title || sh.author || sh.publisher || sh.genre) { Lr = [b - 336, 336]; b -= 336 + G; }
+  if (sh.cover || sh.back || sh.title || sh.author || sh.publisher || sh.genre) { var RH = (sh.cover || sh.back) ? 450 : 336; Lr = [b - RH, RH]; b -= RH + G; }
   
   if (Lh !== undefined) drawHead(ctx, t, th, gi(0, 0.7), Lh, hh);
   if (Lf !== undefined) drawFest(ctx, t, th, gi(0.2, 0.7), Lf, fp);
@@ -994,13 +1014,17 @@ function renderBooks() {
       '<div class="bt"><button class="btn small" type="button" data-act="up" data-id="' + b.id + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="Move up">↑</button>' +
       '<button class="btn small" type="button" data-act="down" data-id="' + b.id + '"' + (i === n - 1 ? ' disabled' : '') + ' aria-label="Move down">↓</button>' +
       '<button class="btn small warn" type="button" data-act="rmbook" data-id="' + b.id + '"' + (n <= 1 ? ' disabled' : '') + '>Remove</button></div></div>' +
-      '<div class="up"><div class="thumb cv" id="th-' + b.id + '" style="' + coverThumb(b.id) + '"></div>' +
-      '<label class="btn small" for="cvf-' + b.id + '">Front cover</label><input type="file" id="cvf-' + b.id + '" data-file="cover" data-bid="' + b.id + '" accept="image/*" hidden>' +
-      '<button class="btn small warn" type="button" data-act="rmcover" data-id="' + b.id + '">Remove</button></div>' +
-      '<div class="up"><div class="thumb cv" id="thb-' + b.id + '" style="' + backThumb(b.id) + '"></div><label class="btn small" for="bkf-' + b.id + '">Back cover</label><input type="file" id="bkf-' + b.id + '" data-file="back" data-bid="' + b.id + '" accept="image/*" hidden><button class="btn small warn" type="button" data-act="rmback" data-id="' + b.id + '">Remove</button></div>' +
+      '<div class="covers">' +
+      '<div class="cvbox"><span class="cap">Front cover</span><label class="thumb cv" id="th-' + b.id + '" for="cvf-' + b.id + '" style="' + coverThumb(b.id) + '" title="Tap to add front cover"></label>' +
+      '<div class="acts"><label class="btn small" for="cvf-' + b.id + '">Upload / replace</label><input type="file" id="cvf-' + b.id + '" data-file="cover" data-bid="' + b.id + '" accept="image/*" hidden>' +
+      '<button class="btn small warn" type="button" data-act="rmcover" data-id="' + b.id + '">Remove</button></div></div>' +
+      '<div class="cvbox"><span class="cap">Back cover</span><label class="thumb cv" id="thb-' + b.id + '" for="bkf-' + b.id + '" style="' + backThumb(b.id) + '" title="Tap to add back cover"></label>' +
+      '<div class="acts"><label class="btn small" for="bkf-' + b.id + '">Upload / replace</label><input type="file" id="bkf-' + b.id + '" data-file="back" data-bid="' + b.id + '" accept="image/*" hidden>' +
+      '<button class="btn small warn" type="button" data-act="rmback" data-id="' + b.id + '">Remove</button></div></div>' +
+      '</div>' +
       f('title', 'Book title') +
-      '<div class="grid2">' + f('author', 'Author') + f('publisher', 'Publisher') + f('genre', 'Genre') + '</div>' +
-      '<div class="grid2">' + f('oldP', 'Original price (₹)') + f('newP', 'Discount price (₹)') + '</div></div>';
+      '<div class="g3">' + f('author', 'Author') + f('publisher', 'Publisher') + f('genre', 'Genre') + '</div>' +
+      '<div class="g3" style="grid-template-columns:repeat(2,minmax(0,1fr))">' + f('oldP', 'Original price (₹)') + f('newP', 'Discount price (₹)') + '</div></div>';
   }).join('');
 }
 function renderStatus() {
