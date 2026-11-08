@@ -1,4 +1,11 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>(function(){var m=new URLSearchParams(location.search).get('mode')||'';document.documentElement.classList.add('m-'+(m||'full'));if(m==='settings'){var l=document.createElement('link');l.rel='stylesheet';l.href='settings.css';document.head.appendChild(l)}})();</script><script src="media-store.js"></script><script src="video-lib.js"></script></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}details.book>summary.bsum{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 4px;font-size:15px}
+details.book>summary.bsum::-webkit-details-marker{display:none}
+details.book>summary.bsum::after{content:"›";margin-inline-start:auto;font-size:20px;transition:transform .15s}
+details.book[open]>summary.bsum::after{transform:rotate(90deg)}
+details.book .btl{opacity:.75;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:46%}
+details.book .bh{display:flex;justify-content:flex-end}
+.cvbox .thumb.cv{max-width:150px}
+</style><script>(function(){var m=new URLSearchParams(location.search).get('mode')||'';document.documentElement.classList.add('m-'+(m||'full'));if(m==='settings'){var l=document.createElement('link');l.rel='stylesheet';l.href='settings.css';document.head.appendChild(l)}})();</script><script src="media-store.js"></script><script src="video-lib.js"></script></head><body>
 <title>Book Video Studio</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -232,6 +239,7 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
               <label class="f"><span>Speaker name</span><input type="text" id="f-spName" data-p="spName"></label>
               <label class="f"><span>Role / intro</span><input type="text" id="f-spRole" data-p="spRole"></label>
             </div>
+            <details class="in"><summary>🔍 Zoom &amp; position <small>only if needed</small></summary><div class="subb" style="display:grid;gap:8px;padding:8px 0 0">
             <div class="grid2">
               <label class="f" style="flex:1 1 100%"><span>Zoom (100% – 300%) <b id="spZoomV"></b></span><input type="range" id="spZoom" data-p="spZoom" min="1" max="3" step="0.05" aria-label="Video zoom"></label>
               <label class="f"><span>Move left ↔ right</span><input type="range" id="spX" data-p="spX" min="0" max="100" step="1" aria-label="Horizontal position"></label>
@@ -240,6 +248,7 @@ html.m-view .phone canvas{position:absolute;inset:0;width:100%;height:100%;objec
             <button class="btn small" type="button" data-act="spreset">↺ Reset zoom</button>
             
             <p class="hint">If the video is shorter than the chosen length it loops, and its sound loops with it.</p>
+            </div></details>
           </div>
         </details>
 
@@ -1047,14 +1056,16 @@ function renderThemes() {
 }
 function backThumb(id) { var c = media.backs[id]; return c ? 'background-image:url(' + c.url + ')' : ''; }
 function coverThumb(id) { var c = media.covers[id]; return c ? 'background-image:url(' + c.url + ')' : ''; }
+var bkOpen = {};
 function renderBooks() {
   var n = state.books.length, d = (TOTAL / n).toFixed(n === 4 || n === 6 || n === 3 || n === 2 || n === 1 || n === 5 ? 0 : 1);
   $('#slotHint').textContent = 'Each book shows for ' + (+(TOTAL / n).toFixed(1)) + ' s (total ' + TOTAL + ' s). Maximum 6 books.';
   $('#addBook').disabled = n >= 6;
   $('#books').innerHTML = state.books.map(function (b, i) {
     var f = function (k, label) { return '<label class="f"><span>' + label + '</span><input type="text" id="b-' + b.id + '-' + k + '" data-bid="' + b.id + '" data-bk="' + k + '" value="' + esc(b[k]) + '"></label>'; };
-    return '<div class="book">' +
-      '<div class="bh"><div><strong>Book ' + (i + 1) + '</strong> <span class="dur">' + fmt(i * TOTAL / n) + ' – ' + fmt((i + 1) * TOTAL / n) + '</span></div>' +
+    var isOpen = bkOpen[b.id] === undefined ? i === 0 : bkOpen[b.id];
+    return '<details class="book" data-bid="' + b.id + '"' + (isOpen ? ' open' : '') + '><summary class="bsum"><strong>Book ' + (i + 1) + '</strong> <span class="dur">' + fmt(i * TOTAL / n) + ' – ' + fmt((i + 1) * TOTAL / n) + '</span> <span class="btl">' + esc(b.title) + '</span></summary>' +
+      '<div class="bh"><div></div>' +
       '<div class="bt"><button class="btn small" type="button" data-act="up" data-id="' + b.id + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="Move up">↑</button>' +
       '<button class="btn small" type="button" data-act="down" data-id="' + b.id + '"' + (i === n - 1 ? ' disabled' : '') + ' aria-label="Move down">↓</button>' +
       '<button class="btn small warn" type="button" data-act="rmbook" data-id="' + b.id + '"' + (n <= 1 ? ' disabled' : '') + '>🗑 Remove</button></div></div>' +
@@ -1068,8 +1079,9 @@ function renderBooks() {
       '</div>' +
       f('title', 'Book title') +
       '<div class="g3">' + f('author', 'Author') + f('publisher', 'Publisher') + f('genre', 'Genre') + '</div>' +
-      '<div class="g3" style="grid-template-columns:repeat(2,minmax(0,1fr))">' + f('oldP', 'Original price (₹)') + f('newP', 'Discount price (₹)') + '</div></div>';
+      '<div class="g3" style="grid-template-columns:repeat(2,minmax(0,1fr))">' + f('oldP', 'Original price (₹)') + f('newP', 'Discount price (₹)') + '</div></details>';
   }).join('');
+  [].forEach.call(document.querySelectorAll('#books > details.book'), function (d) { d.addEventListener('toggle', function () { bkOpen[d.dataset.bid] = d.open; }); });
 }
 function renderStatus() {
   $('#logoSt').textContent = media.logo ? media.logo.name : 'No PNG logo — company name shows as text';
