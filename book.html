@@ -295,6 +295,7 @@ html.m-view .phone{width:min(100%,400px,calc((100vh - 76px)*9/16))!important}
               <label class="f"><span>Stall label</span><input type="text" id="l-stall" data-p="labels.stall"></label>
               <label class="f"><span>Author label</span><input type="text" id="l-author" data-p="labels.author"></label>
               <label class="f"><span>Publisher label</span><input type="text" id="l-publisher" data-p="labels.publisher"></label>
+              <label class="f"><span>Price label</span><input type="text" id="l-price" data-p="labels.price"></label>
               <label class="f"><span>Discount word</span><input type="text" id="l-off" data-p="labels.off"></label>
               <label class="f"><span>WhatsApp label</span><input type="text" id="l-wa" data-p="labels.wa"></label>
               <label class="f"><span>Web label</span><input type="text" id="l-web" data-p="labels.web"></label>
@@ -351,7 +352,7 @@ var DEFAULT = {
   org: 'உங்கள் பதிப்பகம்', fest: 'புத்தகத் திருவிழா 2027', date: 'ஜன 8 – 19', place: 'YMCA மைதானம், நந்தனம்', stall: 'F-24',
   cta: 'இப்போதே வாங்குங்கள்', spName: 'பேசுபவர் பெயர்', spRole: 'ஆசிரியர்',
   wa: '+91 98765 43210', web: 'www.yourwebsite.com', ig: '@yourhandle', qr: '',
-  labels: { date: 'தேதி', place: 'இடம்', stall: 'அரங்கு எண்', author: 'எழுத்தாளர்', publisher: 'பதிப்பகம்', off: 'தள்ளுபடி', wa: 'வாட்ஸ்அப்', web: 'இணையம்', ig: 'இன்ஸ்டா' },
+  labels: { date: 'தேதி', place: 'இடம்', stall: 'அரங்கு எண்', author: 'எழுத்தாளர்', publisher: 'பதிப்பகம்', price: 'விலை', off: 'தள்ளுபடி', wa: 'வாட்ஸ்அப்', web: 'இணையம்', ig: 'இன்ஸ்டா' },
   theme: 'royal', custom: { bg1: '#1B2160', bg2: '#0A0D2E', accent: '#FFC043', text: '#FFF8E8' }, font: 'Baloo Thambi 2',
   show: { logo: true, orgName: true, festival: false, date: false, place: false, stall: false, title: true, cover: true, back: true, author: true, publisher: true, genre: true, price: true, discount: true, speakerTag: true, contact: true, qr: false, cta: true, dots: true },
   res: '720', dur: 90, fps: 24, musicVol: 0.2, logoSize: 150, spZoom: 1, spX: 50, spY: 20,
@@ -707,21 +708,57 @@ function drawBookBox(ctx, t, th, cl, x, y, w, h, ca, cp, im, ph, dir, spin, im2,
   ctx.restore(); ctx.strokeStyle = 'rgba(255,255,255,.28)'; ctx.lineWidth = 2; rr(ctx, x, y, w, h, 12); ctx.stroke(); ctx.restore();
 }
 function drawInfo(ctx, t, lt, th, ink, exit, book, R) {
-  var S = state, sh = S.show, cl = calm(th), y0 = R[0], H = R[1], CH = Math.min(H, 450), cy0 = y0 + (H - CH) / 2, x0 = 30, x1 = 1050;
+  /* புத்தகப் பகுதி: முன் / பின் அட்டைகள் மட்டும் — பெரிதாக, நடுவில் */
+  var S = state, sh = S.show, cl = calm(th), y0 = R[0], H = R[1], CH = H, cy0 = y0, gap = 56;
   var arOf = function (m) { return m && m.img && m.img.naturalHeight ? m.img.naturalWidth / m.img.naturalHeight : 0; };
   var CW = Math.round(clamp(arOf(media.covers[book.id]) || arOf(media.backs[book.id]) || 2 / 3, 0.58, 0.76) * CH);
-  var li = function (s, d) { return Math.min(eo3((lt - s) / d), exit); };
-  var sp0 = (t % 20) - 12, spin = 0;
+  var n = (sh.cover ? 1 : 0) + (sh.back ? 1 : 0), tot = n * CW + (n - 1) * gap, fx0 = 540 - tot / 2, sp0 = (t % 20) - 12, spin = 0;
   if (sp0 >= 0 && sp0 < 1.8 && lt > 1.3 && exit >= 1) spin = Math.PI * (1 - Math.cos(Math.PI * sp0 / 1.8));
-  if (sh.cover) { drawBookBox(ctx, t, th, cl, 30, cy0, CW, CH, Math.min(eo3((lt - 0.1) / 0.6), exit), clamp((lt - 0.1) / 1), media.covers[book.id], function () { drawCoverPlaceholder(ctx, 30, cy0, CW, CH, book, th); }, 1, spin, media.backs[book.id], function () { drawBackPh(ctx, 30, cy0, CW, CH, th); }); x0 = 30 + CW + 14; }
-  if (sh.back) { var bkx = 1050 - CW; drawBookBox(ctx, t, th, cl, bkx, cy0, CW, CH, Math.min(eo3((lt - 0.3) / 0.6), exit), clamp((lt - 0.3) / 1), media.backs[book.id], function () { drawBackPh(ctx, bkx, cy0, CW, CH, th); }, -1, spin, media.covers[book.id], function () { drawCoverPlaceholder(ctx, bkx, cy0, CW, CH, book, th); }); x1 = bkx - 14; }
-  var tx = x0, W = x1 - x0, items = [], gp = 8;
-  var add = function (h, f) { items.push({ h: h, f: f }); };
-  if (sh.genre && book.genre) add(44, function (yy) { sf(ctx, 27, 800); var gw = Math.min(W, ctx.measureText(book.genre).width + 48); chip(ctx, tx + (W - gw) / 2, yy, gw, 44, th); text(ctx, book.genre, tx + W / 2, yy + 23, { size: 27, weight: 800, color: ink, align: 'center', maxW: W - 30, min: 16 }); });
-  if (sh.author && book.author) add(62, function (yy) { text(ctx, S.labels.author, tx + W / 2, yy + 9, { size: 20, weight: 700, color: rgba(th.text, 0.7), align: 'center', fam: SANS }); text(ctx, book.author, tx + W / 2, yy + 41, { size: 40, weight: 800, color: th.text, align: 'center', maxW: W, min: 22 }); });
-  if (sh.publisher && book.publisher) add(58, function (yy) { text(ctx, S.labels.publisher, tx + W / 2, yy + 9, { size: 20, weight: 700, color: rgba(th.text, 0.7), align: 'center', fam: SANS }); text(ctx, book.publisher, tx + W / 2, yy + 38, { size: 34, weight: 700, color: th.text, align: 'center', maxW: W, min: 20 }); });
-  var tot = items.reduce(function (s, i) { return s + i.h; }, 0) + gp * Math.max(0, items.length - 1), yy = y0 + (H - tot) / 2;
-  items.forEach(function (it, k) { var p = li(0.25 + 0.15 * k, 0.6); if (p > 0) { ctx.save(); ctx.globalAlpha = p; ctx.translate((1 - p) * 40, 0); it.f(yy); ctx.restore(); } yy += it.h + gp; });
+  if (sh.cover) { drawBookBox(ctx, t, th, cl, fx0, cy0, CW, CH, Math.min(eo3((lt - 0.1) / 0.6), exit), clamp((lt - 0.1) / 1), media.covers[book.id], function () { drawCoverPlaceholder(ctx, fx0, cy0, CW, CH, book, th); }, 1, spin, media.backs[book.id], function () { drawBackPh(ctx, fx0, cy0, CW, CH, th); }); fx0 += CW + gap; }
+  if (sh.back) { var bkx = fx0; drawBookBox(ctx, t, th, cl, bkx, cy0, CW, CH, Math.min(eo3((lt - 0.3) / 0.6), exit), clamp((lt - 0.3) / 1), media.backs[book.id], function () { drawBackPh(ctx, bkx, cy0, CW, CH, th); }, -1, spin, media.covers[book.id], function () { drawCoverPlaceholder(ctx, bkx, cy0, CW, CH, book, th); }); }
+}
+/* புத்தகத் தகவல் + விலை: தலைப்புப் பட்டைக்குக் கீழே */
+function metaParts(book) {
+  var S = state, sh = S.show, oldS = money(book.oldP), newS = money(book.newP);
+  return { genre: sh.genre && book.genre, au: sh.author && book.author, pub: sh.publisher && book.publisher, oldS: sh.price ? oldS : '', newS: sh.price ? newS : '', pct: sh.discount ? pctOf(book) : 0 };
+}
+function metaRows(m) { var r = []; if (m.genre) r.push(['g', 40]); if (m.au || m.pub) r.push(['ap', 72]); if (m.oldS || m.newS || m.pct) r.push(['p', 88]); return r; }
+function metaH() { var mx = 0; state.books.forEach(function (b) { var r = metaRows(metaParts(b)); if (r.length) mx = Math.max(mx, r.reduce(function (a, q) { return a + q[1]; }, 0) + 8 * (r.length - 1) + 26); }); return mx; }
+function drawMeta(ctx, t, lt, th, ink, exit, book, R) {
+  var S = state, cl = calm(th), fx = th.fx, m = metaParts(book), rows = metaRows(m); if (!rows.length) return;
+  var a = Math.min(eo3((lt - 0.15) / 0.6), exit); if (a <= 0) return;
+  var x = 30, w = 1020, y = R[0], h = R[1], tot = rows.reduce(function (s2, q) { return s2 + q[1]; }, 0) + 8 * (rows.length - 1), yy = y + (h - tot) / 2;
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(0, (1 - a) * 30); panel(ctx, x, y, w, h, 26, th, t);
+  rows.forEach(function (rw) {
+    var k = rw[0], rh = rw[1], cy = yy + rh / 2;
+    if (k === 'g') { sf(ctx, 26, 800); var gw = Math.min(w - 80, ctx.measureText(m.genre).width + 52); chip(ctx, 540 - gw / 2, yy, gw, rh, th); text(ctx, m.genre, 540, cy + 1, { size: 26, weight: 800, color: ink, align: 'center', maxW: gw - 30, min: 16 }); }
+    else if (k === 'ap') {
+      var two = m.au && m.pub, cols = two ? [[x + w * 0.25, S.labels.author, m.au], [x + w * 0.75, S.labels.publisher, m.pub]] : [[540, m.au ? S.labels.author : S.labels.publisher, m.au || m.pub]], cw = two ? w / 2 - 50 : w - 100;
+      cols.forEach(function (c) { text(ctx, c[1], c[0], yy + 10, { size: 20, weight: 700, color: rgba(th.text, 0.72), align: 'center', maxW: cw, fam: SANS }); text(ctx, c[2], c[0], yy + 46, { size: 38, weight: 800, color: th.text, align: 'center', maxW: cw, min: 20 }); });
+      if (two) { ctx.fillStyle = rgba(th.text, 0.22); ctx.fillRect(540 - 1, yy + 6, 2, rh - 12); }
+    } else {
+      /* விலை: துணைத் தலைப்பு + விலை */
+      text(ctx, S.labels.price, 540, yy + 11, { size: 22, weight: 800, color: th.accent, align: 'center', maxW: 300, fam: SANS });
+      var shown = m.newS || m.oldS, two2 = m.oldS && m.newS, py = yy + 56;
+      if (shown) {
+        sf(ctx, 30, 700); var ow = two2 ? ctx.measureText(m.oldS).width : 0; sf(ctx, 46, 800);
+        var cw2 = Math.max(130, ctx.measureText(shown).width + 40), grp = (two2 ? ow + 18 : 0) + cw2, gx = 540 - grp / 2, pu = cl ? 1 : 1 + 0.03 * Math.sin(t * 4);
+        if (two2) { text(ctx, m.oldS, gx, py, { size: 30, weight: 700, color: rgba(th.text, 0.7) }); ctx.strokeStyle = rgba(th.text, 0.85); ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(gx - 3, py + 2); ctx.lineTo(gx + ow + 3, py - 3); ctx.stroke(); gx += ow + 18; }
+        ctx.save(); ctx.translate(gx + cw2 / 2, py); ctx.scale(pu, pu); ctx.translate(-(gx + cw2 / 2), -py); chip(ctx, gx, py - 28, cw2, 56, th); text(ctx, shown, gx + cw2 / 2, py + 2, { size: 46, weight: 800, color: ink, align: 'center', maxW: cw2 - 20, min: 22 }); ctx.restore();
+      }
+      if (m.pct) {
+        var rad = 44, bs = (cl ? 1 : 1 + 0.04 * Math.sin(t * 4 + 1)) * rad / 112;
+        ctx.save(); ctx.translate(x + w - rad - 30, yy + rh / 2 + 6); ctx.rotate(fx === 'vintage' ? -0.2 : -0.12); ctx.scale(bs, bs);
+        burst(ctx, 112, 18, 0.9); ctx.fillStyle = th.accent; if (!cl) { ctx.shadowColor = rgba(th.accent, 0.6); ctx.shadowBlur = 24; } ctx.fill(); ctx.shadowBlur = 0;
+        ctx.strokeStyle = rgba(ink, 0.5); ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, 0, 88, 0, 7); ctx.stroke();
+        text(ctx, m.pct + '%', 0, -14, { size: 88, weight: 800, color: ink, align: 'center', maxW: 150 });
+        text(ctx, S.labels.off, 0, 52, { size: 28, weight: 800, color: ink, align: 'center', maxW: 130, min: 14, fam: SANS });
+        ctx.restore();
+      }
+    }
+    yy += rh + 8;
+  });
+  ctx.restore();
 }
 function drawInfoOld2(ctx, t, lt, th, ink, exit, book, R) {
   var S = state, sh = S.show, fx = th.fx, y0 = R[0], H = R[1], cl = calm(th), CW = 150, CH = 225, cy0 = y0 + (H - CH) / 2, x0 = 40, x1 = 1040;
@@ -842,7 +879,7 @@ function qrMatrix(s) {
 
 function contactRows() { var S = state; return [['wa', S.labels.wa, S.wa], ['web', S.labels.web, S.web], ['ig', S.labels.ig, S.ig]].filter(function (r) { return r[2]; }); }
 function drawContact(ctx, t, lt, th, ink, exit, a, R, rows, qrText, book, pr) {
-  var S = state, sh = S.show, fx = th.fx, cl = calm(th), x = 40, w = 1000, y = R[0], h = R[1], cy = y + h / 2;
+  var S = state, sh = S.show, fx = th.fx, cl = calm(th), x = qrText ? 40 : 170, w = qrText ? 1000 : 740, y = R[0], h = R[1], cy = y + h / 2;
   var oldS = money(book.oldP), newS = money(book.newP), pct = sh.discount ? pctOf(book) : 0, showP = sh.price && (oldS || newS), rowsOn = rows.length || qrText;
   ctx.save(); ctx.globalAlpha = a; ctx.translate(0, (1 - a) * 70); panel(ctx, x, y, w, h, 30, th, t);
   if (pr) {
@@ -929,23 +966,25 @@ function drawFrame(ctx, t, o) {
   drawBg(ctx, t, th);
   var n = S.books.length, slot = TOTAL / n, bi = Math.min(n - 1, Math.floor(t / slot)), lt = t - bi * slot, book = S.books[bi];
   var exit = clamp((slot - lt) / 0.5), gi = function (s, d) { return eo3((t - s) / d); };
-  var G = 10, y = 150, b = 1792, Lh, Lf, Ld, Lc, Lcta, Lr, Lt, hh = (sh.logo && media.logo) ? 100 : 80;
-  var fp = festParts(), rows = sh.contact ? contactRows() : [], qt = S.qr || (digits(S.wa) ? 'https://wa.me/' + digits(S.wa) : ''), qrT = sh.contact && sh.qr && qt ? qt : '', pr = S.books.some(function (b) { return (sh.price && (money(b.oldP) || money(b.newP))) || (sh.discount && pctOf(b)); }), hasC = rows.length || qrT || pr;
+  var G = 10, y = 150, b = 1792, Lh, Lf, Ld, Lc, Lcta, Lr, Lm, Lt, hh = (sh.logo && media.logo) ? 100 : 80;
+  var fp = festParts(), rows = sh.contact ? contactRows() : [], qt = S.qr || (digits(S.wa) ? 'https://wa.me/' + digits(S.wa) : ''), qrT = sh.contact && sh.qr && qt ? qt : '', pr = S.books.some(function (b) { return (sh.price && (money(b.oldP) || money(b.newP))) || (sh.discount && pctOf(b)); }), hasC = rows.length || qrT;
   if ((sh.logo && media.logo) || (sh.orgName && S.org)) { Lh = y; y += hh + G; }
   if (fp.length) { Lf = y; y += 60 + G; }
   if (sh.dots && n > 1) { Ld = b - 6; b -= 12 + G; }
-  if (hasC) { var ch = Math.max(rows.length * 38 + 20, qrT ? 140 : 0, pr ? 160 : 0); Lc = [b - ch, ch]; b -= ch + G; }
+  if (hasC) { var ch = Math.max(rows.length * 36 + 28, qrT ? 140 : 0); Lc = [b - ch, ch]; b -= ch + G; }
   if (sh.cta && S.cta) { Lcta = b - 48; b -= 48 + G; }
-  if (sh.cover || sh.back || sh.author || sh.publisher || sh.genre) { var RH = (sh.cover || sh.back) ? 450 : 336; Lr = [b - RH, RH]; b -= RH + G; }
+  if (sh.cover || sh.back) { b -= 8; Lr = [b - 390, 390]; b -= 390 + G; }
+  var MH = metaH(); if (MH) { Lm = [b - MH, MH]; b -= MH + G; }
   if (sh.title && S.books.some(function (bk) { return bk.title; })) { var TH = titleH(ctx); Lt = [b - TH, TH]; b -= TH + G; }
   
   if (Lh !== undefined) drawHead(ctx, t, th, gi(0, 0.7), Lh, hh);
   if (Lf !== undefined) drawFest(ctx, t, th, gi(0.2, 0.7), Lf, fp);
   drawSpeaker(ctx, t, th, ink, gi(0.3, 0.9), o, [y, b - y]);
   if (Lt) drawTitle(ctx, t, th, eo3(lt / 0.8), exit, book, Lt);
+  if (Lm) drawMeta(ctx, t, lt, th, ink, exit, book, Lm);
   if (Lr) drawInfo(ctx, t, lt, th, ink, exit, book, Lr);
   if (Lcta !== undefined) drawCTA(ctx, t, th, ink, gi(0.9, 0.6), Lcta);
-  if (Lc) drawContact(ctx, t, lt, th, ink, exit, gi(0.6, 0.8), Lc, rows, qrT, book, pr);
+  if (Lc) drawContact(ctx, t, lt, th, ink, exit, gi(0.6, 0.8), Lc, rows, qrT, book, false);
   if (Ld !== undefined) drawDots(ctx, th, n, bi, lt, slot, gi(0.8, 0.6), Ld);
   ctx.restore();
 }
