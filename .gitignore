@@ -1,0 +1,5 @@
+node_modules/
+desktop/node_modules/
+desktop/app/
+desktop/dist/
+desktop/build/

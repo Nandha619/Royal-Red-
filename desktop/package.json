@@ -1,0 +1,26 @@
+{
+  "name": "news-studio-desktop",
+  "version": "1.0.0",
+  "description": "NEWS STUDIO — E-Paper, Mobile TV, Book Shelf (Windows program)",
+  "main": "main.js",
+  "author": "NEWS STUDIO",
+  "license": "UNLICENSED",
+  "scripts": {
+    "prep": "node prep.js",
+    "start": "node prep.js && electron .",
+    "dist": "node prep.js && electron-builder --win nsis portable --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "in.newsstudio.desktop",
+    "productName": "NEWS STUDIO",
+    "files": ["main.js", "app/**/*"],
+    "icon": "build/icon.png",
+    "win": { "target": ["nsis", "portable"], "icon": "build/icon.png" },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true, "createDesktopShortcut": true },
+    "artifactName": "NEWS-STUDIO-${version}-${type}.${ext}"
+  }
+}
