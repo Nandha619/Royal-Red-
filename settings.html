@@ -6,6 +6,10 @@
 <meta name="theme-color" content="#B3121A">
 <title>Settings · NEWS STUDIO</title>
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NEWS STUDIO">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="settings.css">
 <style>
@@ -37,6 +41,7 @@ html,body{margin:0}
   <div class="st-head">
     <a class="st-back" id="back" href="index.html">← Back</a>
     <h1>⚙ Settings</h1>
+    <button type="button" id="instBtn" hidden style="border:0;border-radius:10px;padding:8px 12px;font:inherit;font-size:12px;font-weight:800;background:#d71920;color:#fff;cursor:pointer">⬇ Install app</button>
     <div class="st-mode" id="edMode" role="group" aria-label="Editor layout"><button type="button" data-m="mobile" aria-pressed="false">📱 Mobile</button><button type="button" data-m="desktop" aria-pressed="false">🖥 Computer</button></div>
     <span data-owner-slot style="display:flex;align-items:center"></span>
   </div>
@@ -287,5 +292,11 @@ html,body{margin:0}
   openTab((location.hash || '').slice(1) || 'epaper', false);
 })();
 </script>
+<script>(function(){var ev=null,b=document.getElementById('instBtn');if(!b)return;
+var standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;if(standalone)return;
+addEventListener('beforeinstallprompt',function(e){e.preventDefault();ev=e;b.hidden=false});
+if(/iphone|ipad|ipod/i.test(navigator.userAgent))b.hidden=false;
+b.onclick=function(){if(ev){ev.prompt();ev.userChoice.finally(function(){ev=null;b.hidden=true})}else alert('Safari → Share → Add to Home Screen')};
+addEventListener('appinstalled',function(){b.hidden=true})})();</script>
 </body>
 </html>
