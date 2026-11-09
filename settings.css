@@ -252,3 +252,23 @@ html.bright.m-settings .stage{background:#fff}
 html.bright.m-settings .moreh,html.bright .st-empty{color:#8a6a52}
 html.bright.m-settings .stp{color:#2a1410}
 .st-bright{border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.16);color:#fff;border-radius:10px;min-width:40px;height:36px;font-size:18px;cursor:pointer}
+
+/* ===== never wider than the phone screen (large system fonts, long titles, big uploads) ===== */
+html.m-settings,html.m-settings body{overflow-x:hidden;max-width:100vw}
+html.m-settings :where(select,input,textarea,.card,.panel,details,label,.grid2,.g3,.covers,.cvbox,.up,.body,.subb,.row,.ess,.book,.exp,.themes,.checks){max-width:100%;min-width:0;box-sizing:border-box}
+html.m-settings :where(select,input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),textarea){width:100%;text-overflow:ellipsis}
+html.m-settings .grid2,html.m-settings .checks{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))}
+html.m-settings .up,html.m-settings .acts,html.m-settings .bt,html.m-settings .row{flex-wrap:wrap}
+html.m-settings .thumb.cv{width:100%;max-width:140px}
+html.m-settings .covers{gap:8px}
+html.m-settings .btn,html.m-settings button{white-space:normal;overflow-wrap:anywhere}
+html.m-settings .pgr button span{font-size:11px;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+/* compact sizes + readable labels on dark */
+html.m-settings label.f>span,html.m-settings .lab,html.m-settings .cvbox .cap{color:var(--s-mut)}
+html.m-settings .thumb.cv{max-width:104px}
+html.m-settings :where(select,input:not([type=checkbox]):not([type=radio]),textarea){font-size:13px;min-height:36px;padding:6px 8px}
+html.m-settings .btn.small,html.m-settings button.small{min-height:34px;font-size:12px;padding:4px 10px}
+html.m-settings .exp{padding:10px 12px}
+html.m-settings .exp h2{font-size:15px;margin:0}
+html.m-settings .body,html.m-settings .subb{gap:6px}
+html.m-settings .stage .phone{max-width:min(100%,240px)}
