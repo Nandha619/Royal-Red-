@@ -27,7 +27,7 @@
         var c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
         c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(url); res(c);
       };
-      im.onerror = function () { URL.revokeObjectURL(url); rej(new Error('படத்தைப் படிக்க முடியவில்லை')); };
+      im.onerror = function () { URL.revokeObjectURL(url); rej(new Error('Could not read the image')); };
       im.src = url;
     });
   }
@@ -72,14 +72,14 @@
     process: function (file, onStatus) {
       var say = onStatus || function () {};
       return readImg(file, 1100).then(function (src) {
-        say('மாதிரி ஏற்றுகிறது… (முதல் முறை சற்று நேரமாகும்)', 0);
+        say('Loading model… (a little slow the first time)', 0);
         return Promise.all([loadLib(), toBlob(src, 'image/png')]).then(function (a) {
           var remove = a[0], blob = a[1];
           return remove(blob, {
             output: { format: 'image/png' },
             progress: function (key, cur, tot) {
-              if (/fetch|download/i.test(key)) say('மாதிரி இறக்கப்படுகிறது…', tot ? cur / tot : 0);
-              else say('உருவத்தை வெட்டுகிறது…', 1);
+              if (/fetch|download/i.test(key)) say('Downloading model…', tot ? cur / tot : 0);
+              else say('Cutting out the subject…', 1);
             }
           });
         }).then(function (out) { return blobToCanvas(out); }).then(function (c) {

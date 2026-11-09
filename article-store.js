@@ -57,14 +57,14 @@
   /* ---------- அட்மின் உள்நுழைவு (Firebase Auth REST) ---------- */
   function session() { var s = jget(AKEY, true); return s && s.idToken ? s : null; }
   function token() {
-    var s = session(); if (!s) return Promise.reject(new Error('அட்மின் உள்நுழைவு தேவை'));
+    var s = session(); if (!s) return Promise.reject(new Error('Admin sign-in required'));
     if (Date.now() < s.exp - 60000) return Promise.resolve(s.idToken);
     return http('https://securetoken.googleapis.com/v1/token?key=' + encodeURIComponent(C.apiKey), {
       method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(s.refreshToken)
     }).then(function (j) {
       s.idToken = j.id_token; s.refreshToken = j.refresh_token; s.exp = Date.now() + (+j.expires_in) * 1000; jset(AKEY, s, true); return s.idToken;
-    }).catch(function () { try { sessionStorage.removeItem(AKEY); } catch (e) {} throw new Error('அமர்வு முடிந்தது — மீண்டும் உள்நுழையவும்'); });
+    }).catch(function () { try { sessionStorage.removeItem(AKEY); } catch (e) {} throw new Error('Session expired — sign in again'); });
   }
 
   function make(kind) {
@@ -93,10 +93,10 @@
       if (r.kind !== 'article' && !r.body) r.body = r.summary;
       if (r.kind !== 'article' && !r.role) r.role = '-';
       if (r.kind !== 'article') { if (!r.name) r.name = '-'; if (!r.summary) r.summary = r.title; if (!r.body) r.body = r.summary; }
-      if (!r.name || !r.role || !r.title || !r.summary || !r.body) return Promise.reject(new Error('எல்லா புலங்களையும் நிரப்பவும்'));
+      if (!r.name || !r.role || !r.title || !r.summary || !r.body) return Promise.reject(new Error('Please fill in all fields'));
       if (!cloud) {
         var l = jget(LKEY) || []; r.id = uid(); l.push(r);
-        return jset(LKEY, l) ? Promise.resolve(r.id) : Promise.reject(new Error('சேமிக்க இடம் போதவில்லை — சிறிய படத்தைப் பயன்படுத்தவும்'));
+        return jset(LKEY, l) ? Promise.resolve(r.id) : Promise.reject(new Error('Not enough storage — use a smaller image'));
       }
       return http(DOC() + '/' + col + '?key=' + encodeURIComponent(C.apiKey), { method: 'POST', body: JSON.stringify(enc(r)) })
         .then(function (d) { return d.name.split('/').pop(); });
@@ -111,7 +111,7 @@
         method: 'POST', body: JSON.stringify({ email: email, password: pass, returnSecureToken: true })
       }).then(function (j) {
         jset(AKEY, { email: j.email, idToken: j.idToken, refreshToken: j.refreshToken, exp: Date.now() + (+j.expiresIn) * 1000 }, true);
-      }).catch(function (e) { throw new Error(/INVALID|EMAIL|PASSWORD|CREDENTIAL/i.test(e.message) ? 'மின்னஞ்சல் அல்லது கடவுச்சொல் சரியில்லை' : e.message); });
+      }).catch(function (e) { throw new Error(/INVALID|EMAIL|PASSWORD|CREDENTIAL/i.test(e.message) ? 'Incorrect email or password' : e.message); });
     },
     logout: function () { try { sessionStorage.removeItem(AKEY); } catch (e) {} },
     listAll: function () {

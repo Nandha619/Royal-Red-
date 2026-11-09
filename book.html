@@ -345,26 +345,26 @@ function onColor(h) { return lum(h) > 0.42 ? '#15133A' : '#FFFFFF'; }
 
 /* ---------- defaults & state ---------- */
 var THEMES = [
-  { id: 'royal', name: 'ராயல் சிவப்பு', fx: 'premium', font: 'Baloo Thambi 2', bg1: '#8E0E1A', bg2: '#2A0408', accent: '#F0B93B', text: '#FFF6E8' },
-  { id: 'vintage', name: 'பழைய காகிதம்', fx: 'vintage', font: 'Noto Serif Tamil', bg1: '#E9D8AE', bg2: '#C8AB74', card: '#F6EBD0', accent: '#8E2B1B', text: '#3A2814' },
-  { id: 'premium', name: 'பிரீமியம் கண்ணாடி 3D', fx: 'premium', font: 'Baloo Thambi 2', bg1: '#2A1B63', bg2: '#07061C', accent: '#F2C96B', text: '#FFFFFF' },
-  { id: 'matte', name: 'மேட் பூச்சு', fx: 'matte', font: 'Anek Tamil', bg1: '#2F3338', bg2: '#2F3338', accent: '#E0A458', text: '#EFEAE0' },
-  { id: 'white', name: 'வெள்ளை காகிதம்', fx: 'white', font: 'Anek Tamil', bg1: '#FFFFFF', bg2: '#F1F0EB', card: '#FFFFFF', accent: '#1F3A8A', text: '#1B1B1F' },
-  { id: 'library', name: 'புத்தக நூலகம்', fx: 'library', font: 'Noto Serif Tamil', bg1: '#3B2314', bg2: '#190D06', card: '#2A170C', accent: '#E3B04B', text: '#FBEFD5' },
-  { id: 'ink', name: 'மை நீலம்', bg1: '#1B2160', bg2: '#0A0D2E', accent: '#FFC043', text: '#FFF8E8' },
-  { id: 'turmeric', name: 'மஞ்சள்', bg1: '#FFD24A', bg2: '#F4A81D', accent: '#2B2A8C', text: '#1A1840' },
-  { id: 'emerald', name: 'மரகதம்', bg1: '#0F6B57', bg2: '#05342C', accent: '#F6D56F', text: '#F2FFF7' },
-  { id: 'hibiscus', name: 'செம்பருத்தி', bg1: '#9B1F52', bg2: '#4A0F2B', accent: '#FFD36B', text: '#FFF2F3' }
+  { id: 'royal', name: 'Royal Red', fx: 'premium', font: 'Baloo Thambi 2', bg1: '#8E0E1A', bg2: '#2A0408', accent: '#F0B93B', text: '#FFF6E8' },
+  { id: 'vintage', name: 'Vintage Paper', fx: 'vintage', font: 'Noto Serif Tamil', bg1: '#E9D8AE', bg2: '#C8AB74', card: '#F6EBD0', accent: '#8E2B1B', text: '#3A2814' },
+  { id: 'premium', name: 'Premium Glass 3D', fx: 'premium', font: 'Baloo Thambi 2', bg1: '#2A1B63', bg2: '#07061C', accent: '#F2C96B', text: '#FFFFFF' },
+  { id: 'matte', name: 'Matte', fx: 'matte', font: 'Anek Tamil', bg1: '#2F3338', bg2: '#2F3338', accent: '#E0A458', text: '#EFEAE0' },
+  { id: 'white', name: 'White Paper', fx: 'white', font: 'Anek Tamil', bg1: '#FFFFFF', bg2: '#F1F0EB', card: '#FFFFFF', accent: '#1F3A8A', text: '#1B1B1F' },
+  { id: 'library', name: 'Book Library', fx: 'library', font: 'Noto Serif Tamil', bg1: '#3B2314', bg2: '#190D06', card: '#2A170C', accent: '#E3B04B', text: '#FBEFD5' },
+  { id: 'ink', name: 'Ink Blue', bg1: '#1B2160', bg2: '#0A0D2E', accent: '#FFC043', text: '#FFF8E8' },
+  { id: 'turmeric', name: 'Turmeric', bg1: '#FFD24A', bg2: '#F4A81D', accent: '#2B2A8C', text: '#1A1840' },
+  { id: 'emerald', name: 'Emerald', bg1: '#0F6B57', bg2: '#05342C', accent: '#F6D56F', text: '#F2FFF7' },
+  { id: 'hibiscus', name: 'Hibiscus', bg1: '#9B1F52', bg2: '#4A0F2B', accent: '#FFD36B', text: '#FFF2F3' }
 ];
 var FONTS = [
-  ['Baloo Thambi 2', 'பலூ தம்பி (தடித்த)'], ['Anek Tamil', 'அனேக் தமிழ்'], ['Noto Serif Tamil', 'நோட்டோ செரிஃப்'],
-  ['Kavivanar', 'கவிவாணர் (கையெழுத்து)'], ['Mukta Malar', 'முக்தா மலர்'], ['Hind Madurai', 'ஹிந்த் மதுரை'], ['Tiro Tamil', 'திரோ தமிழ்']
+  ['Baloo Thambi 2', 'Baloo Thambi (bold)'], ['Anek Tamil', 'Anek Tamil'], ['Noto Serif Tamil', 'Noto Serif'],
+  ['Kavivanar', 'Kavivanar (handwriting)'], ['Mukta Malar', 'Mukta Malar'], ['Hind Madurai', 'Hind Madurai'], ['Tiro Tamil', 'Tiro Tamil']
 ];
 var DEFAULT = {
-  org: 'உங்கள் பதிப்பகம்', fest: 'புத்தகத் திருவிழா 2027', date: 'ஜன 8 – 19', place: 'YMCA மைதானம், நந்தனம்', stall: 'F-24',
-  cta: 'இப்போதே வாங்குங்கள்', spName: 'பேசுபவர் பெயர்', spRole: 'ஆசிரியர்',
+  org: 'Your Publisher', fest: 'Book Fair 2027', date: 'Jan 8 – 19', place: 'YMCA Grounds, Nandanam', stall: 'F-24',
+  cta: 'Buy now', spName: 'Speaker name', spRole: 'Author',
   wa: '+91 98765 43210', web: 'www.yourwebsite.com', ig: '@yourhandle', qr: '',
-  labels: { date: 'தேதி', place: 'இடம்', stall: 'அரங்கு எண்', author: 'எழுத்தாளர்', publisher: 'பதிப்பகம்', price: 'விலை', off: 'தள்ளுபடி', wa: 'வாட்ஸ்அப்', web: 'இணையம்', ig: 'இன்ஸ்டா' },
+  labels: { date: 'Date', place: 'Place', stall: 'Stall no.', author: 'Author', publisher: 'Publisher', price: 'Price', off: 'Off', wa: 'WhatsApp', web: 'Web', ig: 'Instagram' },
   theme: 'royal', custom: { bg1: '#1B2160', bg2: '#0A0D2E', accent: '#FFC043', text: '#FFF8E8' }, font: 'Baloo Thambi 2',
   show: { logo: true, orgName: true, festival: false, date: false, place: false, stall: false, title: true, cover: true, back: true, author: true, publisher: true, genre: true, price: true, discount: true, speakerTag: true, contact: true, qr: false, cta: true, dots: true },
   res: '720', dur: 90, fps: 24, musicVol: 0.2, logoSize: 150, spZoom: 1, spX: 50, spY: 20,
@@ -646,7 +646,7 @@ function drawSpeaker(ctx, t, th, ink, a, o, R) {
   if (!drawn) {
     ctx.fillStyle = rgba(th.text, 0.12); ctx.fillRect(x, y, w, h); ctx.fillStyle = rgba(th.text, 0.24);
     ctx.beginPath(); ctx.arc(540, y + h * 0.38, 120, 0, 7); ctx.fill(); ctx.beginPath(); ctx.ellipse(540, y + h * 0.92, 270, 230, 0, 0, 7); ctx.fill();
-    if (o.preview) text(ctx, 'பேசுபவர் வீடியோ / படம் இங்கே', 540, y + 70, { size: 32, weight: 600, color: rgba(th.text, 0.75), align: 'center', maxW: 760, fam: SANS });
+    if (o.preview) text(ctx, 'Speaker video / photo here', 540, y + 70, { size: 32, weight: 600, color: rgba(th.text, 0.75), align: 'center', maxW: 760, fam: SANS });
   }
   if (fx === 'vintage') { ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgba(150,100,40,.28)'; ctx.fillRect(x, y, w, h); ctx.globalCompositeOperation = 'source-over'; grain(ctx, 0.8); }
   if (fx === 'premium') { var sg = ctx.createLinearGradient(x, y, x + w * 0.7, y + h * 0.5); sg.addColorStop(0, 'rgba(255,255,255,.16)'); sg.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = sg; ctx.fillRect(x, y, w, h); }
@@ -866,7 +866,7 @@ function drawCoverPlaceholder(ctx, x, y, w, h, book, th) {
   ctx.fillStyle = rgba(on, 0.14); ctx.beginPath(); ctx.arc(x + w * 0.85, y + h * 0.18, w * 0.42, 0, Math.PI * 2); ctx.fill();
   ctx.beginPath(); ctx.arc(x + w * 0.1, y + h * 0.95, w * 0.5, 0, Math.PI * 2); ctx.fill();
   ctx.strokeStyle = rgba(on, 0.5); ctx.lineWidth = 3; ctx.strokeRect(x + 14, y + 14, w - 28, h - 28);
-  sf(ctx, 30, 800); var lines = wrap(ctx, book.title || 'புத்தகம்', w - 56).slice(0, 5), lh = 38;
+  sf(ctx, 30, 800); var lines = wrap(ctx, book.title || 'Book', w - 56).slice(0, 5), lh = 38;
   lines.forEach(function (ln, i) { text(ctx, ln, x + w / 2, y + h / 2 - (lines.length * lh) / 2 + lh * i + lh / 2, { size: 30, weight: 800, color: on, align: 'center' }); });
 }
 

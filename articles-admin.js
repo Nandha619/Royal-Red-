@@ -69,7 +69,7 @@
       var det = document.createElement('details'), sm = h('summary', '', 'Read full details'), bd = h('div', 'body'); bd.style.cssText = 'white-space:pre-wrap;line-height:1.8;overflow-wrap:anywhere';
       bd.textContent = a.body; det.append(sm, bd); c.appendChild(det);
       var row = h('div', 'st-row');
-      function btn(txt, cls, fn) { var b = h('button', cls, txt); b.type = 'button'; b.onclick = function () { b.disabled = true; fn().then(load).catch(function (e) { toast('⚠ ' + e.message); b.disabled = false; if (/உள்நுழை|அமர்வு/.test(e.message)) render(); }); }; row.appendChild(b); }
+      function btn(txt, cls, fn) { var b = h('button', cls, txt); b.type = 'button'; b.onclick = function () { b.disabled = true; fn().then(load).catch(function (e) { toast('⚠ ' + e.message); b.disabled = false; if (/sign-in|Session/i.test(e.message)) render(); }); }; row.appendChild(b); }
       if (a.status !== 'approved') btn('✔ Approve (show on front page)', '', function () { return S.setStatus(a.id, 'approved').then(function () { toast('✔ Approved'); }); });
       if (a.status === 'approved') btn('⏸ Take off front page', 'alt', function () { return S.setStatus(a.id, 'pending').then(function () { toast('Moved back to pending'); }); });
       if (a.status === 'pending') btn('✖ Reject', 'alt', function () { return S.setStatus(a.id, 'rejected').then(function () { toast('Rejected'); }); });
@@ -81,7 +81,7 @@
   function load() {
     if (!S.isAdmin()) return render();
     return S.listAll(kind).then(function (l) { all = l; render(); }).catch(function (e) {
-      if (/உள்நுழை|அமர்வு|401|403|PERMISSION/i.test(e.message)) { S.logout(); } else toast('⚠ ' + e.message);
+      if (/sign-in|Session|401|403|PERMISSION/i.test(e.message)) { S.logout(); } else toast('⚠ ' + e.message);
       render();
     });
   }
@@ -122,7 +122,7 @@
       st.all = [].concat.apply([], lists).sort(function (a, b) { return b.createdAt - a.createdAt; });
       st.listed = true; notify();
       if (firstErr) {
-        if (/உள்நுழை|அமர்வு|401|403|PERMISSION/i.test(firstErr.message)) S('article').logout(); else toast('⚠ ' + firstErr.message);
+        if (/sign-in|Session|401|403|PERMISSION/i.test(firstErr.message)) S('article').logout(); else toast('⚠ ' + firstErr.message);
       }
       render();
     });
@@ -200,7 +200,7 @@
     var det = document.createElement('details'), sm = h('summary', '', 'Read full details'), bd = h('div', 'body'); bd.style.cssText = 'white-space:pre-wrap;line-height:1.8;overflow-wrap:anywhere';
     bd.textContent = a.body; det.append(sm, bd); c.appendChild(det);
     var row = h('div', 'st-row');
-    function btn(txt, cls, fn) { var b = h('button', cls, txt); b.type = 'button'; b.onclick = function () { b.disabled = true; fn().then(load).catch(function (e) { toast('⚠ ' + e.message); b.disabled = false; if (/உள்நுழை|அமர்வு/.test(e.message)) render(); }); }; row.appendChild(b); }
+    function btn(txt, cls, fn) { var b = h('button', cls, txt); b.type = 'button'; b.onclick = function () { b.disabled = true; fn().then(load).catch(function (e) { toast('⚠ ' + e.message); b.disabled = false; if (/sign-in|Session/i.test(e.message)) render(); }); }; row.appendChild(b); }
     if (a.status !== 'approved') btn('✔ Approve (show on front page)', '', function () { return Sx.setStatus(a.id, 'approved').then(function () { toast('✔ Approved'); }); });
     if (a.status === 'approved') btn('⏸ Take off front page', 'alt', function () { return Sx.setStatus(a.id, 'pending').then(function () { toast('Moved back to pending'); }); });
     if (a.status === 'pending') btn('✖ Reject', 'alt', function () { return Sx.setStatus(a.id, 'rejected').then(function () { toast('Rejected'); }); });

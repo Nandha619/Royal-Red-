@@ -6,7 +6,7 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="application-name" content="Theekkathir News Studio">
-<meta name="description" content="தீக்கதிர் செய்தி வீடியோ தயாரிப்பு ஸ்டுடியோ">
+<meta name="description" content="News video production studio">
 <meta name="theme-color" content="#FFC800">
 <style>
 @font-face{font-family:"Noto Sans Tamil";font-weight:100 900;src:local("Noto Sans Tamil"),local("NotoSansTamil-Regular"),local("NotoSansTamil")}
@@ -242,35 +242,35 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
        kept hidden so previously saved settings and the shared code still find their fields -->
   <div id="legacy" hidden>
 <input data-k="ticker" aria-label="legacy ticker">
-<label>⏱ இந்தச் செய்தியின் நீளம் (தொகுப்பு முறையில்; வினாடி)<select data-k="len"><option value="20">20 வினாடி</option><option value="30">30 வினாடி</option><option value="40">40 வினாடி</option><option value="50">50 வினாடி</option><option value="60">60 வினாடி</option></select></label>
-<label>இயல்புநிலை புரோமோ எழுத்து<input id="gPrDef" placeholder="BREAKING NEWS"></label>
-<label>வீடியோ நீளம் (வினாடி; அதிகபட்சம் 180 = 3 நிமிடம்)<input id="gDur" type="number" min="6" max="180"></label>
-<label>ஒரு படம் / வினாடி<input id="gSl" type="number" min="1" max="15"></label>
+<label>⏱ Length of this story (combo mode; seconds)<select data-k="len"><option value="20">20 s</option><option value="30">30 s</option><option value="40">40 s</option><option value="50">50 s</option><option value="60">60 s</option></select></label>
+<label>Default promo text<input id="gPrDef" placeholder="BREAKING NEWS"></label>
+<label>Video length (seconds; max 180 = 3 min)<input id="gDur" type="number" min="6" max="180"></label>
+<label>Seconds per image<input id="gSl" type="number" min="1" max="15"></label>
 <details class="sub" id="subPromo">
-    <summary>🎬 புரோமோ <small>தொட்டால் துணை செட்டிங்</small></summary>
+    <summary>🎬 Promo <small>tap for sub-settings</small></summary>
     <div class="subb">
-      <div class="row" style="align-items:center;flex-wrap:wrap;gap:14px"><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gPrOn" style="width:auto"> 🎬 வீடியோ மேல் புரோமோ அனிமேஷன்</label></div>
-<div class="row"><label>புரோமோ பாணி<select id="gPrStyle"><option value="full">முழுக் கட்டம் (சேனல் இடைவேளை)</option><option value="band">நடுப் பட்டை</option></select></label><label>எத்தனை வினாடி தெரியும்<input id="gPrDur" type="number" min="2" max="10"></label></div>
-<small>📍 வீடியோ முன்னோட்டத்தின் கீழே உள்ள நேரக்கோட்டில் புரோமோ தேவையான இடத்தில் “＋ புரோமோ” அழுத்துங்கள். அது அந்த நேரத்தில் பாப்-அப் ஆக வரும்; தங்க நிறப் பட்டையை இழுத்து நகர்த்தலாம், தட்டினால் நேரம் / சொல்லை மாற்றலாம்.</small>
-<details class="in"><summary>⌨ எண்ணாகவும் வார்த்தையாகவும் அமைக்க (மேம்பட்டது)</summary><div class="subb">
-  <label>🎬 வீடியோ புரோமோ எழுத்து (இந்தச் செய்திக்கு; காலியாக விட்டால் இயல்புநிலை வரும்; பல வார்த்தைகளை | கொண்டு பிரிக்கவும்)<input data-k="promo" placeholder="BREAKING NEWS | JUST IN | NEWS UPDATE"></label>
-  <label>⏱ புரோமோ வரும் நேரங்கள் (வினாடி அல்லது நிமிடம்:வினாடி; காற்புள்ளியால் பிரிக்கவும், எ.கா: 10, 25, 1:05; காலியாக விட்டால் இடைவெளி முறை)<input data-k="promoAt" placeholder="10, 25, 1:05" inputmode="text"></label><small id="promoAtInfo"></small>
-  <div class="row" style="align-items:end"><label>முன்னோட்ட நேரம் <b id="pScrubT">0:00</b><input type="range" id="pScrub" min="0" max="90" step="0.1" value="0"></label></div>
-  <div class="row"><button class="alt" id="bPrAdd" type="button">＋ இந்த நேரத்தில் புரோமோ சேர்</button><button class="alt" id="bPrClr" type="button">✖ நேரங்களை அழி</button></div>
-<div class="row"><label>எத்தனை வினாடிக்கு ஒருமுறை<input id="gPrEvery" type="number" min="5" max="180"></label></div>
-      <div class="row"><button class="alt" id="bPrTest" type="button">▶ புரோமோவைச் சோதி</button></div>
+      <div class="row" style="align-items:center;flex-wrap:wrap;gap:14px"><label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gPrOn" style="width:auto"> 🎬 Promo animation over the video</label></div>
+<div class="row"><label>Promo style<select id="gPrStyle"><option value="full">Full frame (channel break)</option><option value="band">Middle band</option></select></label><label>Seconds visible<input id="gPrDur" type="number" min="2" max="10"></label></div>
+<small>📍 On the timeline below the video preview, press “＋ Promo” where you want one. It pops up at that time; drag the gold bar to move it, tap it to change the time / text.</small>
+<details class="in"><summary>⌨ Set by numbers and words (advanced)</summary><div class="subb">
+  <label>🎬 Promo text for this story (leave empty for the default; separate several phrases with |)<input data-k="promo" placeholder="BREAKING NEWS | JUST IN | NEWS UPDATE"></label>
+  <label>⏱ Promo times (seconds or min:sec; comma separated, e.g. 10, 25, 1:05; empty = interval mode)<input data-k="promoAt" placeholder="10, 25, 1:05" inputmode="text"></label><small id="promoAtInfo"></small>
+  <div class="row" style="align-items:end"><label>Preview time <b id="pScrubT">0:00</b><input type="range" id="pScrub" min="0" max="90" step="0.1" value="0"></label></div>
+  <div class="row"><button class="alt" id="bPrAdd" type="button">＋ Add promo at this time</button><button class="alt" id="bPrClr" type="button">✖ Clear times</button></div>
+<div class="row"><label>Repeat every (seconds)<input id="gPrEvery" type="number" min="5" max="180"></label></div>
+      <div class="row"><button class="alt" id="bPrTest" type="button">▶ Test promo</button></div>
 </div></details>
     </div>
   </details>
 <details class="sub" id="subCombo">
-    <summary>🎞 தொகுப்பு வீடியோ — Top 10 <small>ஒரே வீடியோ · அதிகபட்சம் 3 நிமிடம்</small></summary>
+    <summary>🎞 Combo video — Top 10 <small>one video · max 3 min</small></summary>
     <div class="subb">
-      <label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gCombo" style="width:auto"> தொகுப்பு முறை: ஒவ்வொரு செய்தியும் தன் நீளம் ஓடி, முடிவில் புரோமோ வரும்; End card கடைசியில் மட்டும்</label>
-      <div class="row"><label>தொடக்க செய்தி எண் (part 2-க்கு 7 போன்ற எண் கொடுக்கவும்)<input id="gFrom" type="number" min="1" max="10"></label></div>
+      <label style="display:flex;gap:8px;align-items:center;flex-direction:row"><input type="checkbox" id="gCombo" style="width:auto"> Combo mode: each story plays for its own length, then a promo; end card only at the very end</label>
+      <div class="row"><label>Starting story number (e.g. 7 for part 2)<input id="gFrom" type="number" min="1" max="10"></label></div>
       <small id="cInfo"></small>
-      <div class="row"><button class="alt" id="bTpl" type="button">⭐ இந்த அமைப்பை இயல்பு அமைப்பாக சேமி</button><button class="alt" id="bTplRst" type="button">↺ இந்தச் செய்தியை இயல்புக்கு மீட்டமை</button></div>
-      <small>புதிய செய்தி சேர்க்கும்போது எழுத்து (தலைப்பு / ஸ்கிரிப்ட்) காலியாகவும், மற்றவை (நீளம், BREAKING, புரோமோ எழுத்து, zoom) இயல்பு அமைப்பிலிருந்தும் தொடங்கும். முதல் செய்தியின் அமைப்பு தானாகவே இயல்பு அமைப்பாகச் சேமிக்கப்பட்டிருக்கும்.</small>
-      <div class="row"><button class="alt" id="bCP" type="button">▶ தொகுப்பு முன்னோட்டம்</button></div>
+      <div class="row"><button class="alt" id="bTpl" type="button">⭐ Save these settings as default</button><button class="alt" id="bTplRst" type="button">↺ Reset this story to default</button></div>
+      <small>A new story starts with empty text (title / script); the rest (length, BREAKING, promo text, zoom) starts from the default settings. The first story's settings are saved as the default automatically.</small>
+      <div class="row"><button class="alt" id="bCP" type="button">▶ Combo preview</button></div>
     </div>
   </details>
   </div>
@@ -405,7 +405,7 @@ function draw(it,t){
   if(!STILL&&!window._exp)ML.forEach((m,i)=>{if(m.type!=="v")return;if(m.one){oneSync(m,t);return}const on=i===si||(nM>1&&i===nx&&st2>SL-.6);if(on&&!m.el._on){m.el._on=true;m.el.currentTime=0;m.el.play().catch(()=>{})}else if(!on&&m.el._on){m.el._on=false;m.el.pause()}m.el.muted=!(rec&&i===si)});
   const dm=(m,al)=>{ctx.save();ctx.globalAlpha=al;if(m.type==="v"){if(m.el.readyState>=2){cover(m.el,m.el.videoWidth,m.el.videoHeight,fx,fy,fw,fh,uz,it.px,it.py);if(window._exp)snapFrame(m)}else if(window._exp&&m._lc)cover(m._lc,m._lc.width,m._lc.height,fx,fy,fw,fh,uz,it.px,it.py)}else cover(m.el,m.el.naturalWidth,m.el.naturalHeight,fx,fy,fw,fh,uz,it.px,it.py);ctx.restore()};
   if(nM){dm(ML[si],p);if(nM>1&&st2>SL-.5)dm(ML[nx],p*ease((st2-(SL-.5))/.5))}
-  else{ctx.save();ctx.fillStyle="#242424";ctx.fillRect(fx,fy,fw,fh);const gg=ctx.createLinearGradient(fx+((t*260)%1500)-400,0,fx+((t*260)%1500),0);gg.addColorStop(0,"rgba(255,255,255,0)");gg.addColorStop(.5,"rgba(255,255,255,.1)");gg.addColorStop(1,"rgba(255,255,255,0)");ctx.fillStyle=gg;ctx.fillRect(fx,fy,fw,fh);ctx.fillStyle="#9a9a9a";ctx.font=`700 44px ${FONT}`;ctx.textAlign="center";ctx.fillText("வீடியோ / படம் இங்கே",W/2,vy+vh/2+14);ctx.restore();ctx.textAlign="left"}
+  else{ctx.save();ctx.fillStyle="#242424";ctx.fillRect(fx,fy,fw,fh);const gg=ctx.createLinearGradient(fx+((t*260)%1500)-400,0,fx+((t*260)%1500),0);gg.addColorStop(0,"rgba(255,255,255,0)");gg.addColorStop(.5,"rgba(255,255,255,.1)");gg.addColorStop(1,"rgba(255,255,255,0)");ctx.fillStyle=gg;ctx.fillRect(fx,fy,fw,fh);ctx.fillStyle="#9a9a9a";ctx.font=`700 44px ${FONT}`;ctx.textAlign="center";ctx.fillText("Video / photo here",W/2,vy+vh/2+14);ctx.restore();ctx.textAlign="left"}
   WMARK(fx,fy,fw,fh);FRAMEFX(it,t,fx,fy,fw,fh);PRO1(it,t,fx,fy,fw,fh);
   if(nM>1){for(let j=0;j<nM;j++){ctx.fillStyle=j===si?GOLD:"rgba(255,255,255,.45)";ctx.beginPath();ctx.arc(vx+vw/2-(nM-1)*14+j*28,vy+vh-30,7,0,7);ctx.fill()}}
   FRAMEBORDER(vx,vy,vw,vh,t,p);
@@ -601,7 +601,7 @@ function PROMO(it,t,fx,fy,fw,fh){
   if(u>=DU||T0+DU>durOf(it)-(G.combo&&lastSeg(it)?EC:0))return;
   (G.prStyle==="band"?promoBand:promoFull)(words[k%words.length],u,DU,fx,fy,fw,fh)
 }
-/* பாணி 2: நடுப் பட்டை */
+/* பாணி 2: Middle band */
 function promoBand(text,u,DU,fx,fy,fw,fh){
   const IN=.5,OUT=.45,sk=34;
   const pin=ease(u/IN),pg=ease((u-.08)/IN),po=u>DU-OUT?ease((u-(DU-OUT))/OUT):0;

@@ -2,7 +2,7 @@
    - சொந்தக் கோப்புகள்: எப்போதும் புதியது (சர்வரிடம் 304 சரிபார்ப்பு மட்டும் — முழு பதிவிறக்கம் இல்லை);
      இணையம் மெதுவாக இருந்தாலோ இல்லாவிட்டாலோ சேமித்த நகல் உடனே
    - CDN நூலகங்கள் (pdf.js, mp4-muxer, qrcode) & எழுத்துருக்கள்: ஒருமுறை பதிவிறக்கி, பிறகு உடனே / ஆஃப்லைனிலும் */
-const VER='np-v13',LIB='np-lib-v1';
+const VER='np-v14',LIB='np-lib-v1';
 const CORE=['./','index.html','settings.html','news.html','book.html',
   'settings.css','articles.css','manifest.json','icon.svg','icon-192.png','icon-512.png',
   'media-store.js','video-lib.js','pager.js','articles-config.js','article-store.js','cutout.js','articles.js','posts.js','market.js','banner.js',

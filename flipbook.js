@@ -88,17 +88,17 @@
       '<div class="fb-pg fb-L"></div><div class="fb-pg fb-R"></div>' +
       '<div class="fb-sh fb-shL"></div><div class="fb-sh fb-shR"></div>' +
       '<div class="fb-leaf"></div></div></div></div>' +
-      '<button class="fb-nav fb-prev" type="button" aria-label="முந்தைய பக்கம்">‹</button>' +
-      '<button class="fb-nav fb-next" type="button" aria-label="அடுத்த பக்கம்">›</button>' +
-      '<div class="fb-thumbs" role="listbox" aria-label="பக்கங்கள்"></div>' +
-      '<div class="fb-bar"><input class="fb-prog" type="range" min="0" max="0" value="0" aria-label="பக்கம்">' +
-      '<div class="fb-row"><div class="fb-grp"><button class="fb-btn fb-bTh" type="button" aria-label="பக்கப் படங்கள்">' + I.grid + '</button></div>' +
+      '<button class="fb-nav fb-prev" type="button" aria-label="Previous page">‹</button>' +
+      '<button class="fb-nav fb-next" type="button" aria-label="Next page">›</button>' +
+      '<div class="fb-thumbs" role="listbox" aria-label="Pages"></div>' +
+      '<div class="fb-bar"><input class="fb-prog" type="range" min="0" max="0" value="0" aria-label="Page">' +
+      '<div class="fb-row"><div class="fb-grp"><button class="fb-btn fb-bTh" type="button" aria-label="Page thumbnails">' + I.grid + '</button></div>' +
       '<div class="fb-pgn" aria-live="polite">0 / 0</div>' +
-      '<div class="fb-grp"><button class="fb-btn fb-bZo" type="button" aria-label="சிறிதாக்கு">' + I.zout + '</button>' +
-      '<button class="fb-btn fb-bZi" type="button" aria-label="பெரிதாக்கு">' + I.zin + '</button>' +
-      '<button class="fb-btn fb-bFs" type="button" aria-label="முழுத்திரை">' + I.full + '</button>' +
-      '<button class="fb-btn fb-bSn" type="button" aria-label="ஒலி">' + I.snd + '</button>' +
-      (opt.onDownload ? '<button class="fb-btn fb-bDl" type="button" aria-label="பதிவிறக்கு"><svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 11l4.5 4.5 4.5-4.5M5 19.5h14"/></svg></button>' : '') +
+      '<div class="fb-grp"><button class="fb-btn fb-bZo" type="button" aria-label="Zoom out">' + I.zout + '</button>' +
+      '<button class="fb-btn fb-bZi" type="button" aria-label="Zoom in">' + I.zin + '</button>' +
+      '<button class="fb-btn fb-bFs" type="button" aria-label="Full screen">' + I.full + '</button>' +
+      '<button class="fb-btn fb-bSn" type="button" aria-label="Sound">' + I.snd + '</button>' +
+      (opt.onDownload ? '<button class="fb-btn fb-bDl" type="button" aria-label="Download"><svg viewBox="0 0 24 24"><path d="M12 4v11M7.5 11l4.5 4.5 4.5-4.5M5 19.5h14"/></svg></button>' : '') +
       '</div></div></div>';
     var pill = el('div', 'fb-pill'); root.appendChild(pill);
     if (opt.minimal) root.classList.add('fb-min');
@@ -491,7 +491,7 @@
     q$('.fb-bZi').onclick = function () { zoomBy(1.4); }; q$('.fb-bZo').onclick = function () { zoomBy(1 / 1.4); };
     prog.addEventListener('input', function () { var v = +prog.value; pgn.textContent = spread && v > 0 ? (v + 1) + (v + 2 <= N ? ' – ' + (v + 2) : '') + ' / ' + N : (v + 1) + ' / ' + N; });
     prog.addEventListener('change', function () { goPage(+prog.value); });
-    bSn.onclick = function () { lsSet('np_sound', soundOn() ? '0' : '1'); updateUI(); if (opt.toast) opt.toast(soundOn() ? 'புரட்டும் ஒலி: இயக்கம்' : 'புரட்டும் ஒலி: நிறுத்தம்'); };
+    bSn.onclick = function () { lsSet('np_sound', soundOn() ? '0' : '1'); updateUI(); if (opt.toast) opt.toast(soundOn() ? 'Page-turn sound: on' : 'Page-turn sound: off'); };
     if (opt.onDownload) q$('.fb-bDl').onclick = function () { opt.onDownload(); };
     bTh.onclick = function () { var on = !thumbs.classList.contains('on'); thumbs.classList.toggle('on', on); bTh.classList.toggle('act', on); if (on) { loadThumbs(); var cur = thumbs.querySelector('.on'); if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: 'center' }); } };
     if (!root.requestFullscreen && !root.webkitRequestFullscreen) bFs.style.display = 'none';
