@@ -2,7 +2,11 @@ name: Build Windows program (.exe)
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     tags: ['v*']
+concurrency:
+  group: build-windows
+  cancel-in-progress: true
 permissions:
   contents: write
 jobs:
