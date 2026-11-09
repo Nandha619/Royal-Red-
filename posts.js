@@ -103,7 +103,7 @@
     q('#pT').focus({ preventScroll: true });
   }
   window.PostBoard = {
-    mount: function (sc, hostEl, k) { if (k === 'shopping' && window.Market) { Market.mount(sc, hostEl); return; } if (window.Market) Market.unmount(sc); host = hostEl || sc.parentNode; root = sc; kind = k; C = CFG[k]; S = window.ArticleStore.forKind(k); sc.classList.add('art'); closeOv(); load(); },
-    unmount: function (sc) { if (window.Market) Market.unmount(sc); if (sc) sc.classList.remove('art'); closeOv(); }
+    mount: function (sc, hostEl, k) { if (k === 'events' && window.Banner) { if (window.Market) Market.unmount(sc); Banner.mount(sc, hostEl); return; } if (window.Banner) Banner.unmount(sc); if (k === 'shopping' && window.Market) { Market.mount(sc, hostEl); return; } if (window.Market) Market.unmount(sc); host = hostEl || sc.parentNode; root = sc; kind = k; C = CFG[k]; S = window.ArticleStore.forKind(k); sc.classList.add('art'); closeOv(); load(); },
+    unmount: function (sc) { if (window.Banner) Banner.unmount(sc); if (window.Market) Market.unmount(sc); if (sc) sc.classList.remove('art'); closeOv(); }
   };
 })();
