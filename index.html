@@ -604,6 +604,7 @@ loadPdfJs().catch(function(){});
 <script src="cutout.js"></script>
 <script src="articles.js"></script>
 <script src="posts.js"></script>
+<script src="market.js"></script>
 <script src="flipbook.js"></script>
 <script>
 const ADMIN=(()=>{try{return localStorage.getItem('np_admin_device')==='1'}catch(e){return false}})();
@@ -707,6 +708,7 @@ function openSub(){$('#subBar').classList.add('on');$('#shelfBtn').setAttribute(
 /* Books தவிர்த்த பிரிவுகள் — பார்வை மட்டும் (திருத்துதல் செட்டிங்ஸில்) */
 function renderSec(id){
   const sc=$('#sec');
+  if(id!=='shopping'&&window.Market)Market.unmount(sc);
   if(id==='article'&&window.ArticleShelf){if(window.PostBoard)PostBoard.unmount(sc);ArticleShelf.mount(sc,$('#main'));return}
   if(window.ArticleShelf)ArticleShelf.unmount(sc);
   if((id==='shopping'||id==='events')&&window.PostBoard){PostBoard.mount(sc,$('#main'),id);return}

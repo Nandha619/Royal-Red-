@@ -103,7 +103,7 @@
     q('#pT').focus({ preventScroll: true });
   }
   window.PostBoard = {
-    mount: function (sc, hostEl, k) { host = hostEl || sc.parentNode; root = sc; kind = k; C = CFG[k]; S = window.ArticleStore.forKind(k); sc.classList.add('art'); closeOv(); load(); },
-    unmount: function (sc) { if (sc) sc.classList.remove('art'); closeOv(); }
+    mount: function (sc, hostEl, k) { if (k === 'shopping' && window.Market) { Market.mount(sc, hostEl); return; } if (window.Market) Market.unmount(sc); host = hostEl || sc.parentNode; root = sc; kind = k; C = CFG[k]; S = window.ArticleStore.forKind(k); sc.classList.add('art'); closeOv(); load(); },
+    unmount: function (sc) { if (window.Market) Market.unmount(sc); if (sc) sc.classList.remove('art'); closeOv(); }
   };
 })();

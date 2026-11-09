@@ -23,7 +23,7 @@
       name: { stringValue: a.name }, role: { stringValue: a.role }, title: { stringValue: a.title },
       summary: { stringValue: a.summary }, extra: { stringValue: a.extra || '' }, body: { stringValue: a.body }, photo: { stringValue: a.photo || '' },
       cutout: { booleanValue: !!a.cutout }, status: { stringValue: a.status },
-      kind: { stringValue: a.kind || 'article' }, extra: { stringValue: a.extra || '' },
+      kind: { stringValue: a.kind || 'article' }, photos: { stringValue: a.photos || '' },
       createdAt: { integerValue: String(a.createdAt) }
     } };
   }
@@ -31,7 +31,7 @@
     var f = d.fields || {}, s = function (k) { return f[k] && f[k].stringValue != null ? f[k].stringValue : ''; };
     return {
       id: d.name.split('/').pop(), name: s('name'), role: s('role'), title: s('title'), summary: s('summary'), extra: s('extra'), body: s('body'),
-      photo: s('photo'), kind: s('kind') || 'article', extra: s('extra'), cutout: !!(f.cutout && f.cutout.booleanValue), status: s('status') || 'pending',
+      photo: s('photo'), kind: s('kind') || 'article', photos: s('photos'), cutout: !!(f.cutout && f.cutout.booleanValue), status: s('status') || 'pending',
       createdAt: f.createdAt && f.createdAt.integerValue ? +f.createdAt.integerValue : 0
     };
   }
@@ -86,7 +86,7 @@
       var r = {
         name: String(a.name || '').trim().slice(0, LIM.name), role: String(a.role || '').trim().slice(0, LIM.role),
         title: String(a.title || '').trim().slice(0, LIM.title), summary: String(a.summary || '').trim().slice(0, LIM.summary), extra: String(a.extra || '').trim().slice(0, LIM.extra),
-        body: String(a.body || '').trim().slice(0, LIM.body), photo: a.photo || '', cutout: !!a.cutout,
+        body: String(a.body || '').trim().slice(0, LIM.body), photo: a.photo || '', photos: typeof a.photos === 'string' ? a.photos.slice(0, 600000) : '', cutout: !!a.cutout,
         kind: KINDS.indexOf(a.kind) >= 0 ? a.kind : 'article', extra: String(a.extra || '').trim().slice(0, LIM.extra),
         status: 'pending', createdAt: Date.now()
       };
