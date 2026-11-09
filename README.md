@@ -25,7 +25,6 @@ Host the folder as a static site / PWA and open `index.html`.
 - `settings.css` — அனைத்து செட்டிங் பக்கங்களுக்கும் பொதுவான தோற்றம்
 - `news.html` — Mobile TV (`?mode=view` காட்சி · `?mode=settings` செட்டிங்ஸ்)
 - `book.html` — Book studio (`?mode=view` காட்சி · `?mode=settings` செட்டிங்ஸ்)
-- `bookshelf.html` — தனிப் புத்தக அலமாரி
 - `flipbook.js` — E-Paper flip-book இயந்திரம் (pdf.js படங்களை 3D strips-ஆக வளைத்துப் புரட்டும்)
 - `media-store.js` — பகிரப்பட்ட media சேமிப்பு (IndexedDB)
 - `owner-gate.js` — உரிமையாளர் உள்நுழைவு (app + settings)

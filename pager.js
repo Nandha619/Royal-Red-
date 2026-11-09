@@ -10,8 +10,8 @@
     var key, tabs, anchor;
     if ($('#essBox')) {                       /* Mobile TV */
       key = 'pg_tv'; anchor = $('#essBox'); var g = function (id) { return $('#' + id); };
-      tabs = [['✎', 'Text', [g('essBox'), g('tkBox')]], ['⬆', 'Video', [g('vidBox')]], ['🎨', 'Look', [g('subZoom'), g('subWm'), g('subTheme'), g('subCardPh')]],
-        ['⚙', 'More', [g('subOut'), g('subBulk'), g('subMore'), g('subPromo'), g('subCombo')]]];
+      tabs = [['✎', 'Text', [g('essBox'), g('tkBox')]], ['⬆', 'Video', [g('vidBox'), g('renderNote')]], ['🎨', 'Look', [g('subZoom'), g('subWm'), g('subTheme'), g('subCardPh')]],
+        ['⚙', 'More', [g('subOut'), g('subBulk'), g('subMore'), g('subOnce')]]];
       var mh = $('.moreh'); if (mh) mh.style.display = 'none';
     } else if ($('.panels')) {                /* Books */
       key = 'pg_bk'; anchor = $('.panels').firstElementChild;
