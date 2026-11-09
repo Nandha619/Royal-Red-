@@ -3,7 +3,7 @@
 (function () {
   'use strict';
   var S, root, host, all = [], cat = 'all', q = '';
-  var CATS = [['car', '🚗', 'கார்'], ['bike', '🏍', 'பைக்'], ['mobile', '📱', 'மொபைல்'], ['home', '🏠', 'வீடு / நிலம்'], ['elec', '📺', 'மின்னணு'], ['furn', '🛋', 'வீட்டுப் பொருள்'], ['other', '🛒', 'மற்றவை']];
+  var CATS = [['car', '🚗', 'கார்'], ['bike', '🏍', 'பைக்'], ['mobile', '📱', 'மொபைல்'], ['rent', '🏠', 'வாடகை வீடு'], ['elec', '📺', 'மின்னணு'], ['furn', '🛋', 'வீட்டுப் பொருள்'], ['other', '🛒', 'மற்றவை']];
   var CN = {}; CATS.forEach(function (c) { CN[c[0]] = c; });
   function h(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
   function css() {
@@ -27,6 +27,8 @@
       '.mk-ci{position:relative;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:#1b2340;display:grid;place-items:center;font-size:40px;transition:transform .15s}.mk-card:active .mk-ci{transform:scale(.97)}' +
       '.mk-ci img{width:100%;height:100%;object-fit:cover}.mk-ci b{position:absolute;left:6px;bottom:6px;background:rgba(11,16,32,.88);color:var(--g);border-radius:8px;padding:3px 8px;font-size:13px;font-weight:800}' +
       '.mk-ct{margin-top:6px;font-size:13px;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.mk-cl{color:var(--m);font-size:11px;margin-top:2px}' +
+      '.mk-hot{margin:16px 12px 0;border-radius:18px;padding:12px 0 12px;box-shadow:0 8px 24px rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,200,61,.55)}.mk-hot .mk-rs{padding:0 12px 4px}.mk-hot .mk-card{width:150px}' +
+      '.mk-hh{display:flex;align-items:center;gap:10px;padding:0 12px 10px}.mk-hh h2{font:800 20px/1.1 inherit!important}.mk-hh small{color:#ffe9a8}.mk-hi2{font-size:34px}.mk-hadd{margin-left:auto;height:34px;padding:0 14px;border-radius:99px;border:0;background:#ffc83d;color:#1a0f0a!important;font-weight:800}.mk-hn{margin:0 12px;padding:16px;border:2px dashed rgba(255,255,255,.4);border-radius:12px;text-align:center;color:#fff;font-size:13px}' +
       '.mk-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0 12px}.mk-grid .mk-card{width:auto}' +
       '.mk-empty{margin:40px 20px;text-align:center;color:var(--m)}.mk-empty b{display:block;color:var(--t);font-size:17px;margin-bottom:6px}' +
       '.mk-fab{position:fixed;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);z-index:30;display:flex;gap:8px;align-items:center;height:50px;padding:0 22px;border-radius:99px;border:0;background:linear-gradient(180deg,#e02a2a,#b3121a);color:#fff;font-weight:800;font-size:15px;box-shadow:0 8px 22px rgba(215,25,32,.5)}' +
@@ -62,6 +64,16 @@
     var r = h('section', 'mk-row'), hd = h('div', 'mk-rh'); hd.appendChild(h('h2', '', title)); hd.appendChild(h('small', '', list.length + ' விளம்பரம்')); r.appendChild(hd);
     var s = h('div', grid ? 'mk-grid' : 'mk-rs'); list.forEach(function (m) { s.appendChild(card(m)); }); r.appendChild(s); return r;
   }
+  var HOT = ['car', 'bike', 'rent'];
+  var HOTC = { car: ['#7d0b12', '#d71920'], bike: ['#0a1f5c', '#2455d6'], rent: ['#06371f', '#0f8a4b'] };
+  function hot(c, list) {
+    var w = h('section', 'mk-hot'), g = HOTC[c[0]]; w.style.background = 'linear-gradient(135deg,' + g[0] + ',' + g[1] + ')';
+    var hd = h('div', 'mk-hh'); hd.appendChild(h('span', 'mk-hi2', c[1])); var t = h('div'); t.appendChild(h('h2', '', c[2])); t.appendChild(h('small', '', list.length ? list.length + ' விளம்பரம்' : 'இன்னும் இல்லை')); hd.appendChild(t);
+    var ad = h('button', 'mk-hadd', '＋ சேர்க்க'); ad.type = 'button'; ad.onclick = function () { form(c[0]); }; hd.appendChild(ad); w.appendChild(hd);
+    if (list.length) { var s2 = h('div', 'mk-rs'); list.forEach(function (m) { s2.appendChild(card(m)); }); w.appendChild(s2); }
+    else w.appendChild(h('div', 'mk-hn', c[2] + ' விற்க / வாடகைக்கு விட வேண்டுமா? “＋ சேர்க்க” தொடவும்.'));
+    return w;
+  }
   var heroT = null;
   function draw() {
     clearInterval(heroT); root.innerHTML = ''; root.classList.add('mk');
@@ -70,7 +82,7 @@
     root.appendChild(h('div', 'mk-hero-w')); var cs = h('div', 'mk-cats');
     [['all', '✨', 'அனைத்தும்']].concat(CATS).forEach(function (c) { var b = h('button', 'mk-cat' + (cat === c[0] ? ' on' : '')); b.type = 'button'; b.innerHTML = '<i>' + c[1] + '</i><span>' + c[2] + '</span>'; b.onclick = function () { cat = c[0]; draw(); }; cs.appendChild(b); });
     root.appendChild(cs); root.appendChild(h('div', 'mk-body'));
-    var fab = h('button', 'mk-fab', '＋ விற்க'); fab.type = 'button'; fab.onclick = form; root.appendChild(fab);
+    var fab = h('button', 'mk-fab', '＋ விற்க'); fab.type = 'button'; fab.onclick = function () { form(); }; root.appendChild(fab);
     body();
   }
   function nm() { var n = {}; try { n = JSON.parse(localStorage.getItem('np_tabs') || '{}') || {}; } catch (e) {} return n.shopping || ''; }
@@ -79,7 +91,7 @@
     var L = all.filter(function (m) { return (cat === 'all' || m.cat === cat) && (!q || (m.a.title + ' ' + m.loc + ' ' + m.det + ' ' + m.a.summary).toLowerCase().indexOf(q) >= 0); });
     if (!all.length) { var e = h('div', 'mk-empty'); e.appendChild(h('b', '', 'இன்னும் விளம்பரங்கள் இல்லை')); e.append('கார், பைக், மொபைல் எதுவானாலும் “＋ விற்க” தொட்டு முதலில் சேர்க்கலாம் — நிர்வாகி ஒப்புதல் அளித்ததும் இங்கே தெரியும்.'); b.appendChild(e); return; }
     if (!L.length) { var e2 = h('div', 'mk-empty'); e2.appendChild(h('b', '', 'எதுவும் கிடைக்கவில்லை')); e2.append('வேறு பிரிவு அல்லது சொல்லைத் தேர்வு செய்யவும்.'); b.appendChild(e2); return; }
-    var feat = L.filter(function (m) { return m.imgs[0]; }).slice(0, 5);
+    var feat = [];
     if (feat.length && !q) {
       var hero = h('div', 'mk-hero'), im = h('img'), hi = h('div', 'mk-hi'), dots = h('div', 'mk-dots'), k = 0;
       hero.appendChild(im); hero.appendChild(dots); hero.appendChild(hi);
@@ -89,8 +101,7 @@
       hw.appendChild(h('div', '')); hw.firstChild.style.height = '4px'; hw.appendChild(hero);
     }
     if (cat === 'all' && !q) {
-      b.appendChild(row('🔥 புதியவை', L.slice(0, 10)));
-      CATS.forEach(function (c) { var l = L.filter(function (m) { return m.cat === c[0]; }); if (l.length) b.appendChild(row(c[1] + ' ' + c[2], l)); });
+      CATS.forEach(function (c) { var l = L.filter(function (m) { return m.cat === c[0]; }); if (HOT.indexOf(c[0]) >= 0) b.appendChild(hot(c, l)); else if (l.length) b.appendChild(row(c[1] + ' ' + c[2], l)); });
     } else b.appendChild(row((cat === 'all' ? '🔍 முடிவுகள்' : CN[cat][1] + ' ' + CN[cat][2]), L, true));
   }
   function ov() { closeOv(); var o = h('div', 'mk-ov'); host.appendChild(o); return o; }
@@ -122,7 +133,7 @@
       im.onerror = function () { URL.revokeObjectURL(u); rej(new Error('படத்தைப் படிக்க முடியவில்லை')); }; im.src = u;
     });
   }
-  function form() {
+  function form(pre) {
     var o = ov(), bar = h('div', 'mk-bar'), bk = h('button', 'mk-back', '✕'); bk.type = 'button'; bk.onclick = closeOv; bar.appendChild(bk); bar.appendChild(h('b', '', '＋ விளம்பரம் சேர்க்க')); o.appendChild(bar);
     var fm = h('div', 'mk-fm'), imgs = [], busy = false, t0 = Date.now(), L = S.limits;
     fm.innerHTML = '<div><div class="mk-ph" id="mP"></div><small style="color:#9aa4bd">📷 முதல் படம் முகப்புப் படம் — அதிகபட்சம் 4</small></div>' +
@@ -136,7 +147,7 @@
       '<label>கைபேசி எண் *<input id="mR" type="tel" inputmode="tel" maxlength="15"></label>' +
       '<input class="mk-hp" id="mH" tabindex="-1" autocomplete="off" aria-hidden="true"><div class="mk-er" id="mE" role="alert"></div>' +
       '<button class="mk-go" id="mS" type="button">சமர்ப்பிக்கவும்</button><small style="color:#9aa4bd">நிர்வாகி ஒப்புதல் அளித்த பிறகே விளம்பரம் அனைவருக்கும் தெரியும்.' + (S.mode === 'local' ? ' (சோதனை முறை: இந்தச் சாதனத்தில் மட்டும்.)' : '') + '</small>';
-    o.appendChild(fm); var Q = function (s) { return fm.querySelector(s); }, er = function (m) { Q('#mE').textContent = m || ''; };
+    o.appendChild(fm); if (pre) fm.querySelector('#mC').value = pre; var Q = function (s) { return fm.querySelector(s); }, er = function (m) { Q('#mE').textContent = m || ''; };
     function ph() {
       var w = Q('#mP'); w.innerHTML = '';
       imgs.forEach(function (d, i) { var t = h('div', 't'), im = h('img'); im.src = d; t.appendChild(im); var x = h('u', '', '✕'); x.onclick = function () { imgs.splice(i, 1); ph(); }; t.appendChild(x); w.appendChild(t); });
