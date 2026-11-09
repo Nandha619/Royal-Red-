@@ -41,6 +41,7 @@ html,body{margin:0}
   <div class="st-head">
     <a class="st-back" id="back" href="index.html">← Back</a>
     <h1>⚙ Settings</h1>
+    <button type="button" id="brBtn" class="st-bright" title="Bright / Dark" aria-label="Bright or dark mode">☀</button>
     <button type="button" id="instBtn" hidden style="border:0;border-radius:10px;padding:8px 12px;font:inherit;font-size:12px;font-weight:800;background:#d71920;color:#fff;cursor:pointer">⬇ Install app</button>
     <div class="st-mode" id="edMode" role="group" aria-label="Editor layout"><button type="button" data-m="mobile" aria-pressed="false">📱 Mobile</button><button type="button" data-m="desktop" aria-pressed="false">🖥 Computer</button></div>
     <span data-owner-slot style="display:flex;align-items:center"></span>
@@ -296,7 +297,10 @@ html,body{margin:0}
   openTab((location.hash || '').slice(1) || 'epaper', false);
 })();
 </script>
-<script>(function(){var ev=null,b=document.getElementById('instBtn');if(!b)return;
+<script>(function(){var bb=document.getElementById('brBtn');function ap(){var on=false;try{on=localStorage.getItem('tk_bright')==='1'}catch(e){}document.documentElement.classList.toggle('bright',on);bb.textContent=on?'🌙':'☀';[].forEach.call(document.querySelectorAll('iframe'),function(f){try{f.contentWindow.postMessage({bright:on},'*')}catch(e){}})}
+bb.onclick=function(){var on=false;try{on=localStorage.getItem('tk_bright')==='1';localStorage.setItem('tk_bright',on?'0':'1')}catch(e){}ap()};ap();addEventListener('load',function(){setTimeout(ap,600)});document.addEventListener('load',function(e){if(e.target&&e.target.tagName==='IFRAME')setTimeout(ap,200)},true);
+})();
+(function(){var ev=null,b=document.getElementById('instBtn');if(!b)return;
 var standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;if(standalone)return;
 addEventListener('beforeinstallprompt',function(e){e.preventDefault();ev=e;b.hidden=false});
 if(/iphone|ipad|ipod/i.test(navigator.userAgent))b.hidden=false;
