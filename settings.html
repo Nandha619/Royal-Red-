@@ -31,6 +31,20 @@ html,body{margin:0}
 .st-sec[open]>summary::after{content:'▴'}
 .st-sec>summary b{color:var(--s-acc);font-size:12px}
 .st-sec>.st-native{padding:0 4px 8px}
+.yt-prev{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:var(--s-r);overflow:hidden;border:1px solid var(--s-line)}
+.yt-prev iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.yt-prev.off:after{content:"Nothing to preview yet";position:absolute;inset:0;display:grid;place-items:center;color:#9aa3b5;font:600 12px system-ui,sans-serif}
+.sc .yt-seg{display:flex;gap:6px;flex-wrap:wrap}
+.sc .yt-seg button{flex:1 1 110px;min-height:38px}
+.sc .yt-seg button[aria-pressed=true]{background:var(--s-acc);border-color:var(--s-acc);color:#1a0f0a}
+.yt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.sc .yt-card{display:block;padding:0;min-height:0;text-align:left;overflow:hidden;position:relative;line-height:1.3}
+.sc .yt-card img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#000}
+.sc .yt-card span{display:block;padding:6px 8px 8px;font-size:11px;font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sc .yt-card small{display:block;padding:0 8px 6px;font-size:10px}
+.sc .yt-card.on{border-color:var(--s-acc);box-shadow:0 0 0 2px var(--s-acc)}
+.sc .yt-card.on:before{content:"● STREAMING";position:absolute;left:6px;top:6px;z-index:1;background:var(--s-acc);color:#1a0f0a;font:800 9px system-ui,sans-serif;padding:2px 6px;border-radius:99px}
+.sc textarea[readonly]{font:12px/1.4 ui-monospace,Consolas,monospace}
 .st-sub > iframe{display:block;width:100%;border:0;background:var(--s-bg)}
 @media (prefers-reduced-motion:reduce){.st-pane > .st-native{animation:none}}
 </style>
@@ -49,6 +63,7 @@ html,body{margin:0}
   <nav class="st-tabs" id="tabs" role="tablist" aria-label="Settings sections">
     <button class="st-tab" role="tab" data-t="epaper" type="button">📰 E-Paper</button>
     <button class="st-tab" role="tab" data-t="tv" type="button">📺 Mobile TV</button>
+    <button class="st-tab" role="tab" data-t="yt" type="button">▶ YouTube</button>
     <button class="st-tab" role="tab" data-t="shelf" type="button">📚 Book Shelf</button>
     <button class="st-tab" role="tab" data-t="share" type="button">📣 Share</button>
     <button class="st-tab" role="tab" data-t="theme" type="button">🎨 Theme</button>
@@ -93,6 +108,71 @@ html,body{margin:0}
   <!-- ===== Mobile TV (news.html?mode=settings) ===== -->
   <section class="st-pane" id="p-tv" role="tabpanel"></section>
 
+  <!-- ===== YouTube: channel · video to stream on Mobile TV ===== -->
+  <section class="st-pane" id="p-yt" role="tabpanel">
+    <div class="st-native">
+      <div class="sc">
+        <h2>▶ Stream on Mobile TV</h2>
+        <label class="toggle"><span>Show YouTube on the Mobile TV page</span><input type="checkbox" id="ytOn"></label>
+        <div class="st-kv"><span>Now streaming</span><b id="ytNow">Nothing chosen yet</b></div>
+        <div class="yt-prev" id="ytPrevBox"><iframe id="ytPrev" title="YouTube preview" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>
+        <p class="note" id="ytMsg">Choose what to stream below. The player above is only a preview.</p>
+      </div>
+
+      <div class="sc">
+        <h2>1 · What to stream</h2>
+        <div class="yt-seg" id="ytMode" role="group" aria-label="What to stream">
+          <button type="button" data-m="video" aria-pressed="true">🎬 Chosen video</button>
+          <button type="button" data-m="uploads" aria-pressed="false">🆕 Latest uploads</button>
+          <button type="button" data-m="live" aria-pressed="false">🔴 Live stream</button>
+        </div>
+        <p class="note" id="ytModeNote"></p>
+      </div>
+
+      <div class="sc">
+        <h2>2 · Your channel</h2>
+        <label>Channel link, @handle or channel ID
+          <input id="ytChan" placeholder="https://www.youtube.com/@yourchannel" autocomplete="off" autocapitalize="off" spellcheck="false">
+        </label>
+        <div class="st-row">
+          <button type="button" class="st-btn primary" id="ytConnect">🔗 Connect channel</button>
+          <button type="button" class="alt" id="ytDisc">✖ Disconnect</button>
+        </div>
+        <div class="st-kv"><span>Connected channel</span><b id="ytChName">—</b></div>
+        <details class="st-sec"><summary>🔑 API key <small>needed to list your videos and to use an @handle</small></summary><div class="st-native">
+          <label>YouTube Data API key
+            <input id="ytKey" type="password" placeholder="AIza…" autocomplete="off" spellcheck="false">
+          </label>
+          <p class="note">Optional. Create one free in Google Cloud Console (YouTube Data API v3) and limit it to your website address. It is saved on this device only and is never part of the public config. Without a key you can still paste a video link, stream the latest uploads or the live stream if you enter the channel ID (starts with UC).</p>
+          <div class="st-row"><button type="button" class="alt" id="ytKeySave">Save key</button></div>
+        </div></details>
+      </div>
+
+      <div class="sc" id="ytVidBox">
+        <h2>3 · Pick the video <small id="ytCount"></small></h2>
+        <div class="st-row"><button type="button" class="alt" id="ytLoad">↻ Load my videos</button></div>
+        <div class="yt-grid" id="ytGrid"></div>
+        <p class="note" id="ytGridNote">Tap a video to stream it on Mobile TV.</p>
+        <label>Or paste any YouTube video link
+          <input id="ytLink" placeholder="https://www.youtube.com/watch?v=…" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="url">
+        </label>
+        <div class="st-row"><button type="button" class="st-btn primary" id="ytUse">✔ Use this video</button></div>
+      </div>
+
+      <div class="sc">
+        <h2>Player options</h2>
+        <label class="toggle"><span>Start muted (needed for auto-play; viewers tap “sound”)</span><input type="checkbox" id="ytMute"></label>
+        <label class="toggle"><span>Repeat the video</span><input type="checkbox" id="ytLoop"></label>
+      </div>
+
+      <details class="st-sec"><summary>🌐 Public config <small>make this choice the default for every visitor</small></summary><div class="st-native">
+        <p class="note">Your choice is saved on this device. Visitors on other phones see what is set in <b>youtube-config.js</b> on the website. Copy this and send it to whoever updates the site (it contains no API key).</p>
+        <textarea id="ytPub" rows="9" readonly></textarea>
+        <div class="st-row"><button type="button" class="alt" id="ytCopy">⧉ Copy</button></div>
+      </div></details>
+    </div>
+  </section>
+
   <!-- ===== Book Shelf: Books · Articles · Shopping · Events (ஒரே வடிவமைப்பில் துணைத் தாவல்கள்) ===== -->
   <section class="st-pane" id="p-shelf" role="tabpanel">
     <nav class="st-subtabs" id="subtabs" role="tablist" aria-label="Book Shelf sections" hidden></nav>
@@ -134,6 +214,119 @@ html,body{margin:0}
 <script src="media-store.js"></script>
 <script src="video-lib.js"></script>
 <script src="share-hub.js"></script>
+<script src="youtube-config.js"></script>
+<script src="yt.js"></script>
+<script>
+/* ---------- ▶ YouTube tab: channel · what to stream on Mobile TV ---------- */
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  var mounted = false, vids = [], msgT = 0, chanDirty = false;
+  var NOTE = {
+    video: 'Streams the one video you pick in step 3.',
+    uploads: 'Streams your channel’s latest uploads one after another — no need to pick. Needs the channel ID or a connected channel.',
+    live: 'Streams your channel’s current live stream (when you are live). Needs the channel ID or a connected channel.'
+  };
+  function msg(t, bad) { var m = $('#ytMsg'); m.textContent = t; m.style.color = bad ? '#ff8a8a' : ''; clearTimeout(msgT); }
+  function save(p) { var c = YT.set(p); render(); return c; }
+
+  function render() {
+    var c = YT.get(), ready = YT.ready(c), lab = YT.label(c);
+    $('#ytOn').checked = c.on;
+    $('#ytNow').textContent = lab || 'Nothing chosen yet';
+    if (!chanDirty) $('#ytChan').value = c.channel || '';
+    $('#ytChName').textContent = c.channelId ? c.channelId : '—';
+    $('#ytMute').checked = c.mute; $('#ytLoop').checked = c.loop;
+    [].forEach.call(document.querySelectorAll('#ytMode button'), function (b) { b.setAttribute('aria-pressed', b.dataset.m === c.mode ? 'true' : 'false'); });
+    $('#ytModeNote').textContent = NOTE[c.mode];
+    $('#ytVidBox').style.display = c.mode === 'video' ? '' : 'none';
+    $('#ytPub').value = YT.publicConfig();
+    if (c.on && !ready) msg('Streaming is ON but nothing is chosen yet — Mobile TV will keep showing the studio video.', true);
+    drawGrid(c);
+    preview(c);
+  }
+  function preview(c) {
+    var box = $('#ytPrevBox'), f = $('#ytPrev'), u = YT.embedUrl(c, { autoplay: false });
+    box.classList.toggle('off', !u);
+    if (!u) { f.removeAttribute('src'); return; }
+    if (f.getAttribute('src') !== u) f.src = u;
+  }
+  function drawGrid(c) {
+    var g = $('#ytGrid'); g.innerHTML = '';
+    $('#ytCount').textContent = vids.length ? '(' + vids.length + ')' : '';
+    vids.forEach(function (v) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'yt-card' + (v.id === c.videoId ? ' on' : '');
+      var im = document.createElement('img'); im.alt = ''; im.loading = 'lazy'; im.src = YT.thumb(v.id);
+      var s = document.createElement('span'); s.textContent = v.title;
+      var d = document.createElement('small'); d.textContent = v.date;
+      b.appendChild(im); b.appendChild(s); b.appendChild(d);
+      b.onclick = function () { save({ mode: 'video', videoId: v.id, title: v.title }); msg('✔ “' + v.title + '” will stream on Mobile TV'); };
+      g.appendChild(b);
+    });
+    $('#ytGridNote').textContent = vids.length ? 'Tap a video to stream it on Mobile TV.' : 'No list yet. Connect your channel (with an API key) and tap “Load my videos”, or paste a link below.';
+  }
+  function connect() {
+    var raw = $('#ytChan').value.trim(), ref = YT.channelRef(raw);
+    if (!ref) { msg('Enter your channel link, @handle or channel ID', true); return Promise.resolve(); }
+    if (ref.id) {
+      chanDirty = false;
+      save({ channel: raw, channelId: ref.id });
+      msg('✔ Channel connected');
+      return YT.apiKey() ? YT.resolveChannel(ref).then(function (r) { save({ channel: r.title || raw }); return loadVideos(); }).catch(function () {}) : Promise.resolve();
+    }
+    if (!YT.apiKey()) { msg('An @handle needs an API key (below). Or paste the channel link that contains /channel/UC… — or just the channel ID.', true); return Promise.resolve(); }
+    msg('Connecting…');
+    return YT.resolveChannel(ref).then(function (r) { chanDirty = false; save({ channel: r.title || raw, channelId: r.id }); msg('✔ Connected: ' + (r.title || r.id)); return loadVideos(); })
+      .catch(function (e) { msg('⚠ ' + e.message, true); });
+  }
+  function loadVideos() {
+    var c = YT.get();
+    if (!c.channelId) { msg('Connect your channel first', true); return Promise.resolve(); }
+    if (!YT.apiKey()) { msg('Add an API key to list your videos — or paste a video link below', true); return Promise.resolve(); }
+    msg('Loading videos…');
+    return YT.listVideos(c.channelId, 30).then(function (l) { vids = l; render(); msg(l.length ? '✔ ' + l.length + ' videos loaded' : 'No public videos found'); })
+      .catch(function (e) { msg('⚠ ' + e.message, true); });
+  }
+  function useLink() {
+    var id = YT.videoId($('#ytLink').value);
+    if (!id) { msg('That does not look like a YouTube video link', true); return; }
+    save({ mode: 'video', videoId: id, title: '' });
+    msg('✔ Video chosen');
+    YT.titleOf(id).then(function (t) { if (t && YT.get().videoId === id) save({ title: t }); });
+    $('#ytLink').value = '';
+  }
+
+  function mount() {
+    if (!mounted) {
+      mounted = true;
+      $('#ytOn').onchange = function (e) {
+        var c = save({ on: e.target.checked });
+        msg(c.on ? (YT.ready(c) ? '✔ Mobile TV will stream YouTube' : 'Streaming ON — now choose what to stream', !YT.ready(c)) : 'Mobile TV shows the studio video again');
+      };
+      $('#ytMode').onclick = function (e) { var b = e.target.closest('button'); if (!b) return; var c = save({ mode: b.dataset.m }); if (!YT.ready(c)) msg(c.mode === 'video' ? 'Pick a video below' : 'Enter your channel link or ID first', true); else msg('✔ Saved'); };
+      $('#ytConnect').onclick = connect;
+      $('#ytChan').oninput = function () { chanDirty = true; };
+      $('#ytDisc').onclick = function () { vids = []; chanDirty = false; save({ channel: '', channelId: '' }); msg('Channel disconnected'); };
+      $('#ytLoad').onclick = loadVideos;
+      $('#ytUse').onclick = useLink;
+      $('#ytLink').onkeydown = function (e) { if (e.key === 'Enter') useLink(); };
+      $('#ytChan').onkeydown = function (e) { if (e.key === 'Enter') connect(); };
+      $('#ytKey').value = YT.apiKey();
+      $('#ytKeySave').onclick = function () { YT.setApiKey($('#ytKey').value); msg($('#ytKey').value.trim() ? '✔ API key saved on this device' : 'API key removed'); };
+      $('#ytMute').onchange = function (e) { save({ mute: e.target.checked }); };
+      $('#ytLoop').onchange = function (e) { save({ loop: e.target.checked }); };
+      $('#ytCopy').onclick = function () {
+        var t = $('#ytPub'); t.select();
+        try { navigator.clipboard.writeText(t.value).then(function () { msg('✔ Copied'); }, function () { document.execCommand('copy'); msg('✔ Copied'); }); } catch (e) { try { document.execCommand('copy'); msg('✔ Copied'); } catch (x) {} }
+      };
+    }
+    render();
+    if (YT.get().channelId && YT.apiKey() && !vids.length) loadVideos();
+  }
+  function leave() { var f = $('#ytPrev'); if (f && f.getAttribute('src')) f.removeAttribute('src'); }
+  window.__yt = { mount: mount, leave: leave };
+})();
+</script>
 <script>
 (function () {
   'use strict';
@@ -158,7 +351,7 @@ html,body{margin:0}
   }
   /* முன்னோட்டம் தேவைப்படும் பகுதிகள் (Mobile TV / Books தங்களுக்குள் preview வைத்துள்ளன) */
   function prevView() {
-    if (cur === 'tv') return '';
+    if (cur === 'tv' || cur === 'yt') return '';
     if (cur === 'shelf') return '';
     return cur === 'share' ? 'books' : 'paper';
   }
@@ -181,13 +374,13 @@ html,body{margin:0}
   addEventListener('resize', function () { autoEd(); syncPrev(); });
 
   /* ---------- தாவல்கள் ---------- */
-  var TABS = ['epaper', 'tv', 'shelf', 'share', 'theme'];
+  var TABS = ['epaper', 'tv', 'yt', 'shelf', 'share', 'theme'];
   var SUBS = ['books'];          /* Book Shelf பிரிவுகள் — அனைத்தும் ஒரே பக்கத்தில் */
   var SUBVIEW = { books: 'books', posts: 'article' };
   var SUBDEF = { books: ['📚', 'Books'], posts: ['📥', 'Posts'] };
   var OLDSUB = { articles: 'article', shopping: 'shopping', events: 'events' };   /* பழைய இணைப்புகள் → ஒருங்கிணைந்த பெட்டி */
   var pendingN = 0;
-  var VIEW_OF = { epaper: 'paper', tv: 'tv', shelf: 'books', share: 'paper', theme: 'paper' };
+  var VIEW_OF = { epaper: 'paper', tv: 'tv', yt: 'tv', shelf: 'books', share: 'paper', theme: 'paper' };
   var SRC = { tv: 'news.html?mode=settings' };
   var cur = '', sub = 'books', wantKind = null;
   function tabNames() { try { return JSON.parse(ls.get('np_tabs') || '{}') || {}; } catch (e) { return {}; } }
@@ -234,6 +427,7 @@ html,body{margin:0}
     try { if (push !== false) history.replaceState(null, '', '#' + (id === 'shelf' ? sub : id)); } catch (e) {}
     fitFrames(); syncPrev(); window.scrollTo(0, 0);
     if (id === 'epaper') loadPdfInfo();
+    if (window.__yt) { if (id === 'yt') window.__yt.mount(); else window.__yt.leave(); }
     if (id === 'share') {
       if (window.ShareHub) { ShareHub.mount($('#shareBox')); }
       if (window.ArticleAdmin) ArticleAdmin.mountAll($('#aprBox'), wantKind);

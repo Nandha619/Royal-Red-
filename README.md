@@ -34,6 +34,7 @@ Host the folder as a static site / PWA and open `index.html`.
 - `articles-config.js` — Firebase அமைப்பு (3 மதிப்புகள்)
 - `articles-admin.js` — செட்டிங்ஸ் → Articles (அட்மின் ஒப்புதல்)
 - `cutout.js` — புகைப்படப் பின்னணி நீக்கம் (உருவம் மட்டும் PNG)
+- `yt.js` / `youtube-config.js` — YouTube: Settings → ▶ YouTube (connect channel, choose the video) and the player on the Mobile TV page. `youtube-config.js` holds the public default for all visitors (never put an API key in it)
 - `sw.js` — service worker
 
 ## Articles அமைப்பு (எல்லோரும் எழுத · அட்மின் ஒப்புதல்)
