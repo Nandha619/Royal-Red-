@@ -226,9 +226,16 @@ html,body{background:#000}
 #modeBtn:active{animation:none;transform:scale(.95)}
 @media (prefers-reduced-motion:reduce){#modeBtn,#modeBtn .ico{animation:none}}
 #bar{position:relative}
-#subBar{display:none;position:absolute;left:8px;right:8px;top:calc(100% + 6px);z-index:30;gap:6px;padding:8px;border-radius:14px;background:var(--panel,#fff);border:1px solid var(--line,#ececec);box-shadow:0 10px 28px rgba(0,0,0,.45);overflow-x:auto;scrollbar-width:none}
+#subBar{display:none;position:absolute;left:8px;right:8px;bottom:calc(100% + 6px);z-index:30;gap:6px;padding:8px;border-radius:14px;background:var(--panel,#fff);border:1px solid var(--line,#ececec);box-shadow:0 10px 28px rgba(0,0,0,.45);overflow-x:auto;scrollbar-width:none}
 #subBar.on{display:flex;animation:dropIn2 .22s ease}
-@keyframes dropIn2{from{opacity:0;transform:translateY(-8px)}}
+/* ===== options bar moved to the BOTTOM ===== */
+#main{order:1}
+#bar{order:2;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(0deg,var(--red,#d71920),var(--deep,#7e0910));box-shadow:0 -4px 14px rgba(0,0,0,.35)}
+#bar:after{bottom:auto;top:-3px}
+@media (max-width:480px){#bar{padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}}
+#ytShare{bottom:14px}
+#toast{bottom:100px}
+@keyframes dropIn2{from{opacity:0;transform:translateY(8px)}}
 #subBar button{flex:1 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;border-radius:11px;padding:8px 10px;min-width:72px;font:inherit;font-size:12px;font-weight:800;background:var(--field,#f3f3f3);color:var(--fg,#101010);cursor:pointer;white-space:nowrap}
 #subBar button .ico{font-size:20px;line-height:1}
 #subBar button.on{background:var(--red);color:var(--on,#fff)}
