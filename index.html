@@ -680,6 +680,12 @@ addEventListener('message',e=>{
   if(!d)return;
   const vd=d.info&&d.info.videoData;
   if(vd&&vd.video_id&&/^[\w-]{11}$/.test(vd.video_id))ytVid={id:vd.video_id,title:String(vd.title||'')};
+  /* newest Short found → play just that one on repeat (no playlist, so no next / previous buttons) */
+  if(ytVid&&YT.get().mode==='latest'&&yfr.dataset.single!=='1'){
+    yfr.dataset.single='1';
+    yfr.src=YT.embedUrl(YT.get(),{vid:ytVid.id,mute:ytQuiet});
+    return;
+  }
   if(d.event==='onError'&&!ytAll){ytAll=true;yfr.remove();yfr=null;tvRender('tv');return}   /* no Shorts list for this channel → fall back to all uploads */
   const ended=(d.event==='onStateChange'&&d.info===0)||(d.event==='infoDelivery'&&d.info&&d.info.playerState===0);
   if(ended&&YT.get().mode==='latest'&&Date.now()-ytEnd>2000){ytEnd=Date.now();ytCmd('playVideoAt',[0])}

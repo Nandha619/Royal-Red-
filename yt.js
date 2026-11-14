@@ -55,6 +55,10 @@
     try { if (/^https?:$/.test(location.protocol)) q.push('origin=' + encodeURIComponent(location.origin)); } catch (e) {}
     var base = 'https://www.youtube.com/embed/';
     if (c.mode === 'live') return c.channelId ? base + 'live_stream?channel=' + c.channelId + '&' + q.join('&') : '';
+    if (c.mode === 'latest' && /^[\w-]{11}$/.test(opt.vid || '')) {   /* the newest Short on its own: native repeat, no playlist buttons */
+      q.push('loop=1', 'playlist=' + opt.vid);
+      return base + opt.vid + '?' + q.join('&');
+    }
     if (c.mode === 'latest') {   /* newest Short of the channel first */
       if (!c.channelId) return '';
       q.push('list=' + (opt.all ? 'UU' : 'UUSH') + c.channelId.slice(2));   /* UUSH = Shorts only (newest first); UU = every upload */
