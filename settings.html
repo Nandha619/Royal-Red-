@@ -120,17 +120,17 @@ html,body{margin:0}
       </div>
 
       <div class="sc">
-        <h2>1 · What to stream</h2>
+        <h2>2 · What to stream</h2>
         <div class="yt-seg" id="ytMode" role="group" aria-label="What to stream">
-          <button type="button" data-m="video" aria-pressed="true">🎬 Chosen video</button>
-          <button type="button" data-m="uploads" aria-pressed="false">🆕 Latest uploads</button>
+          <button type="button" data-m="latest" aria-pressed="true">🆕 Latest upload (auto)</button>
+          <button type="button" data-m="video" aria-pressed="false">🎬 Chosen video</button>
           <button type="button" data-m="live" aria-pressed="false">🔴 Live stream</button>
         </div>
         <p class="note" id="ytModeNote"></p>
       </div>
 
       <div class="sc">
-        <h2>2 · Your channel</h2>
+        <h2>1 · Your channel</h2>
         <label>Channel link, @handle or channel ID
           <input id="ytChan" placeholder="https://www.youtube.com/@yourchannel" autocomplete="off" autocapitalize="off" spellcheck="false">
         </label>
@@ -223,8 +223,8 @@ html,body{margin:0}
   var $ = function (s) { return document.querySelector(s); };
   var mounted = false, vids = [], msgT = 0, chanDirty = false;
   var NOTE = {
+    latest: 'Default. Mobile TV always plays the newest video you uploaded to your channel (Shorts too) — upload a new Short on YouTube and it appears here by itself. Needs the channel connected.',
     video: 'Streams the one video you pick in step 3.',
-    uploads: 'Streams your channel’s latest uploads one after another — no need to pick. Needs the channel ID or a connected channel.',
     live: 'Streams your channel’s current live stream (when you are live). Needs the channel ID or a connected channel.'
   };
   function msg(t, bad) { var m = $('#ytMsg'); m.textContent = t; m.style.color = bad ? '#ff8a8a' : ''; clearTimeout(msgT); }
@@ -270,13 +270,13 @@ html,body{margin:0}
     if (!ref) { msg('Enter your channel link, @handle or channel ID', true); return Promise.resolve(); }
     if (ref.id) {
       chanDirty = false;
-      save({ channel: raw, channelId: ref.id });
+      save({ channel: raw, channelId: ref.id, on: true });
       msg('✔ Channel connected');
-      return YT.apiKey() ? YT.resolveChannel(ref).then(function (r) { save({ channel: r.title || raw }); return loadVideos(); }).catch(function () {}) : Promise.resolve();
+      return YT.apiKey() ? YT.resolveChannel(ref).then(function (r) { save({ channel: r.title || raw, on: true }); return loadVideos(); }).catch(function () {}) : Promise.resolve();
     }
     if (!YT.apiKey()) { msg('An @handle needs an API key (below). Or paste the channel link that contains /channel/UC… — or just the channel ID.', true); return Promise.resolve(); }
     msg('Connecting…');
-    return YT.resolveChannel(ref).then(function (r) { chanDirty = false; save({ channel: r.title || raw, channelId: r.id }); msg('✔ Connected: ' + (r.title || r.id)); return loadVideos(); })
+    return YT.resolveChannel(ref).then(function (r) { chanDirty = false; save({ channel: r.title || raw, channelId: r.id, on: true }); msg('✔ Connected: ' + (r.title || r.id)); return loadVideos(); })
       .catch(function (e) { msg('⚠ ' + e.message, true); });
   }
   function loadVideos() {
@@ -303,7 +303,7 @@ html,body{margin:0}
         var c = save({ on: e.target.checked });
         msg(c.on ? (YT.ready(c) ? '✔ Mobile TV will stream YouTube' : 'Streaming ON — now choose what to stream', !YT.ready(c)) : 'Mobile TV shows the studio video again');
       };
-      $('#ytMode').onclick = function (e) { var b = e.target.closest('button'); if (!b) return; var c = save({ mode: b.dataset.m }); if (!YT.ready(c)) msg(c.mode === 'video' ? 'Pick a video below' : 'Enter your channel link or ID first', true); else msg('✔ Saved'); };
+      $('#ytMode').onclick = function (e) { var b = e.target.closest('button'); if (!b) return; var c = save({ mode: b.dataset.m }); if (!YT.ready(c)) msg(c.mode === 'video' ? 'Pick a video below' : 'Connect your channel first (step 1)', true); else msg('✔ Saved'); };
       $('#ytConnect').onclick = connect;
       $('#ytChan').oninput = function () { chanDirty = true; };
       $('#ytDisc').onclick = function () { vids = []; chanDirty = false; save({ channel: '', channelId: '' }); msg('Channel disconnected'); };

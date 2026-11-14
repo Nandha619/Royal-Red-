@@ -4,14 +4,14 @@
 (function () {
   'use strict';
   var KEY = 'tk_yt', KAPI = 'tk_yt_api';
-  var DEF = { on: false, mode: 'video', channel: '', channelId: '', videoId: '', title: '', mute: true, loop: true };
+  var DEF = { on: false, mode: 'latest', channel: '', channelId: '', videoId: '', title: '', mute: true, loop: true };
   var PUB = ['on', 'mode', 'channel', 'channelId', 'videoId', 'title', 'mute', 'loop'];
 
   function jget(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
   function clean(c) {
     var o = {};
     o.on = !!c.on;
-    o.mode = c.mode === 'uploads' || c.mode === 'live' ? c.mode : 'video';
+    o.mode = c.mode === 'video' || c.mode === 'live' ? c.mode : 'latest';   /* 'uploads' (old) = 'latest' */
     o.channel = String(c.channel || '').slice(0, 200);
     o.channelId = /^UC[\w-]{22}$/.test(c.channelId || '') ? c.channelId : '';
     o.videoId = /^[\w-]{11}$/.test(c.videoId || '') ? c.videoId : '';
@@ -54,9 +54,9 @@
     try { if (/^https?:$/.test(location.protocol)) q.push('origin=' + encodeURIComponent(location.origin)); } catch (e) {}
     var base = 'https://www.youtube.com/embed/';
     if (c.mode === 'live') return c.channelId ? base + 'live_stream?channel=' + c.channelId + '&' + q.join('&') : '';
-    if (c.mode === 'uploads') {
+    if (c.mode === 'latest') {   /* the channel's uploads playlist always starts with the newest upload (Shorts included) */
       if (!c.channelId) return '';
-      q.push('list=UU' + c.channelId.slice(2)); if (c.loop) q.push('loop=1');
+      q.push('list=UU' + c.channelId.slice(2));
       return base + 'videoseries?' + q.join('&');
     }
     if (!c.videoId) return '';
@@ -66,7 +66,7 @@
   function label(c) {
     c = c || get();
     if (c.mode === 'live') return c.channelId ? 'Channel live stream' : '';
-    if (c.mode === 'uploads') return c.channelId ? 'Latest uploads (auto)' : '';
+    if (c.mode === 'latest') return c.channelId ? 'Latest upload (auto)' : '';
     return c.videoId ? (c.title || 'Video ' + c.videoId) : '';
   }
 

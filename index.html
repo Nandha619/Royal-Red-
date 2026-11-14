@@ -656,6 +656,7 @@ function tvRender(v){
       if(yfr)yfr.remove();
       yfr=document.createElement('iframe');yfr.className='ytf';yfr.title='YouTube';yfr.dataset.u=url;
       yfr.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';yfr.allowFullscreen=true;yfr.src=url;
+      yfr.onload=()=>{try{yfr.contentWindow.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'https://www.youtube.com')}catch(e){}};
       tv.insertBefore(yfr,tv.firstChild);ytUnmuted=false;
     }
   }else{
@@ -667,6 +668,15 @@ function tvRender(v){
   mu.hidden=!(tvSrc==='yt'&&YT.get().mute&&!ytUnmuted);
 }
 function ytCmd(f,a){try{yfr.contentWindow.postMessage(JSON.stringify({event:'command',func:f,args:a||[]}),'https://www.youtube.com')}catch(e){}}
+/* Latest-upload mode: when the newest video ends, replay it (the playlist would otherwise move on to older ones) */
+let ytEnd=0;
+addEventListener('message',e=>{
+  if(e.origin!=='https://www.youtube.com'||!yfr||e.source!==yfr.contentWindow)return;
+  let d=e.data;if(typeof d==='string'){try{d=JSON.parse(d)}catch(x){return}}
+  if(!d)return;
+  const ended=(d.event==='onStateChange'&&d.info===0)||(d.event==='infoDelivery'&&d.info&&d.info.playerState===0);
+  if(ended&&YT.get().mode==='latest'&&Date.now()-ytEnd>2000){ytEnd=Date.now();ytCmd('playVideoAt',[0])}
+});
 $('#ytSw').onclick=()=>{tvSrc=tvSrc==='yt'?'studio':'yt';tvRender('tv')};
 $('#ytMute').onclick=()=>{if(!yfr)return;ytCmd('unMute');ytCmd('setVolume',[100]);ytCmd('playVideo');ytUnmuted=true;$('#ytMute').hidden=true};
 function show(v){

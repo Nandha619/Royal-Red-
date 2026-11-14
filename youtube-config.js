@@ -4,7 +4,7 @@
    Never put an API key in this file. */
 window.YT_DEFAULT = {
   on: false,          // true = Mobile TV streams YouTube
-  mode: 'video',      // 'video' (chosen video) | 'uploads' (latest uploads of the channel) | 'live' (channel live stream)
+  mode: 'latest',     // 'latest' (newest upload of the channel, auto) | 'video' (chosen video) | 'live' (channel live stream)
   channel: '',        // channel link / @handle as typed
   channelId: '',      // UC… channel ID
   videoId: '',        // chosen video ID (11 characters)
