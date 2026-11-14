@@ -50,7 +50,7 @@
     c = c || get(); opt = opt || {};
     var q = ['playsinline=1', 'rel=0', 'modestbranding=1', 'enablejsapi=1'];
     if (opt.autoplay !== false) q.push('autoplay=1');
-    if (c.mute && opt.autoplay !== false) q.push('mute=1');
+    if (opt.mute && opt.autoplay !== false) q.push('mute=1');   /* only when the browser would block sound autoplay */
     try { if (/^https?:$/.test(location.protocol)) q.push('origin=' + encodeURIComponent(location.origin)); } catch (e) {}
     var base = 'https://www.youtube.com/embed/';
     if (c.mode === 'live') return c.channelId ? base + 'live_stream?channel=' + c.channelId + '&' + q.join('&') : '';

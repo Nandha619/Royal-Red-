@@ -161,7 +161,6 @@ html,body{margin:0}
 
       <div class="sc">
         <h2>Player options</h2>
-        <label class="toggle"><span>Start muted (needed for auto-play; viewers tap “sound”)</span><input type="checkbox" id="ytMute"></label>
         <label class="toggle"><span>Repeat the video</span><input type="checkbox" id="ytLoop"></label>
       </div>
 
@@ -236,7 +235,7 @@ html,body{margin:0}
     $('#ytNow').textContent = lab || 'Nothing chosen yet';
     if (!chanDirty) $('#ytChan').value = c.channel || '';
     $('#ytChName').textContent = c.channelId ? c.channelId : '—';
-    $('#ytMute').checked = c.mute; $('#ytLoop').checked = c.loop;
+    $('#ytLoop').checked = c.loop;
     [].forEach.call(document.querySelectorAll('#ytMode button'), function (b) { b.setAttribute('aria-pressed', b.dataset.m === c.mode ? 'true' : 'false'); });
     $('#ytModeNote').textContent = NOTE[c.mode];
     $('#ytVidBox').style.display = c.mode === 'video' ? '' : 'none';
@@ -313,7 +312,6 @@ html,body{margin:0}
       $('#ytChan').onkeydown = function (e) { if (e.key === 'Enter') connect(); };
       $('#ytKey').value = YT.apiKey();
       $('#ytKeySave').onclick = function () { YT.setApiKey($('#ytKey').value); msg($('#ytKey').value.trim() ? '✔ API key saved on this device' : 'API key removed'); };
-      $('#ytMute').onchange = function (e) { save({ mute: e.target.checked }); };
       $('#ytLoop').onchange = function (e) { save({ loop: e.target.checked }); };
       $('#ytCopy').onclick = function () {
         var t = $('#ytPub'); t.select();
