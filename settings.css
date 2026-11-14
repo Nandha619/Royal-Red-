@@ -272,3 +272,11 @@ html.m-settings .exp{padding:10px 12px}
 html.m-settings .exp h2{font-size:15px;margin:0}
 html.m-settings .body,html.m-settings .subb{gap:6px}
 html.m-settings .stage .phone{max-width:min(100%,240px)}
+
+/* ===== section tabs moved to the BOTTOM (same as the main page) ===== */
+.st-page{padding-bottom:calc(58px + env(safe-area-inset-bottom,0px))}
+#tabs.st-tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;gap:4px;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));background:linear-gradient(0deg,#7d0b12 0%,#b3121a 70%,#d71920 100%);border-top:3px solid #ffc83d;box-shadow:0 -4px 16px rgba(0,0,0,.5)}
+#tabs .st-tab{min-height:40px;border-radius:10px;border-bottom-color:transparent}
+#tabs .st-tab[aria-selected=true]{border-radius:10px}
+.st-top{border-bottom:3px solid #ffc83d}
+@media (min-width:700px){#tabs.st-tabs{justify-content:center}}

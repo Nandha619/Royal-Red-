@@ -60,14 +60,6 @@ html,body{margin:0}
     <div class="st-mode" id="edMode" role="group" aria-label="Editor layout"><button type="button" data-m="mobile" aria-pressed="false">📱 Mobile</button><button type="button" data-m="desktop" aria-pressed="false">🖥 Computer</button></div>
     <span data-owner-slot style="display:flex;align-items:center"></span>
   </div>
-  <nav class="st-tabs" id="tabs" role="tablist" aria-label="Settings sections">
-    <button class="st-tab" role="tab" data-t="epaper" type="button">📰 E-Paper</button>
-    <button class="st-tab" role="tab" data-t="tv" type="button">📺 Mobile TV</button>
-    <button class="st-tab" role="tab" data-t="yt" type="button">▶ YouTube</button>
-    <button class="st-tab" role="tab" data-t="shelf" type="button">📚 Book Shelf</button>
-    <button class="st-tab" role="tab" data-t="share" type="button">📣 Share</button>
-    <button class="st-tab" role="tab" data-t="theme" type="button">🎨 Theme</button>
-  </nav>
 </header>
 
 <main class="st-body">
@@ -203,6 +195,16 @@ html,body{margin:0}
   </aside>
 
 </main>
+
+<!-- section tabs: bottom bar -->
+<nav class="st-tabs" id="tabs" role="tablist" aria-label="Settings sections">
+    <button class="st-tab" role="tab" data-t="epaper" type="button">📰 E-Paper</button>
+    <button class="st-tab" role="tab" data-t="tv" type="button">📺 Mobile TV</button>
+    <button class="st-tab" role="tab" data-t="yt" type="button">▶ YouTube</button>
+    <button class="st-tab" role="tab" data-t="shelf" type="button">📚 Book Shelf</button>
+    <button class="st-tab" role="tab" data-t="share" type="button">📣 Share</button>
+    <button class="st-tab" role="tab" data-t="theme" type="button">🎨 Theme</button>
+  </nav>
 <div class="st-toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="theme.js"></script>
@@ -391,7 +393,7 @@ html,body{margin:0}
     });
   }
   function fitFrames() {
-    var h = Math.max(240, innerHeight - $('#top').offsetHeight - ($('#subtabs').offsetHeight || 0));
+    var h = Math.max(240, innerHeight - $('#top').offsetHeight - $('#tabs').offsetHeight - ($('#subtabs').offsetHeight || 0));
     [].forEach.call(document.querySelectorAll('.st-pane > iframe, .st-sub > iframe'), function (f) { f.style.height = h + 'px'; });
   }
   function openSub(k) {
