@@ -20,11 +20,17 @@
     o.loop = c.loop !== false;
     return o;
   }
-  function get() { return clean(Object.assign({}, DEF, window.YT_DEFAULT || {}, jget(KEY) || {})); }
+  /* Only what the owner changed on this device is stored (and only from this version on), so the website's
+     default (youtube-config.js) is never hidden by an old, full copy saved earlier. */
+  function local() { var o = jget(KEY); return o && o._v === 2 ? o : {}; }
+  function get() {
+    var l = local(), o = {}; Object.keys(l).forEach(function (k) { if (k !== '_v') o[k] = l[k]; });
+    return clean(Object.assign({}, DEF, window.YT_DEFAULT || {}, o));
+  }
   function set(patch) {
-    var c = clean(Object.assign(get(), patch || {}));
-    try { localStorage.setItem(KEY, JSON.stringify(c)); } catch (e) {}
-    return c;
+    var l = local(); l._v = 2; Object.keys(patch || {}).forEach(function (k) { l[k] = patch[k]; });
+    try { localStorage.setItem(KEY, JSON.stringify(l)); } catch (e) {}
+    return get();
   }
   function apiKey() { try { return (localStorage.getItem(KAPI) || '').trim(); } catch (e) { return ''; } }
   function setApiKey(k) { try { if (k) localStorage.setItem(KAPI, String(k).trim()); else localStorage.removeItem(KAPI); } catch (e) {} }
