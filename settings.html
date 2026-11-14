@@ -100,6 +100,9 @@ html,body{margin:0}
   <!-- ===== Mobile TV (news.html?mode=settings) ===== -->
   <section class="st-pane" id="p-tv" role="tabpanel"></section>
 
+  <!-- ===== News Card: editable news poster ===== -->
+  <section class="st-pane" id="p-card" role="tabpanel"><div id="cardBox"></div></section>
+
   <!-- ===== YouTube: channel · video to stream on Mobile TV ===== -->
   <section class="st-pane" id="p-yt" role="tabpanel">
     <div class="st-native">
@@ -201,6 +204,7 @@ html,body{margin:0}
     <button class="st-tab" role="tab" data-t="epaper" type="button">📰 E-Paper</button>
     <button class="st-tab" role="tab" data-t="tv" type="button">📺 Mobile TV</button>
     <button class="st-tab" role="tab" data-t="yt" type="button">▶ YouTube</button>
+    <button class="st-tab" role="tab" data-t="card" type="button">🗞 News Card</button>
     <button class="st-tab" role="tab" data-t="shelf" type="button">📚 Book Shelf</button>
     <button class="st-tab" role="tab" data-t="share" type="button">📣 Share</button>
     <button class="st-tab" role="tab" data-t="theme" type="button">🎨 Theme</button>
@@ -217,6 +221,7 @@ html,body{margin:0}
 <script src="share-hub.js"></script>
 <script src="youtube-config.js"></script>
 <script src="yt.js"></script>
+<script src="newscard.js"></script>
 <script>
 /* ---------- ▶ YouTube tab: channel · what to stream on Mobile TV ---------- */
 (function () {
@@ -351,7 +356,7 @@ html,body{margin:0}
   }
   /* முன்னோட்டம் தேவைப்படும் பகுதிகள் (Mobile TV / Books தங்களுக்குள் preview வைத்துள்ளன) */
   function prevView() {
-    if (cur === 'tv' || cur === 'yt') return '';
+    if (cur === 'tv' || cur === 'yt' || cur === 'card') return '';
     if (cur === 'shelf') return '';
     return cur === 'share' ? 'books' : 'paper';
   }
@@ -374,13 +379,13 @@ html,body{margin:0}
   addEventListener('resize', function () { autoEd(); syncPrev(); });
 
   /* ---------- தாவல்கள் ---------- */
-  var TABS = ['epaper', 'tv', 'yt', 'shelf', 'share', 'theme'];
+  var TABS = ['epaper', 'tv', 'yt', 'card', 'shelf', 'share', 'theme'];
   var SUBS = ['books'];          /* Book Shelf பிரிவுகள் — அனைத்தும் ஒரே பக்கத்தில் */
   var SUBVIEW = { books: 'books', posts: 'article' };
   var SUBDEF = { books: ['📚', 'Books'], posts: ['📥', 'Posts'] };
   var OLDSUB = { articles: 'article', shopping: 'shopping', events: 'events' };   /* பழைய இணைப்புகள் → ஒருங்கிணைந்த பெட்டி */
   var pendingN = 0;
-  var VIEW_OF = { epaper: 'paper', tv: 'tv', yt: 'tv', shelf: 'books', share: 'paper', theme: 'paper' };
+  var VIEW_OF = { epaper: 'paper', tv: 'tv', yt: 'tv', card: 'tv', shelf: 'books', share: 'paper', theme: 'paper' };
   var SRC = { tv: 'news.html?mode=settings' };
   var cur = '', sub = 'books', wantKind = null;
   function tabNames() { try { return JSON.parse(ls.get('np_tabs') || '{}') || {}; } catch (e) { return {}; } }
@@ -427,6 +432,7 @@ html,body{margin:0}
     try { if (push !== false) history.replaceState(null, '', '#' + (id === 'shelf' ? sub : id)); } catch (e) {}
     fitFrames(); syncPrev(); window.scrollTo(0, 0);
     if (id === 'epaper') loadPdfInfo();
+    if (id === 'card' && window.NewsCard && !$('#cardBox').firstChild) NewsCard.mount($('#cardBox'));
     if (window.__yt) { if (id === 'yt') window.__yt.mount(); else window.__yt.leave(); }
     if (id === 'share') {
       if (window.ShareHub) { ShareHub.mount($('#shareBox')); }

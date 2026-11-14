@@ -141,7 +141,7 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
   <div class="row">
     <button id="bCombo" class="gold" type="button">⬇ Make MP4</button>
     <button id="bPlay" class="alt">▶ Preview</button>
-    <button id="bCard" class="alt">🖼 Card</button>
+    <button id="bCard" class="alt" hidden>🖼 Card</button>
   </div>
   <div id="st">Ready. 1080×1920 · 30 FPS</div><small id="net"></small>
   <div class="bar" aria-hidden="true"><div id="xProg"></div></div>
@@ -187,7 +187,7 @@ html.m-view #vInfo{display:block;position:fixed;left:50%;bottom:calc(env(safe-ar
       <small>The sound of your uploaded video is always kept in the MP4.</small>
     </div>
   </details>
-  <details class="sub" id="subCardPh">
+  <details class="sub" id="subCardPh" hidden>
     <summary>Card photos <small>only for the news-card poster</small></summary>
     <div class="subb">
       <label>Photos for this news <small>used by the News card, not by the video</small><input type="file" id="fMedia" accept="video/*,image/*" multiple><small id="mInfo"></small></label>
