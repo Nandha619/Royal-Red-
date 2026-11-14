@@ -62,11 +62,18 @@ html,body{background:#000}
 #tv.on,#bk.on,#lib.on{display:block;animation:fade .3s}#sec.on{display:block;animation:fade .3s;overflow:auto;padding:16px;background:var(--bg,#fffdf0);color:var(--fg,#101010)}
 @keyframes fade{from{opacity:0;transform:translateY(8px)}}
 #tv iframe,#bk iframe,#lib iframe{width:100%;height:100%;border:0;background:var(--bg,#fffdf0)}
-#tv iframe.ytf{background:#000}
-#ytSw{position:absolute;z-index:3;border:1px solid rgba(255,255,255,.55);border-radius:99px;background:rgba(0,0,0,.62);color:#fff;font:800 12px/1 inherit;font-family:inherit;padding:8px 14px;min-height:34px;cursor:pointer;backdrop-filter:blur(3px);box-shadow:0 2px 10px rgba(0,0,0,.4)}
-#ytSw[hidden]{display:none}
-#ytSw{right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 64px);opacity:.8}
-#ytSw:hover,#ytSw:active{opacity:1}
+#tv{overflow:hidden}
+/* the YouTube player is taller than the frame so its title/branding strips fall outside and are cropped; taps pass through it */
+#tv iframe.ytf{position:absolute;left:0;top:-80px;width:100%;height:calc(100% + 160px);background:#000;pointer-events:none}
+#ytShare{position:absolute;z-index:3;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 64px);width:46px;height:46px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.55);color:#fff;cursor:pointer;display:grid;place-items:center;backdrop-filter:blur(3px);box-shadow:0 2px 10px rgba(0,0,0,.45)}
+#ytShare[hidden]{display:none}
+#ytShare svg{width:22px;height:22px;display:block}
+#ytShare:active{transform:scale(.92)}
+#ytShMenu{position:absolute;z-index:4;left:0;right:0;bottom:0;padding:12px 12px calc(env(safe-area-inset-bottom,0px) + 14px);background:#fff;color:#101010;border-radius:16px 16px 0 0;box-shadow:0 -8px 28px rgba(0,0,0,.5);display:grid;gap:8px}
+#ytShMenu[hidden]{display:none}
+#ytShMenu b{font-size:13px;text-align:center}
+#ytShMenu button{border:0;border-radius:10px;padding:12px;font:inherit;font-size:14px;font-weight:800;background:#f3f3f3;color:#101010;cursor:pointer}
+#ytShMenu button[data-k=x]{background:transparent;color:#777}
 #sec h2{font-size:22px;color:var(--red);padding-bottom:8px;margin-bottom:12px;border-bottom:3px solid var(--red)}
 #sec .body{min-height:55vh;white-space:pre-wrap;outline:0;border:2px dashed var(--line,#e5d79a);border-radius:12px;padding:12px;font-size:16px;line-height:1.7}
 #sec .body:empty:before{content:attr(data-ph);color:#999}
@@ -584,7 +591,7 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layout);
   <div id="hint"><span><i>◀</i> Drag or tap the page edge to turn <i style="animation-direction:reverse">▶</i> &nbsp;|&nbsp; Double-tap to zoom</span></div>
   <div id="load">Loading…</div>
 </div>
-<div id="sec"></div><div id="tv"><button type="button" id="ytSw" hidden></button></div><div id="bk"></div><div id="lib"></div><div id="bkBar"><button type="button" id="bkBack" aria-label="Back to shelf" title="Shelf">←</button><button type="button" id="bkAgain" aria-label="Play again" title="Again">↻</button></div></div><div id="toast"></div>
+<div id="sec"></div><div id="tv"><button type="button" id="ytShare" hidden aria-label="Share this video" title="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button><div id="ytShMenu" hidden><b>Share this video</b><button type="button" data-k="wa">WhatsApp</button><button type="button" data-k="fb">Facebook</button><button type="button" data-k="ig">Instagram (copy link)</button><button type="button" data-k="cp">Copy link</button><button type="button" data-k="x">Close</button></div></div><div id="bk"></div><div id="lib"></div><div id="bkBar"><button type="button" id="bkBack" aria-label="Back to shelf" title="Shelf">←</button><button type="button" id="bkAgain" aria-label="Play again" title="Again">↻</button></div></div><div id="toast"></div>
 </div>
 <script>
 /* pdf.js இனி பக்கத்தைத் தடுக்காது: பின்னணியில் ஏற்றப்படும்; PDF திறக்கும் முன் loadPdfJs() காத்திருக்கும் */
@@ -637,45 +644,63 @@ const SEC_ONLY=['article','shopping','events'];
 const VIEWS=['paper','tv','books',...SEC_ONLY],SET_TAB={paper:'epaper',tv:'tv',books:'shelf',article:'articles',shopping:'shopping',events:'events'};
 let names={};try{names=JSON.parse(ls.get('np_tabs')||'{}')||{}}catch(e){}
 const secName=id=>names[id]||(SECS.find(x=>x[0]===id)||[0,id])[1];
-let view='paper',bkMode='shelf',lastBook=0,ifr=null,bifr=null,lifr=null,yfr=null,tvSrc='',ytQuiet=false;
+let view='paper',bkMode='shelf',lastBook=0,ifr=null,bifr=null,lifr=null,yfr=null,tvSrc='',ytQuiet=false,ytAll=false,ytVid=null;
 const FRAME_ALLOW='camera;microphone;fullscreen;autoplay;clipboard-write;display-capture';
 /* ---------- Mobile TV: YouTube (Settings → ▶ YouTube) or the studio template video ---------- */
 const ytOn=()=>{try{const c=window.YT&&YT.get();return !!(c&&c.on&&YT.ready(c))}catch(e){return false}};
 function tvRender(v){
-  const tv=$('#tv'),sw=$('#ytSw');
-  if(v!=='tv'){if(ifr){ifr.remove();ifr=null}if(yfr){yfr.remove();yfr=null}sw.hidden=true;return}
+  const tv=$('#tv'),sh=$('#ytShare');
+  if(v!=='tv'){if(ifr){ifr.remove();ifr=null}if(yfr){yfr.remove();yfr=null}sh.hidden=true;$('#ytShMenu').hidden=true;return}
   const has=ytOn();
-  tvSrc=has&&tvSrc!=='studio'?'yt':'studio';
+  tvSrc=has?'yt':'studio';
   if(tvSrc==='yt'){
     if(ifr){ifr.remove();ifr=null}
-    const url=YT.embedUrl(YT.get());
+    const url=YT.embedUrl(YT.get(),{all:ytAll});
     if(!yfr||yfr.dataset.u!==url){
       /* plays at once: with sound when the browser allows it (the viewer has already tapped the page), otherwise silently and the sound comes on at the first tap */
       ytQuiet=!(navigator.userActivation&&navigator.userActivation.hasBeenActive);
       if(yfr)yfr.remove();
-      yfr=document.createElement('iframe');yfr.className='ytf';yfr.title='YouTube';yfr.dataset.u=url;
-      yfr.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';yfr.allowFullscreen=true;yfr.src=YT.embedUrl(YT.get(),{mute:ytQuiet});
+      yfr=document.createElement('iframe');yfr.className='ytf';yfr.title='Video';yfr.dataset.u=url;
+      yfr.allow='autoplay; encrypted-media; picture-in-picture';yfr.src=YT.embedUrl(YT.get(),{all:ytAll,mute:ytQuiet});
       yfr.onload=()=>{try{yfr.contentWindow.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'https://www.youtube.com')}catch(e){}};
-      tv.insertBefore(yfr,tv.firstChild);
+      tv.insertBefore(yfr,tv.firstChild);ytVid=null;
     }
   }else{
     if(yfr){yfr.remove();yfr=null}
     if(!ifr){ifr=document.createElement('iframe');ifr.allow=FRAME_ALLOW;ifr.src='news.html?mode=view';tv.insertBefore(ifr,tv.firstChild)}
   }
-  sw.hidden=!has;sw.textContent=tvSrc==='yt'?'📺 Studio':'▶ YouTube';
-  sw.setAttribute('aria-label',tvSrc==='yt'?'Show the studio video':'Show YouTube');
+  sh.hidden=tvSrc!=='yt';
 }
 function ytCmd(f,a){try{yfr.contentWindow.postMessage(JSON.stringify({event:'command',func:f,args:a||[]}),'https://www.youtube.com')}catch(e){}}
-/* Latest-upload mode: when the newest video ends, replay it (the playlist would otherwise move on to older ones) */
+/* Latest Short only: repeat it when it ends (the playlist would move on to older ones); remember which video is playing for Share */
 let ytEnd=0;
 addEventListener('message',e=>{
   if(e.origin!=='https://www.youtube.com'||!yfr||e.source!==yfr.contentWindow)return;
   let d=e.data;if(typeof d==='string'){try{d=JSON.parse(d)}catch(x){return}}
   if(!d)return;
+  const vd=d.info&&d.info.videoData;
+  if(vd&&vd.video_id&&/^[\w-]{11}$/.test(vd.video_id))ytVid={id:vd.video_id,title:String(vd.title||'')};
+  if(d.event==='onError'&&!ytAll){ytAll=true;yfr.remove();yfr=null;tvRender('tv');return}   /* no Shorts list for this channel → fall back to all uploads */
   const ended=(d.event==='onStateChange'&&d.info===0)||(d.event==='infoDelivery'&&d.info&&d.info.playerState===0);
   if(ended&&YT.get().mode==='latest'&&Date.now()-ytEnd>2000){ytEnd=Date.now();ytCmd('playVideoAt',[0])}
 });
-$('#ytSw').onclick=()=>{tvSrc=tvSrc==='yt'?'studio':'yt';tvRender('tv')};
+/* Share: the video's link goes to WhatsApp / Facebook / Instagram through the phone's share sheet */
+function ytLink(){return ytVid?'https://www.youtube.com/shorts/'+ytVid.id:'https://www.youtube.com/channel/'+YT.get().channelId}
+function ytShare(){
+  const url=ytLink(),title=(ytVid&&ytVid.title)||YT.get().channel||'NEWS STUDIO';
+  if(navigator.share){navigator.share({title:title,text:title,url:url}).catch(()=>{});return}
+  $('#ytShMenu').hidden=false;
+}
+$('#ytShare').onclick=ytShare;
+$('#ytShMenu').onclick=ev=>{
+  const b=ev.target.closest('button');if(!b)return;
+  const url=ytLink(),title=(ytVid&&ytVid.title)||YT.get().channel||'NEWS STUDIO',k=b.dataset.k;
+  const go=u=>{window.open(u,'_blank','noopener')};
+  if(k==='wa')go('https://wa.me/?text='+encodeURIComponent(title+' '+url));
+  else if(k==='fb')go('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(url));
+  else if(k==='ig'||k==='cp'){try{navigator.clipboard.writeText(url)}catch(x){}toast(k==='ig'?'Link copied — paste it in Instagram':'Link copied')}
+  $('#ytShMenu').hidden=true;
+};
 document.addEventListener('pointerdown',()=>{if(yfr&&ytQuiet){ytQuiet=false;ytCmd('unMute');ytCmd('setVolume',[100])}},true);
 function show(v){
   if(!VIEWS.includes(v))v='paper';

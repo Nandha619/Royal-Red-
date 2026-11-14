@@ -49,14 +49,15 @@
   function embedUrl(c, opt) {
     c = c || get(); opt = opt || {};
     var q = ['playsinline=1', 'rel=0', 'modestbranding=1', 'enablejsapi=1'];
+    if (!opt.controls) q.push('controls=0', 'fs=0', 'disablekb=1', 'iv_load_policy=3', 'cc_load_policy=0');   /* video only — no YouTube buttons */
     if (opt.autoplay !== false) q.push('autoplay=1');
     if (opt.mute && opt.autoplay !== false) q.push('mute=1');   /* only when the browser would block sound autoplay */
     try { if (/^https?:$/.test(location.protocol)) q.push('origin=' + encodeURIComponent(location.origin)); } catch (e) {}
     var base = 'https://www.youtube.com/embed/';
     if (c.mode === 'live') return c.channelId ? base + 'live_stream?channel=' + c.channelId + '&' + q.join('&') : '';
-    if (c.mode === 'latest') {   /* the channel's uploads playlist always starts with the newest upload (Shorts included) */
+    if (c.mode === 'latest') {   /* newest Short of the channel first */
       if (!c.channelId) return '';
-      q.push('list=UU' + c.channelId.slice(2));
+      q.push('list=' + (opt.all ? 'UU' : 'UUSH') + c.channelId.slice(2));   /* UUSH = Shorts only (newest first); UU = every upload */
       return base + 'videoseries?' + q.join('&');
     }
     if (!c.videoId) return '';
@@ -66,7 +67,7 @@
   function label(c) {
     c = c || get();
     if (c.mode === 'live') return c.channelId ? 'Channel live stream' : '';
-    if (c.mode === 'latest') return c.channelId ? 'Latest upload (auto)' : '';
+    if (c.mode === 'latest') return c.channelId ? 'Latest Short (auto)' : '';
     return c.videoId ? (c.title || 'Video ' + c.videoId) : '';
   }
 

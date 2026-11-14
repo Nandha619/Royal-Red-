@@ -122,7 +122,7 @@ html,body{margin:0}
       <div class="sc">
         <h2>2 · What to stream</h2>
         <div class="yt-seg" id="ytMode" role="group" aria-label="What to stream">
-          <button type="button" data-m="latest" aria-pressed="true">🆕 Latest upload (auto)</button>
+          <button type="button" data-m="latest" aria-pressed="true">🆕 Latest Short (auto)</button>
           <button type="button" data-m="video" aria-pressed="false">🎬 Chosen video</button>
           <button type="button" data-m="live" aria-pressed="false">🔴 Live stream</button>
         </div>
@@ -222,7 +222,7 @@ html,body{margin:0}
   var $ = function (s) { return document.querySelector(s); };
   var mounted = false, vids = [], msgT = 0, chanDirty = false;
   var NOTE = {
-    latest: 'Default. Mobile TV always plays the newest video you uploaded to your channel (Shorts too) — upload a new Short on YouTube and it appears here by itself. Needs the channel connected.',
+    latest: 'Default. Mobile TV always plays your channel’s newest Short, repeating, with no YouTube buttons — upload a new Short on YouTube and it appears here by itself. Needs the channel connected.',
     video: 'Streams the one video you pick in step 3.',
     live: 'Streams your channel’s current live stream (when you are live). Needs the channel ID or a connected channel.'
   };
@@ -245,7 +245,7 @@ html,body{margin:0}
     preview(c);
   }
   function preview(c) {
-    var box = $('#ytPrevBox'), f = $('#ytPrev'), u = YT.embedUrl(c, { autoplay: false });
+    var box = $('#ytPrevBox'), f = $('#ytPrev'), u = YT.embedUrl(c, { autoplay: false, controls: true });
     box.classList.toggle('off', !u);
     if (!u) { f.removeAttribute('src'); return; }
     if (f.getAttribute('src') !== u) f.src = u;
